@@ -4,7 +4,12 @@ import logging
 import psycopg2
 import psycopg2.extras
 from pathlib import Path
-from sentence_transformers import SentenceTransformer
+try:
+    from sentence_transformers import SentenceTransformer
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except (ImportError, OSError):
+    SentenceTransformer = None
+    SENTENCE_TRANSFORMERS_AVAILABLE = False
 
 from app.config import settings
 from app.services.segmenter import SentenceSegmenterService
@@ -212,6 +217,8 @@ class SemanticMatcher:
     @classmethod
     def get_model(cls):
         """Loads and returns the SentenceTransformer model as a singleton."""
+        if not SENTENCE_TRANSFORMERS_AVAILABLE:
+            raise RuntimeError("sentence-transformers package is not available.")
         if cls._model is None:
             cls._model = SentenceTransformer(settings.SENTENCE_TRANSFORMERS_MODEL)
         return cls._model
