@@ -21,6 +21,7 @@ from app.services.extractor import (
 from app.services.segmenter import SentenceSegmenterService
 from app.services.matcher import DualTierMatcher
 from app.services.llm import LLMService
+from app.services.analytics import DocumentAnalyticsService
 from app.tasks.celery_app import celery_app
 from app.tasks.analysis import analyze_document_task
 
@@ -257,6 +258,37 @@ async def health():
     }
 
 
+@app.get(
+    f"{settings.API_V1_STR}/system/info",
+    status_code=status.HTTP_200_OK,
+    summary="Get engine specifications and capabilities",
+    description="Returns platform capability details, allowed formats, tone options, and active algorithms."
+)
+@app.get("/api/info", include_in_schema=False)
+async def get_system_info():
+    return {
+        "project": settings.PROJECT_NAME,
+        "version": "1.1.0",
+        "description": "Local-first Plagiarism Detection and Generative Academic Rewriting Platform",
+        "capabilities": {
+            "supported_formats": [f".{ext}" for ext in settings.ALLOWED_EXTENSIONS],
+            "max_file_size_mb": settings.MAX_FILE_SIZE_MB,
+            "spacy_model": settings.SPACY_MODEL,
+            "ollama_model": settings.OLLAMA_MODEL,
+            "rewriting_tones": ["academic", "standard", "creative"],
+            "execution_mode": "Eager (Sync)" if settings.CELERY_ALWAYS_EAGER else "Celery + Redis Queue",
+            "features": [
+                "Lexical TF-IDF Cosine Similarity Engine",
+                "Semantic Vector Indexing (Sentence-Transformers + FAISS / HNSW)",
+                "Preserved Absolute Coordinate Mapping (start_char, end_char)",
+                "Readability Analytics & Flesch Metric Calculation Engine",
+                "Local Generative AI Tone Paraphraser",
+                "Publication-Ready WeasyPrint PDF Exporter"
+            ]
+        }
+    }
+
+
 # Global/lazy instance of the plagiarism matching engine
 matcher_instance = None
 
@@ -367,12 +399,16 @@ async def upload_document(file: UploadFile = File(...)):
         for s in sentences_data
     ]
     
+    # Compute readability metrics
+    metrics_data = DocumentAnalyticsService.analyze_readability(text, len(sentences))
+    
     return DocumentUploadResponse(
         filename=file.filename,
         text=text,
         char_count=len(text),
         sentence_count=len(sentences),
         sentences=sentences,
+        metrics=metrics_data,
         analysis=None
     )
 

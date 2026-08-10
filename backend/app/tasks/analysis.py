@@ -7,6 +7,7 @@ from app.tasks.celery_app import celery_app
 from app.services.extractor import DocumentExtractorService
 from app.services.segmenter import SentenceSegmenterService
 from app.services.matcher import DualTierMatcher
+from app.services.analytics import DocumentAnalyticsService
 
 logger = logging.getLogger(__name__)
 
@@ -80,6 +81,9 @@ def analyze_document_task(self, file_path: str, original_filename: str) -> dict:
         matcher = DualTierMatcher()
         analysis_report = matcher.analyze_document(sentences_data, job_id=job_id)
         
+        # Compute readability and document statistics
+        metrics = DocumentAnalyticsService.analyze_readability(text, len(sentences))
+        
         # Return complete results in the same structure as DocumentUploadResponse
         result = {
             "filename": original_filename,
@@ -87,6 +91,7 @@ def analyze_document_task(self, file_path: str, original_filename: str) -> dict:
             "char_count": len(text),
             "sentence_count": len(sentences),
             "sentences": sentences,
+            "metrics": metrics,
             "analysis": analysis_report
         }
         return result

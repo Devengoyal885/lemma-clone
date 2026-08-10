@@ -1,85 +1,91 @@
-# Lemma: Plagiarism Analysis & Academic Text Rewriting Platform
+# Lemma: Local-First Plagiarism Analysis & Academic Text Rewriting Platform
 
-Lemma is a high-performance, local-first plagiarism analysis and academic text rewriting platform. It features a decoupled client-server architecture, local vector-based NLP pipelines, asynchronous worker queues, and professional report automation.
+![Lemma Header](https://img.shields.io/badge/Lemma-v1.1.0-blueviolet?style=for-the-badge&logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi)
+![Ollama](https://img.shields.io/badge/Ollama-Local_LLM-000000?style=for-the-badge&logo=ollama)
+![PyTest](https://img.shields.io/badge/Tests-Passing-brightgreen?style=for-the-badge&logo=pytest)
+
+**Lemma** is a high-performance, local-first **Plagiarism Analysis, Document Analytics, and Generative Academic Text Rewriting Platform**. Built with a decoupled client-server architecture, local vector NLP pipelines, asynchronous Celery worker queues, and publication-grade PDF report automation, Lemma enables researchers, students, and educators to analyze document integrity and eliminate plagiarized segments while maintaining total privacy.
 
 ---
 
-## 🚀 Key Features
+## 🌟 Key Features
 
-* **Dual-Tier Plagiarism Matcher**: Combines classical lexical matching (TF-IDF + Cosine Similarity) with deep vector semantic indexing (Sentence-Transformers + local FAISS index) to detect both verbatim copy-pastes and complex paraphrasing.
-* **Precision Coordinate Mapping**: Utilizes an optimized `spaCy` tokenization pipeline to segment documents into sentences, explicitly preserving absolute character index boundaries (`start_char`, `end_char`) for exact frontend styling.
-* **Interactive 3D Visual Shell**: Features a visually stunning, premium dark-mode landing page powered by an interactive **3D Fibonacci Particle Sphere** that rotates, reacts dynamically to mouse cursor dragging/hover, and gracefully bursts and reforms.
-* **Local Generative Rewriter Workspace**: Integrates with local native `Ollama` pipelines (targeting an optimized Qwen 2.5:3B custom model) to offer document-level text rewriting supporting **Academic**, **Standard**, and **Creative** tones.
-* **Decoupled Async Architecture**: Implements `Celery` + `Redis` task queues to run document parsing loops in background workers.
-* **HTML-to-PDF Report Automation**: Generates publication-ready PDF reports with color-coded highlighted plagiarism coordinates using the `WeasyPrint` rendering engine.
+* 🔬 **Dual-Tier Plagiarism Engine**: Combines classical lexical matching (**TF-IDF + Cosine Similarity**) with deep vector semantic indexing (**Sentence-Transformers + local FAISS / Postgres pgvector / Elasticsearch**) to detect verbatim copy-pastes as well as complex structural paraphrasing.
+* 📍 **Precision Coordinate Mapping**: Utilizes an optimized `spaCy` tokenization pipeline to segment documents into sentences, explicitly preserving absolute character index boundaries (`start_char`, `end_char`) for exact frontend DOM coordinate styling and highlighting.
+* 📊 **Document Analytics & Readability Engine**: Automatically computes comprehensive linguistic stats—including **Word Count**, **Character Count**, **Average Sentence Length**, **Average Word Length**, **Flesch Reading Ease Score (0-100)**, **Grade-Level Complexity Tier**, and **Estimated Reading Time**.
+* 🤖 **Local Generative AI Rewriter**: Integrates with local native `Ollama` models (`llama3`, `qwen2.5:3b`, or `lemma-model`) to paraphrase flagged sentences into **Academic**, **Standard**, or **Creative** tones directly on your device with zero cloud API latency or data leaks.
+* 🎨 **Interactive 3D Visual Shell**: Includes a visually stunning dark-mode landing page featuring an interactive **3D Fibonacci Particle Sphere Canvas** that rotates, reacts dynamically to cursor dragging, and gracefully reforms.
+* ⚡ **Flexible Async Architecture**: Supports both a zero-dependency **Eager Mode** (synchronous single-process processing) and a full **Async Mode** powered by `Celery` + `Redis` worker queues.
+* 📄 **WeasyPrint PDF Automation**: Generates publication-ready PDF academic integrity reports complete with color-coded plagiarism highlighting, match breakdown graphs, and source references.
 
 ---
 
 ## 🛠️ Technology Stack
 
-* **Frontend**: Basic HTML5, CSS3, and Vanilla JavaScript (Minimally designed high-contrast `#000000` dark theme with glassmorphic overlays and custom Canvas animations).
-* **API Service**: FastAPI (Python) using asynchronous patterns, serving static UI assets directly.
-* **NLP & ML Pipelines**: `spaCy` (optimized tokenizer), `scikit-learn` (TF-IDF), `sentence-transformers` (all-MiniLM-L6-v2 vector embeddings), `faiss` (local vector similarity search).
-* **Workers & Cache**: Celery + Redis (supports in-memory eager mode fallback).
-* **Storage**: SQLite (Metadata and sentence mappings).
-* **Report Generation**: WeasyPrint.
+| Layer | Technology / Tool |
+|---|---|
+| **Frontend UI** | HTML5, CSS3 (Custom Stark Dark Theme & Glassmorphism), Vanilla JavaScript, Canvas 3D Physics |
+| **API Framework** | FastAPI (Python 3.10+), Pydantic v2, Asynchronous Route Handlers |
+| **NLP & ML Pipelines** | `spaCy` (en_core_web_sm), `scikit-learn` (TF-IDF), `sentence-transformers` (all-MiniLM-L6-v2), `faiss-cpu` |
+| **Task Queue & Cache** | Celery 5.3+, Redis (with eager mode fallback), SQLite / PostgreSQL metadata |
+| **PDF Generation** | WeasyPrint engine |
+| **Local LLM Runtime** | Ollama Engine (`lemma-model` custom Qwen2.5 / Llama3 prompt pipeline) |
 
 ---
 
 ## 📂 Repository Directory Structure
 
 ```
-lemma/
-├── .gitignore                   # Safe configuration to exclude local/build/binary files
-├── Modelfile                    # Optimized Ollama configurations to build lemma-model
-├── README.md                    # Project documentation
-├── pytest.ini                   # Pytest configurations
-├── requirements.txt             # Project-wide Python dependencies
-├── run.bat                      # Windows automated environment setup & run script
-├── Project Context/             # Project briefs and architecture documents
-│   ├── database_migration_summary.md
-│   ├── mission_briefing.md
-│   ├── project_understanding.md
-│   └── system_understanding.md
+lemma-clone/
+├── .gitignore                   # Excludes binaries, venv, caches, and build outputs
+├── Modelfile                    # Optimized Ollama model configuration file
+├── README.md                    # Platform documentation
+├── pytest.ini                   # Pytest suite configuration
+├── requirements.txt             # Root dependencies manifest
+├── run.bat                      # Windows setup and development runner
 ├── backend/
 │   ├── app/
 │   │   ├── __init__.py
-│   │   ├── config.py            # System configurations
-│   │   ├── main.py              # API routes & endpoint definitions
+│   │   ├── config.py            # Platform environment configuration
+│   │   ├── main.py              # FastAPI endpoints & static file hosting
 │   │   ├── data/
-│   │   │   └── mock_references.json  # Reference corpus text database for seeding
+│   │   │   └── mock_references.json  # Reference corpus text database
 │   │   ├── schemas/
-│   │   │   ├── __init__.py
-│   │   │   ├── document.py      # Pydantic schemas for document analysis
-│   │   │   └── rewrite.py       # Pydantic schemas for sentence rewriting
+│   │   │   ├── document.py      # Pydantic models for upload & metrics
+│   │   │   └── rewrite.py       # Pydantic models for text paraphrasing
 │   │   ├── services/
-│   │   │   ├── __init__.py
-│   │   │   ├── database.py      # SQLite database interaction layer
-│   │   │   ├── extractor.py     # Text extraction (PDF, DOCX, TXT)
-│   │   │   ├── llm.py           # Local Ollama client (with tone optimizations)
+│   │   │   ├── analytics.py     # Readability & document metric calculator
+│   │   │   ├── database.py      # SQLite / PostgreSQL interaction layer
+│   │   │   ├── elasticsearch_client.py # Search index client
+│   │   │   ├── extractor.py     # PDF, DOCX, TXT document parser
+│   │   │   ├── llm.py           # Local Ollama client & prompt generator
 │   │   │   ├── matcher.py       # Lexical (TF-IDF) & Semantic (FAISS) matcher
-│   │   │   ├── pdf_generator.py # PDF report compilation using WeasyPrint
-│   │   │   └── segmenter.py     # Optimized spaCy sentence segmenter
+│   │   │   ├── online_retriever.py  # Ephemeral candidate web retriever
+│   │   │   ├── pdf_generator.py # WeasyPrint PDF report renderer
+│   │   │   └── segmenter.py     # spaCy coordinate-preserving sentence segmenter
 │   │   └── tasks/
-│   │       ├── __init__.py
-│   │       ├── celery_app.py    # Celery queue instantiation & config
-│   │       └── analysis.py      # Celery asynchronous document analysis task
-│   └── tests/                   # Test suite
-│       ├── __init__.py
-│       ├── conftest.py          # Eager Celery environment configurations
-│       ├── test_async_queue.py  # Asynchronous upload & polling tests
-│       ├── test_extractor.py    # Document extractor unit tests
-│       ├── test_main.py         # FastAPI endpoint integration tests
-│       ├── test_matcher.py      # Lexical/semantic matcher tests
-│       ├── test_pdf.py          # WeasyPrint and PDF download integration tests
-│       ├── test_rewrite.py      # Mocked Ollama rewrite tests
-│       └── test_segmenter.py    # Sentence segmenter unit tests
-└── frontend/                    # Vanilla JS + Stark-Theme Frontend assets
-    ├── app.js                   # Client side polling & rewriting controller
-    ├── dashboard.html           # Plagiarism checker & Paraphraser workspaces
-    ├── index.html               # Landing Page (typewriter title, particle canvas)
-    ├── landing.js               # Landing page animation loop & 3D projection physics
-    └── style.css                # Main styling, custom blurs, and button layouts
+│   │       ├── celery_app.py    # Celery queue initialization
+│   │       └── analysis.py      # Background document processing worker
+│   └── tests/                   # Pytest test suite
+│       ├── test_analytics.py    # Unit tests for analytics service
+│       ├── test_async_queue.py  # Async upload & job polling tests
+│       ├── test_extractor.py    # Document extractor tests
+│       ├── test_main.py         # API endpoint integration tests
+│       ├── test_matcher.py      # Matcher dual-engine tests
+│       ├── test_pdf.py          # PDF generation tests
+│       ├── test_rewrite.py      # LLM rewriter tests
+│       └── test_segmenter.py    # Sentence segmenter tests
+└── frontend/                    # Modern Dark-Theme Frontend
+    ├── index.html               # Landing page with 3D Fibonacci Particle Sphere
+    ├── dashboard.html           # Document viewer, plagiarism report, & paraphraser
+    ├── config.json              # Client API connection config
+    └── assets/                  # Frontend JavaScript modules & stylesheet
+        ├── css/
+        │   └── style.css        # Custom CSS design system
+        └── js/
+            ├── app.js           # Dashboard controller & document renderer
+            └── landing.js       # 3D canvas physics animation loop
 ```
 
 ---
@@ -88,131 +94,82 @@ lemma/
 
 ### Prerequisites
 
-* **Python**: Version `3.10` or higher (successfully tested up to `3.13` and `3.14.3`).
-* **Ollama**: Download and install Ollama from [ollama.com](https://ollama.com).
+* **Python**: `3.10` or higher (tested up to `3.14`).
+* **Ollama**: Installed locally from [ollama.com](https://ollama.com).
 
-### 1. Build the Optimized Ollama Model
-To avoid CUDA Out-of-Memory (OOM) errors on local GPUs/CPUs, a custom `Modelfile` is provided to set the context size to `1024` tokens and limit the prediction output window.
-
-Open a terminal and run:
+### 1. Configure Local Ollama Model
+To run AI paraphrasing locally without memory errors, build the custom model:
 ```powershell
-# 1. Pull the default base model
+# 1. Pull base model
 ollama pull llama3
 
-# 2. Build the optimized model
+# 2. Create optimized Lemma model
 ollama create lemma-model -f Modelfile
 
-# 3. Spin up the model to verify it loads
+# 3. Test running the model
 ollama run lemma-model
 ```
 
-### 2. Configure Asynchronous Execution Modes
-Lemma supports two modes of execution:
-
-#### Option A: Zero-Dependency Eager Mode (Easiest)
-Process background analysis synchronously inside the FastAPI process, removing the need for a separate Celery terminal or Redis instance.
-1. Open `backend/app/config.py` and set `CELERY_ALWAYS_EAGER: bool = True`.
-2. Launch the FastAPI server (see below).
-
-#### Option B: Full Background Task Queue Mode (Real Async)
-1. Start your local Redis server on port 6379 (`redis-server`).
-2. Open `backend/app/config.py` and set `CELERY_ALWAYS_EAGER: bool = False`.
-3. Start the Celery worker:
-   ```powershell
-   .\venv\Scripts\celery.exe -A backend.app.tasks.celery_app.celery_app worker --loglevel=info -P solo
-   ```
-
-### 3. Launch the API Server (Windows)
-Double-click or run the root helper script to install dependencies, setup spaCy, and run uvicorn:
+### 2. Launch Development Environment (Windows)
+Run the root automated startup script:
 ```powershell
 .\run.bat
 ```
-
-### 4. Visit the Application
-* Access the **Web Interface** at: 👉 **[http://localhost:8000](http://localhost:8000)** (or go straight to **[http://localhost:8000/dashboard.html](http://localhost:8000/dashboard.html)**).
-* Access the **Swagger API Docs** at: **[http://localhost:8000/docs](http://localhost:8000/docs)**.
+This script will:
+1. Create a Python virtual environment (`venv`) if needed.
+2. Install all backend dependencies from `backend/requirements.txt`.
+3. Download the `spacy` English language model (`en_core_web_sm`).
+4. Start the FastAPI development server at `http://localhost:8000`.
 
 ---
 
-## 📡 Core API Documentation (Implemented Endpoints)
+## 📡 API Endpoint Reference
 
-### `GET /api/v1/health` (or `/health`)
-* **Purpose**: Returns operational status.
+### System & Health
 
-### `POST /api/v1/analyze` (or `/api/analyze`)
-* **Purpose**: Asynchronously ingests a `.txt`, `.docx`, or `.pdf` file. Saves it to disk, triggers a background Celery task, and immediately returns a job/task ID.
-* **Content-Type**: `multipart/form-data`
-* **Response (202 Accepted)**:
-  ```json
-  { "job_id": "7038a805-f8eb-4ae5-8f9d-f5b388e652ca", "status": "pending" }
-  ```
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/health` or `/api/v1/health` | Service health status (DB, Elasticsearch, Ollama, Celery) |
+| `GET` | `/api/info` or `/api/v1/system/info` | Platform engine specifications, capabilities, and settings |
 
-### `GET /api/v1/status/{job_id}` (or `/api/status/{job_id}`)
-* **Purpose**: Retrieves the execution state and results of a document analysis job.
-* **Response (200 OK)**:
-  * When pending: `{ "job_id": "...", "status": "pending" }`
-  * When processing: `{ "job_id": "...", "status": "processing" }`
-  * When completed: 
-    ```json
-    {
-      "job_id": "...",
-      "status": "completed",
-      "result": {
-        "filename": "essay.txt",
-        "text": "Extracted text here...",
-        "char_count": 120,
-        "sentence_count": 5,
-        "sentences": [...],
-        "analysis": {
-          "plagiarism_score": 0.2,
-          "total_sentences": 5,
-          "plagiarized_sentences_count": 1,
-          "lexical_matches_count": 1,
-          "semantic_matches_count": 0,
-          "matches": [...]
-        }
-      }
-    }
-    ```
+### Document Upload & Analysis
 
-### `POST /api/v1/rewrite` (or `/api/rewrite`)
-* **Purpose**: Paraphrases a sentence or paragraph using local LLM controls to eliminate plagiarism.
-* **Payload**:
-  ```json
-  {
-    "text": "This is a plagiarized text segment.",
-    "tone": "creative" // options: "academic" (default), "standard", "creative"
-  }
-  ```
-* **Response (200 OK)**:
-  ```json
-  {
-    "original_text": "This is a plagiarized text segment.",
-    "rewritten_text": "This represents a rewritten sentence segment."
-  }
-  ```
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/documents/upload` | Synchronously upload, extract text, segment sentences, and calculate readability metrics |
+| `POST` | `/api/analyze` or `/api/v1/analyze` | Asynchronously upload file (`.txt`, `.docx`, `.pdf`), start background analysis job, and return `job_id` |
+| `GET` | `/api/status/{job_id}` or `/api/v1/status/{job_id}` | Poll background job status and retrieve full analysis & metrics result payload |
 
-### `GET /api/v1/documents/report/{job_id}` (or `/api/report/{job_id}`)
-* **Purpose**: Generates and compiles a downloadable academic integrity PDF report highlighting plagiarism coordinate matches via WeasyPrint.
-* **Response (200 OK)**: A binary file response containing the PDF report (`application/pdf`).
+### Rewriting & Export
 
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/rewrite` or `/api/v1/rewrite` | Paraphrase sentence/paragraph using local Ollama model (`tone`: `academic`, `standard`, `creative`) |
+| `GET` | `/api/report/{job_id}` or `/api/v1/documents/report/{job_id}` | Download publication-ready PDF integrity report for completed job |
 
 ---
 
 ## 🧪 Running the Test Suite
 
-We use `pytest` for unit and integration testing. Eager mode is forced automatically in tests, removing the need for a running Redis server. Execute the test suite with:
+Run the full pytest suite with Python path configured:
 
-```bash
-.\venv\Scripts\python.exe -m pytest backend/tests/
+```powershell
+$env:PYTHONPATH="backend"
+python -m pytest backend/tests/
 ```
 
 ---
 
-## 🗺️ Build Roadmap
+## 🗺️ Roadmap & Phase Status
 
-* [x] **Phase 1**: Core Ingestion, Parsing Service & spaCy Coordinate Segmenter
-* [x] **Phase 2**: TF-IDF Matrix & Semantic Embeddings Dual Matching Engine (SQLite + FAISS storage)
-* [x] **Phase 3**: Celery Asynchronous Job Queues, Redis Integration, and Ollama Paraphraser Workspace
-* [x] **Phase 4**: Stark dark-theme Frontend with Interactive 3D Canvas and Workspace Switching
-* [x] **Phase 5**: WeasyPrint PDF Generation & End-to-End E2E Verification
+* [x] **Phase 1**: Ingestion, Parsing & spaCy Coordinate Sentence Segmenter
+* [x] **Phase 2**: Dual-Tier Lexical (TF-IDF) & Semantic (FAISS / Vector) Plagiarism Matcher
+* [x] **Phase 3**: Celery Asynchronous Processing & Ollama Generative Rewriter Workspace
+* [x] **Phase 4**: Document Analytics Engine (Flesch Readability, Word Count, Reading Time)
+* [x] **Phase 5**: Dark-Theme Dashboard UI with 3D Fibonacci Canvas & Real-Time Metrics
+* [x] **Phase 6**: WeasyPrint PDF Export & End-to-End Automated Testing
+
+---
+
+## 📄 License
+This project is open-source under the MIT License.

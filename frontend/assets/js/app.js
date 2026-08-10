@@ -37,7 +37,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Metadata Elements
     const metaChars = document.getElementById("meta-chars");
+    const metaWords = document.getElementById("meta-words");
     const metaSentences = document.getElementById("meta-sentences");
+    const metaReadability = document.getElementById("meta-readability");
+    const metaReadabilityLevel = document.getElementById("meta-readability-level");
+    const metaReadingTime = document.getElementById("meta-reading-time");
     const metaFilename = document.getElementById("meta-filename");
     const metaStatus = document.getElementById("meta-status");
 
@@ -548,6 +552,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
         metaChars.textContent = data.char_count.toLocaleString();
         metaSentences.textContent = data.sentence_count.toLocaleString();
+        
+        if (data.metrics) {
+            if (metaWords) metaWords.textContent = (data.metrics.word_count || 0).toLocaleString();
+            if (metaReadability) metaReadability.textContent = (data.metrics.flesch_reading_ease || 0).toFixed(1);
+            if (metaReadabilityLevel) metaReadabilityLevel.textContent = data.metrics.readability_level || "Standard";
+            if (metaReadingTime) metaReadingTime.textContent = `${data.metrics.reading_time_seconds || 0} sec`;
+        } else {
+            const wordCount = (data.text || "").trim().split(/\s+/).filter(Boolean).length;
+            if (metaWords) metaWords.textContent = wordCount.toLocaleString();
+            if (metaReadability) metaReadability.textContent = "N/A";
+            if (metaReadabilityLevel) metaReadabilityLevel.textContent = "Standard";
+            if (metaReadingTime) metaReadingTime.textContent = `${Math.ceil(wordCount / 3.3)} sec`;
+        }
+        
         metaStatus.innerHTML = '<span class="badge badge-dim">Segmented</span>';
 
         // Clear contents
@@ -798,7 +816,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Reset Metadata stats
         metaChars.textContent = "-";
+        if (metaWords) metaWords.textContent = "-";
         metaSentences.textContent = "-";
+        if (metaReadability) metaReadability.textContent = "-";
+        if (metaReadabilityLevel) metaReadabilityLevel.textContent = "Unanalyzed";
+        if (metaReadingTime) metaReadingTime.textContent = "-";
         metaFilename.textContent = "No file uploaded";
         metaStatus.innerHTML = '<span class="badge badge-dim">Idle</span>';
 

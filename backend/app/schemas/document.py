@@ -34,10 +34,20 @@ class PlagiarismAnalysisReport(BaseModel):
     matches: list[PlagiarismMatch] = Field(..., description="Sentence-by-sentence match details.")
 
 
+class DocumentMetrics(BaseModel):
+    word_count: int = Field(..., description="Total word count in document.")
+    char_count: int = Field(..., description="Total character count in document.")
+    avg_sentence_length: float = Field(..., description="Average words per sentence.")
+    avg_word_length: float = Field(..., description="Average character length per word.")
+    flesch_reading_ease: float = Field(..., description="Flesch Reading Ease readability score (0-100).")
+    readability_level: str = Field(..., description="Human readable text complexity tier.")
+    reading_time_seconds: int = Field(..., description="Estimated reading duration in seconds.")
+
 class DocumentUploadResponse(BaseModel):
     filename: str = Field(..., description="The name of the uploaded file.")
     text: str = Field(..., description="The full extracted text of the document.")
     char_count: int = Field(..., description="Total characters in the document.")
     sentence_count: int = Field(..., description="Total segmented sentences in the document.")
     sentences: list[SentenceCoordinate] = Field(..., description="List of sentence coordinate objects.")
+    metrics: DocumentMetrics | None = Field(None, description="Document readability and statistical metrics.")
     analysis: PlagiarismAnalysisReport | None = Field(None, description="Detailed plagiarism analysis report.")
