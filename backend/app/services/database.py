@@ -30,8 +30,13 @@ class DatabaseService:
         """Creates the PostgreSQL tables and extensions if they do not already exist."""
         with cls.get_connection() as conn:
             with conn.cursor() as cursor:
-                # Enable pgvector extension
-                cursor.execute("CREATE EXTENSION IF NOT EXISTS vector;")
+                # Try to enable pgvector extension (optional - gracefully skip if not installed)
+                pgvector_available = False
+                try:
+                    cursor.execute("CREATE EXTENSION IF NOT EXISTS vector;")
+                    pgvector_available = True
+                except Exception:
+                    conn.rollback()
                 
                 # Create documents table
                 cursor.execute("""
@@ -43,23 +48,37 @@ class DatabaseService:
                     );
                 """)
                 
-                # Create sentences table
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS sentences (
-                        id SERIAL PRIMARY KEY,
-                        document_id VARCHAR(255) NOT NULL,
-                        sentence_index INT NOT NULL,
-                        text TEXT NOT NULL,
-                        embedding vector(384),
-                        FOREIGN KEY(document_id) REFERENCES documents(id) ON DELETE CASCADE
-                    );
-                """)
-                
-                # Create HNSW index on the vector embedding column for fast cosine distance search
-                cursor.execute("""
-                    CREATE INDEX IF NOT EXISTS sentences_embedding_hnsw_idx 
-                    ON sentences USING hnsw (embedding vector_cosine_ops);
-                """)
+                # Create sentences table - use vector type if pgvector available, else TEXT
+                if pgvector_available:
+                    cursor.execute("""
+                        CREATE TABLE IF NOT EXISTS sentences (
+                            id SERIAL PRIMARY KEY,
+                            document_id VARCHAR(255) NOT NULL,
+                            sentence_index INT NOT NULL,
+                            text TEXT NOT NULL,
+                            embedding vector(384),
+                            FOREIGN KEY(document_id) REFERENCES documents(id) ON DELETE CASCADE
+                        );
+                    """)
+                    # Create HNSW index on the vector embedding column for fast cosine distance search
+                    try:
+                        cursor.execute("""
+                            CREATE INDEX IF NOT EXISTS sentences_embedding_hnsw_idx 
+                            ON sentences USING hnsw (embedding vector_cosine_ops);
+                        """)
+                    except Exception:
+                        pass
+                else:
+                    cursor.execute("""
+                        CREATE TABLE IF NOT EXISTS sentences (
+                            id SERIAL PRIMARY KEY,
+                            document_id VARCHAR(255) NOT NULL,
+                            sentence_index INT NOT NULL,
+                            text TEXT NOT NULL,
+                            embedding TEXT,
+                            FOREIGN KEY(document_id) REFERENCES documents(id) ON DELETE CASCADE
+                        );
+                    """)
             conn.commit()
 
     @classmethod

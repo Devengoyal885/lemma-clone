@@ -3,8 +3,8 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-    // API URL configuration
-    let API_BASE_URL = 'https://r4hul-78-lemma-backend.hf.space'; -icon
+    // API URL configuration - resolved by APIConfigManager
+    let API_BASE_URL = 'http://localhost:8000';
     let API_UPLOAD_URL = `${API_BASE_URL}/api/v1/documents/upload`;
     let API_ANALYZE_URL = `${API_BASE_URL}/api/v1/analyze`;
     let API_STATUS_URL = `${API_BASE_URL}/api/v1/status`;

@@ -16,3 +16,5 @@ weasyprint>=61.2
 faiss-cpu>=1.8.0
 sqlalchemy
 psycopg2-binary
+elasticsearch>=8.0.0
+

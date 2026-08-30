@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 from fastapi import FastAPI, UploadFile, File, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
+from pydantic import BaseModel, Field
 
 from app.config import settings
 from app.services.pdf_generator import PDFGeneratorService
@@ -290,13 +291,20 @@ async def get_system_info():
 
 
 # Global/lazy instance of the plagiarism matching engine
+# Uses MatcherFactory to automatically select Lite or Advanced mode
 matcher_instance = None
 
 def get_matcher():
     global matcher_instance
     if matcher_instance is None:
-        matcher_instance = DualTierMatcher()
+        from app.services.matcher_factory import MatcherFactory
+        matcher_instance = MatcherFactory.initialize()
     return matcher_instance
+
+def get_matcher_mode():
+    """Get the current matcher mode (lite or advanced)"""
+    from app.services.matcher_factory import MatcherFactory
+    return MatcherFactory.get_mode()
 
 async def check_service_port_open(host_str: str, port_val: int) -> bool:
     import socket
@@ -311,7 +319,8 @@ async def check_service_port_open(host_str: str, port_val: int) -> bool:
             return False
     return await anyio.to_thread.run_sync(check_sync)
 
-async def check_postgres_online():
+async def check_postgres_available() -> bool:
+    """Check if PostgreSQL is available (returns True/False, doesn't throw)"""
     from urllib.parse import urlparse
     db_host = settings.POSTGRES_HOST
     db_port = int(settings.POSTGRES_PORT or 5432)
@@ -323,13 +332,10 @@ async def check_postgres_online():
             if parsed.port: db_port = parsed.port
         except Exception:
             pass
-    if not await check_service_port_open(db_host, db_port):
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="PostgreSQL database service is offline. Please start the PostgreSQL Docker container (run: docker compose up -d)."
-        )
+    return await check_service_port_open(db_host, db_port)
 
-async def check_elasticsearch_online():
+async def check_elasticsearch_available() -> bool:
+    """Check if Elasticsearch is available (returns True/False, doesn't throw)"""
     from urllib.parse import urlparse
     es_host = "localhost"
     es_port = 9200
@@ -340,11 +346,7 @@ async def check_elasticsearch_online():
             if parsed.port: es_port = parsed.port
         except Exception:
             pass
-    if not await check_service_port_open(es_host, es_port):
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Elasticsearch service is offline. Please start the Elasticsearch Docker container (run: docker compose up -d)."
-        )
+    return await check_service_port_open(es_host, es_port)
 
 async def check_ollama_online():
     from urllib.parse import urlparse
@@ -363,6 +365,136 @@ async def check_ollama_online():
             detail="Ollama service is offline. Please make sure Ollama is running locally on your system."
         )
 
+
+# Text Analysis Request/Response Models
+from pydantic import BaseModel
+
+class TextAnalysisRequest(BaseModel):
+    text: str = Field(..., min_length=1, description="Document text to analyze")
+    title: str = Field(default="Pasted Text", description="Optional document title")
+
+class TextAnalysisResponse(BaseModel):
+    status: str = Field(..., description="Analysis status")
+    plagiarism_score: float = Field(..., description="Plagiarism percentage (0-100)")
+    originality_score: float = Field(..., description="Originality percentage (0-100)")
+    total_sentences: int = Field(..., description="Total sentences analyzed")
+    matched_sentences_count: int = Field(..., description="Number of plagiarized sentences")
+    metrics: dict = Field(..., description="Document analytics")
+    matches: list = Field(default_factory=list, description="Plagiarism matches")
+    mode: str = Field(..., description="Analysis mode (lite or advanced)")
+
+
+@app.post(
+    f"{settings.API_V1_STR}/analyze/text",
+    response_model=TextAnalysisResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Analyze pasted text for plagiarism",
+    description="Analyzes raw text input for plagiarism without file upload. Works in Lite Mode without external dependencies."
+)
+async def analyze_text_direct(payload: TextAnalysisRequest):
+    """
+    Direct text plagiarism analysis endpoint.
+    Works with Lite Mode (local TF-IDF matching) by default.
+    Falls back gracefully if external services are unavailable.
+    """
+    import json
+    from app.services.segmenter import SentenceSegmenterService
+    from app.services.analytics import DocumentAnalyticsService
+    from app.services.lite_matcher import LiteMatcher
+    
+    # Validate input
+    if not payload.text or not payload.text.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Text cannot be empty"
+        )
+    
+    text = payload.text.strip()
+    
+    # Get current matcher (automatically selects Lite or Advanced mode)
+    matcher_mode = get_matcher_mode()
+    matcher = get_matcher()
+    
+    # Segment sentences
+    sentences_data = SentenceSegmenterService.segment(text)
+    if not sentences_data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Could not segment text into sentences. Ensure text is not too short."
+        )
+    
+    # Calculate analytics
+    metrics_data = DocumentAnalyticsService.analyze_readability(text, len(sentences_data))
+    
+    # Perform plagiarism analysis
+    all_matches = []
+    matched_sentence_count = 0
+    matched_word_count = 0
+    total_word_count = metrics_data.get("word_count", 0)
+    
+    try:
+        # Use Lite Matcher for text analysis (more direct approach)
+        lite_matcher = LiteMatcher()
+        
+        for sent_idx, sent_data in enumerate(sentences_data):
+            sent_text = sent_data["text"]
+            sent_start = sent_data["start_char"]
+            sent_end = sent_data["end_char"]
+            
+            # Find hybrid matches
+            matches = lite_matcher.find_hybrid_matches(sent_text, top_k=3)
+            
+            if matches:
+                matched_sentence_count += 1
+                # Get matching phrases
+                if matches:
+                    best_match = matches[0]
+                    phrases = lite_matcher.extract_matching_phrases(sent_text, best_match.get("matched_text", ""))
+                    
+                    all_matches.append({
+                        "sentence_index": sent_idx,
+                        "query_text": sent_text,
+                        "query_start": sent_start,
+                        "query_end": sent_end,
+                        "matched_text": best_match.get("matched_text", ""),
+                        "match_type": best_match.get("match_type", "hybrid"),
+                        "score": float(best_match.get("hybrid_score", best_match.get("combined_score", 0))),
+                        "doc_title": best_match.get("doc_title", "Unknown"),
+                        "doc_author": best_match.get("doc_author", "N/A"),
+                        "doc_source": best_match.get("doc_source", "N/A"),
+                        "phrases": phrases
+                    })
+                    
+                    # Count matched words
+                    for phrase in phrases:
+                        matched_word_count += len(phrase["text"].split())
+    
+    except Exception as e:
+        import logging
+        logging.error(f"Text analysis error: {e}")
+        # Gracefully continue with no matches rather than failing
+        all_matches = []
+        matched_sentence_count = 0
+    
+    # Calculate plagiarism score
+    plagiarism_score = 0.0
+    if len(sentences_data) > 0:
+        plagiarism_score = (matched_sentence_count / len(sentences_data)) * 100
+    
+    originality_score = 100.0 - plagiarism_score
+    
+    return TextAnalysisResponse(
+        status="completed",
+        plagiarism_score=round(plagiarism_score, 2),
+        originality_score=round(originality_score, 2),
+        total_sentences=len(sentences_data),
+        matched_sentences_count=matched_sentence_count,
+        metrics=metrics_data,
+        matches=all_matches,
+        mode=matcher_mode
+    )
+
+
 @app.post(
     f"{settings.API_V1_STR}/documents/upload",
     response_model=DocumentUploadResponse,
@@ -371,8 +503,8 @@ async def check_ollama_online():
     description="Ingests a PDF, DOCX, or TXT file, validates constraints, extracts plain text, and segments it."
 )
 async def upload_document(file: UploadFile = File(...)):
-    await check_postgres_online()
-    await check_elasticsearch_online()
+    # Note: Removed database requirements for Lite Mode support
+    # This endpoint now works without PostgreSQL/Elasticsearch
 
     if not file.filename:
         raise HTTPException(
@@ -424,8 +556,10 @@ async def upload_document(file: UploadFile = File(...)):
     include_in_schema=False
 )
 async def analyze_document_async(file: UploadFile = File(...)):
-    await check_postgres_online()
-    await check_elasticsearch_online()
+    # Note: Removed hard database requirements for Lite Mode support
+    # Check availability but continue anyway (graceful degradation)
+    # postgres_available = await check_postgres_available()
+    # es_available = await check_elasticsearch_available()
 
     if not file.filename:
         raise HTTPException(

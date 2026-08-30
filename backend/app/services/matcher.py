@@ -26,46 +26,51 @@ def search_sentences_semantic(query_vector: list[float], k: int = 20, job_id: st
     """
     Performs cosine similarity neighbor search against pgvector.
     Returns the top K matches with document details and cosine similarity scores.
+    Returns empty list gracefully if pgvector extension is not available.
     """
     vector_str = f"[{','.join(map(str, query_vector))}]"
     
-    with DatabaseService.get_connection() as conn:
-        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
-            if job_id:
-                query = """
-                    SELECT s.text, s.document_id, s.sentence_index, d.title, d.author, d.source, (s.embedding <=> %s) AS distance
-                    FROM sentences s
-                    JOIN documents d ON s.document_id = d.id
-                    WHERE s.document_id LIKE 'ref_%%' OR s.document_id LIKE 'job_' || %s || '_%%'
-                    ORDER BY distance ASC
-                    LIMIT %s;
-                """
-                cursor.execute(query, (vector_str, job_id, k))
-            else:
-                query = """
-                    SELECT s.text, s.document_id, s.sentence_index, d.title, d.author, d.source, (s.embedding <=> %s) AS distance
-                    FROM sentences s
-                    JOIN documents d ON s.document_id = d.id
-                    ORDER BY distance ASC
-                    LIMIT %s;
-                """
-                cursor.execute(query, (vector_str, k))
+    try:
+        with DatabaseService.get_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                if job_id:
+                    query = """
+                        SELECT s.text, s.document_id, s.sentence_index, d.title, d.author, d.source, (s.embedding <=> %s) AS distance
+                        FROM sentences s
+                        JOIN documents d ON s.document_id = d.id
+                        WHERE s.document_id LIKE 'ref_%%' OR s.document_id LIKE 'job_' || %s || '_%%'
+                        ORDER BY distance ASC
+                        LIMIT %s;
+                    """
+                    cursor.execute(query, (vector_str, job_id, k))
+                else:
+                    query = """
+                        SELECT s.text, s.document_id, s.sentence_index, d.title, d.author, d.source, (s.embedding <=> %s) AS distance
+                        FROM sentences s
+                        JOIN documents d ON s.document_id = d.id
+                        ORDER BY distance ASC
+                        LIMIT %s;
+                    """
+                    cursor.execute(query, (vector_str, k))
+                    
+                rows = cursor.fetchall()
                 
-            rows = cursor.fetchall()
-            
-            results = []
-            for r in rows:
-                distance = float(r["distance"]) if r["distance"] is not None else 1.0
-                results.append({
-                    "document_id": r["document_id"],
-                    "sentence_index": r["sentence_index"],
-                    "text": r["text"],
-                    "title": r["title"],
-                    "author": r["author"],
-                    "source": r["source"],
-                    "score": 1.0 - distance  # Cosine Similarity
-                })
-            return results
+                results = []
+                for r in rows:
+                    distance = float(r["distance"]) if r["distance"] is not None else 1.0
+                    results.append({
+                        "document_id": r["document_id"],
+                        "sentence_index": r["sentence_index"],
+                        "text": r["text"],
+                        "title": r["title"],
+                        "author": r["author"],
+                        "source": r["source"],
+                        "score": 1.0 - distance  # Cosine Similarity
+                    })
+                return results
+    except Exception as e:
+        logger.warning(f"Semantic search unavailable (pgvector may not be installed): {e}")
+        return []
 
 
 def seed_database():

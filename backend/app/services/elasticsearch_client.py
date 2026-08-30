@@ -38,9 +38,8 @@ def initialize_es() -> None:
         else:
             logger.info(f"Elasticsearch index '{index_name}' already exists.")
     except Exception as e:
-        logger.error(f"Failed to initialize Elasticsearch index: {e}")
-        # Re-raise so that startup fails fast if ES is configured but unavailable
-        raise e
+        logger.warning(f"Could not initialize Elasticsearch index (ES may be offline): {e}")
+        # Do not re-raise - allow app to run with degraded BM25 functionality
 
 def index_sentence_bulk(sentences: list[dict]) -> None:
     """
