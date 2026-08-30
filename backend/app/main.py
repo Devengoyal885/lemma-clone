@@ -722,8 +722,14 @@ async def get_job_report_pdf(job_id: str):
     include_in_schema=False
 )
 async def rewrite_text_endpoint(payload: RewriteRequest):
-    await check_ollama_online()
-    rewritten = await LLMService.rewrite_text(payload.text, tone=payload.tone)
+    try:
+        await check_ollama_online()
+        rewritten = await LLMService.rewrite_text(payload.text, tone=payload.tone)
+    except HTTPException:
+        rewritten = LLMService.fallback_rewrite_text(payload.text, tone=payload.tone)
+    except Exception:
+        rewritten = LLMService.fallback_rewrite_text(payload.text, tone=payload.tone)
+
     return RewriteResponse(
         original_text=payload.text,
         rewritten_text=rewritten

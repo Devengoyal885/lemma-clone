@@ -65,3 +65,20 @@ def test_rewrite_endpoint(client: TestClient):
         data = response.json()
         assert data["original_text"] == "Original text segment to rewrite."
         assert data["rewritten_text"] == "This is the rewritten version."
+
+
+def test_rewrite_endpoint_falls_back_when_ollama_offline(client: TestClient):
+    with patch("httpx.AsyncClient.get", new_callable=AsyncMock, side_effect=Exception("offline")), \
+         patch("httpx.AsyncClient.post", new_callable=AsyncMock, side_effect=Exception("offline")):
+        response = client.post(
+            "/api/v1/rewrite",
+            json={
+                "text": "Original text segment to rewrite.",
+                "tone": "academic"
+            }
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["original_text"] == "Original text segment to rewrite."
+        assert data["rewritten_text"]
+        assert "Original text segment to rewrite." not in data["rewritten_text"]

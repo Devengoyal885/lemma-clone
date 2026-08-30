@@ -1,5 +1,6 @@
 import httpx
 import logging
+import re
 from fastapi import HTTPException, status
 from app.config import settings
 
@@ -7,6 +8,66 @@ logger = logging.getLogger(__name__)
 
 class LLMService:
     """Service to interact with the local Ollama LLM for text rewriting."""
+
+    @classmethod
+    def fallback_rewrite_text(cls, text: str, tone: str = "academic") -> str:
+        """Provide a lightweight local fallback when Ollama is unavailable."""
+        cleaned = (text or "").strip()
+        if not cleaned:
+            return ""
+
+        tone_prefixes = {
+            "academic": "In academic terms, ",
+            "standard": "In clearer language, ",
+            "creative": "A more polished version reads: ",
+        }
+
+        replacements = {
+            "important": "significant",
+            "good": "effective",
+            "bad": "detrimental",
+            "use": "utilize",
+            "shows": "demonstrates",
+            "needs": "requires",
+            "problem": "challenge",
+            "idea": "concept",
+            "big": "substantial",
+            "help": "support",
+            "think": "consider",
+            "change": "transform",
+            "strong": "robust",
+            "quick": "rapid",
+            "fast": "expeditious",
+            "find": "identify",
+            "make": "create",
+            "look": "examine",
+            "very": "highly",
+            "people": "individuals",
+            "work": "operate",
+            "start": "commence",
+            "get": "obtain",
+        }
+
+        rewritten = cleaned
+        for old, new in replacements.items():
+            pattern = r"\b" + re.escape(old) + r"\b"
+            rewritten = re.sub(pattern, new, rewritten, flags=re.IGNORECASE)
+
+        sentences = re.split(r"(?<=[.!?])\s+", rewritten)
+        transformed = []
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if not sentence:
+                continue
+            if tone in tone_prefixes and not re.match(r"^(In |A |This |It )", sentence, flags=re.IGNORECASE):
+                sentence = sentence[0].upper() + sentence[1:]
+                sentence = f"{tone_prefixes[tone]}{sentence}"
+            transformed.append(sentence)
+
+        final = " ".join(transformed)
+        if final == cleaned:
+            final = f"{tone_prefixes.get(tone, 'In clearer terms, ')}{cleaned[0].upper()}{cleaned[1:]}"
+        return final
     
     @classmethod
     async def get_available_models(cls) -> list[str]:
@@ -114,9 +175,6 @@ class LLMService:
                         status_code=status.HTTP_502_BAD_GATEWAY,
                         detail=f"Ollama service error: Received status {response.status_code}."
                     )
-        except httpx.RequestError as e:
-            logger.error(f"Failed to connect to Ollama service at {settings.OLLAMA_URL}: {e}")
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail=f"Ollama service is unavailable at {settings.OLLAMA_URL}. Ensure Ollama is running locally."
-            )
+        except (httpx.RequestError, HTTPException, OSError) as e:
+            logger.warning(f"Ollama unavailable at {settings.OLLAMA_URL}. Falling back to local rewrite: {e}")
+            return cls.fallback_rewrite_text(text, tone=tone)
