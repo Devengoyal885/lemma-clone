@@ -47,10 +47,12 @@ class Settings(BaseSettings):
     # NLP / AI Settings
     SPACY_MODEL: str = "en_core_web_sm"
     SENTENCE_TRANSFORMERS_MODEL: str = "all-MiniLM-L6-v2"
-    MOCK_DATABASE_PATH: Path = BASE_DIR / "data" / "mock_references.json"
-    LEXICAL_THRESHOLD: float = 0.70
-    SEMANTIC_THRESHOLD: float = 0.65
-    HYBRID_THRESHOLD: float = 0.60
+    REFERENCES_DIR: Path = BASE_DIR / "data" / "references"
+    REFERENCES_PATH: Path = BASE_DIR / "data" / "references" / "references.json"
+    MOCK_DATABASE_PATH: Path = BASE_DIR / "data" / "references" / "references.json"
+    LEXICAL_THRESHOLD: float = 0.50
+    SEMANTIC_THRESHOLD: float = 0.55
+    HYBRID_THRESHOLD: float = 0.50
     
     # Database Settings
     DATABASE_URL: str | None = None

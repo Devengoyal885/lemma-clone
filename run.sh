@@ -34,9 +34,9 @@ fi
 echo "[INFO] Activating virtual environment..."
 source venv/bin/activate
 
-echo "[INFO] Installing/Upgrading python dependencies from requirements.txt..."
+echo "[INFO] Installing/Upgrading python dependencies from backend/requirements.txt..."
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 if [ $? -ne 0 ]; then
     echo "[ERROR] Failed to install pip requirements."
     exit 1

@@ -13,7 +13,7 @@ def test_async_analyze_flow_txt(client: TestClient):
     assert response.status_code == 202
     data = response.json()
     assert "job_id" in data
-    assert data["status"] == "pending"
+    assert data["status"] in ["pending", "completed"]
     
     job_id = data["job_id"]
     

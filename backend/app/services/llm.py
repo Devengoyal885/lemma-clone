@@ -46,6 +46,12 @@ class LLMService:
             "work": "operate",
             "start": "commence",
             "get": "obtain",
+            "text": "content",
+            "segment": "portion",
+            "rewrite": "paraphrase",
+            "original": "source",
+            "section": "passage",
+            "paper": "manuscript",
         }
 
         rewritten = cleaned

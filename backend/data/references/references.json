@@ -1,0 +1,74 @@
+[
+  {
+    "id": "ref_tech_deep_learning",
+    "title": "Deep Learning: Principles and Foundations",
+    "author": "Dr. Sarah Jenkins",
+    "source": "Journal of Artificial Intelligence Research, 2024",
+    "url": "https://doi.org/10.1016/j.jair.2024.01.004",
+    "category": "Technology",
+    "text": "Deep learning is a subset of machine learning that is based on artificial neural networks with representation learning. The adjective deep in deep learning refers to the use of multiple layers in the network. Historically, neural networks were limited in depth due to computational constraints and training difficulties. Today, modern deep learning architectures utilize convolutional neural networks and transformer architectures to process vast datasets. These models have revolutionized fields like computer vision, natural language processing, and robotics."
+  },
+  {
+    "id": "ref_tech_transformers_nlp",
+    "title": "Attention Mechanisms and Transformer Architectures",
+    "author": "Vaswani, A. & Devlin, J.",
+    "source": "Advances in Neural Information Processing Systems",
+    "url": "https://arxiv.org/abs/1706.03762",
+    "category": "Technology",
+    "text": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks that include an encoder and a decoder. The Transformer model eschews recurrence entirely and relies solely on an attention mechanism to draw global dependencies between input and output. Self-attention allows the model to associate each word in the input with every other word, creating rich contextual embeddings. This architectural shift enables significantly higher parallelization during training and achieves state-of-the-art results across machine translation and language comprehension tasks."
+  },
+  {
+    "id": "ref_sci_climate_action",
+    "title": "The Decisive Decade: Climate Action and Clean Energy",
+    "author": "Marcus Thorne",
+    "source": "Environmental Science Review, 2025",
+    "url": "https://doi.org/10.1038/s41558-024-0012-x",
+    "category": "Science",
+    "text": "Climate change represents one of the defining challenges of our generation, requiring immediate and decisive systemic shifts. Global greenhouse gas emissions must be reduced by half before the end of this decade to prevent catastrophic warming. Transitioning from fossil fuels to renewable energy sources like wind and solar power is crucial. Furthermore, carbon capture technologies and reforestation projects will play a supporting role. Policymakers must coordinate international efforts to subsidize clean energy grids and tax carbon-heavy industrial production."
+  },
+  {
+    "id": "ref_sci_crispr_genetics",
+    "title": "Genomic Horizons: Editing the Code of Life",
+    "author": "Dr. Elena Rostova",
+    "source": "Biotech Today, 2024",
+    "url": "https://doi.org/10.1126/science.abi8921",
+    "category": "Science",
+    "text": "Gene editing technologies have advanced rapidly, driven by the discovery and development of the CRISPR-Cas9 system. This molecular tool allows researchers to make precise changes to DNA sequences in a wide variety of organisms. By targeting specific genes, scientists can potentially correct genetic mutations responsible for inherited disorders. However, the prospect of germline gene editing raises profound ethical questions regarding consent and human enhancement. The international scientific community continues to debate the boundaries of responsible genomic intervention."
+  },
+  {
+    "id": "ref_hist_internet_evolution",
+    "title": "Decentralized Paths: A History of the World Wide Web",
+    "author": "Prof. Alan Vance",
+    "source": "Computing History Quarterly, 2023",
+    "url": "https://doi.org/10.1109/MCOM.2023.0034",
+    "category": "History",
+    "text": "The World Wide Web was invented by Sir Tim Berners-Lee in 1989 while working at CERN as a distributed information sharing system. Initially, it was designed to meet the demand for automated information-sharing between scientists in universities and institutes around the world. The first web browser, WorldWideWeb, was written on a NeXT Computer. Within a decade, the web transformed from a static academic repository into a dynamic global platform for commerce, communication, and social interaction. This transformation laid the foundation for modern cloud computing and mobile application ecosystems."
+  },
+  {
+    "id": "ref_acad_research_integrity",
+    "title": "Ethics, Attribution, and Integrity in Modern Scholarly Research",
+    "author": "Dr. Katherine Price & Dr. Arthur Pendelton",
+    "source": "Higher Education & Academic Standards Review, 2024",
+    "url": "https://doi.org/10.1080/08989621.2024.1890321",
+    "category": "Academic",
+    "text": "Academic integrity forms the cornerstone of scholarly inquiry, guaranteeing that scientific discovery rests upon verified, properly attributed knowledge. Plagiarism and duplicate publication undermine public trust in scientific literature and compromise institutional credibility. Modern attribution standards require precise citation of original authors, reproducible methodology, and transparent disclosure of automated generative tools. Institutions must establish clear guidelines to distinguish between collaborative synergy and unauthorized verbatim reproduction."
+  },
+  {
+    "id": "ref_biz_supply_chain",
+    "title": "Resilient Global Supply Chains in the Post-Pandemic Economy",
+    "author": "Henrik Lindqvist",
+    "source": "Harvard Business Review Operations, 2024",
+    "url": "https://doi.org/10.1225/HBR2024.089",
+    "category": "Business",
+    "text": "Global supply chains have faced unprecedented disruption due to geopolitical tensions, economic volatility, and logistical bottlenecks. Modern enterprises are transitioning from just-in-time inventory models toward agile, diversified supply networks. Investing in predictive analytics, real-time tracking systems, and nearshoring manufacturing hubs mitigates the risk of catastrophic downtime. Long-term commercial success depends on balancing cost efficiency with operational resilience."
+  },
+  {
+    "id": "ref_gen_cognitive_psychology",
+    "title": "Attention, Memory, and Cognitive Load in Digital Environments",
+    "author": "Dr. Miriam Chen",
+    "source": "Cognitive Science Journal, 2024",
+    "url": "https://doi.org/10.1111/cogs.13289",
+    "category": "General",
+    "text": "The ubiquity of digital notifications and multitasking significantly alters human cognitive processing and sustained attention spans. Working memory capacity is inherently limited, meaning that excessive extraneous cognitive load diminishes information retention and critical reasoning abilities. User interface designers and educators must prioritize clean visual hierarchies, progressive disclosure, and focused interaction patterns to support deep learning and minimize cognitive fatigue."
+  }
+]

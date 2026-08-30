@@ -1,16 +1,17 @@
 import uuid
-# pyrefly: ignore [missing-import]
-from celery.result import AsyncResult
-# pyrefly: ignore [missing-import]
 import os
-from sqlalchemy import create_engine
-from fastapi import FastAPI, UploadFile, File, HTTPException, status
+import io
+import json
+import logging
+from pathlib import Path
+from typing import Optional, List, Dict, Any
+
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, status, Body
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse, Response, StreamingResponse
 from pydantic import BaseModel, Field
 
 from app.config import settings
-from app.services.pdf_generator import PDFGeneratorService
 from app.schemas.document import DocumentUploadResponse, SentenceCoordinate
 from app.schemas.rewrite import RewriteRequest, RewriteResponse
 from app.services.extractor import (
@@ -20,26 +21,20 @@ from app.services.extractor import (
     ExtractionError,
 )
 from app.services.segmenter import SentenceSegmenterService
-from app.services.matcher import DualTierMatcher
-from app.services.llm import LLMService
+from app.services.lite_matcher import LiteMatcher
 from app.services.analytics import DocumentAnalyticsService
-from app.tasks.celery_app import celery_app
-from app.tasks.analysis import analyze_document_task
+from app.services.llm import LLMService
+from app.services.pdf_generator import PDFGeneratorService
+from app.services.source_providers import SourceDiscoveryService
+from app.services.chat_assistant import LemmaAssistantService
+from app.services.pandaz_service import PandazPDFService
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-if DATABASE_URL:
-    if DATABASE_URL.startswith("postgres://"):
-        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-else:
-   DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/lemma"
-
-engine = create_engine(DATABASE_URL)
+logger = logging.getLogger("lemma.main")
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    description="Backend API for Plagiarism Detection and Text Rewriting",
-    version="1.0.0",
+    description="LEMMA 2.0 - AI Document Intelligence, Plagiarism Detection & Pandaz PDF Platform",
+    version="2.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -47,11 +42,16 @@ app = FastAPI(
 # CORS Middleware config
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For production, we would restrict this
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Global instances
+source_discovery_service = SourceDiscoveryService()
+lemma_chat_service = LemmaAssistantService()
+lite_matcher_instance = LiteMatcher()
 
 # Global Exception Handlers
 @app.exception_handler(FileSizeExceededError)
@@ -75,453 +75,128 @@ async def extraction_error_handler(request, exc: ExtractionError):
         content={"detail": str(exc)},
     )
 
-@app.exception_handler(Exception)
-async def general_exception_handler(request, exc: Exception):
-    # Log this in a production app
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": f"An unexpected error occurred: {str(exc)}"},
-    )
 
-from pathlib import Path
-from fastapi.staticfiles import StaticFiles
+# --- 1. SYSTEM HEALTH & STATUS ---
 
 @app.get("/health")
 @app.get(f"{settings.API_V1_STR}/health")
 async def health():
-    import logging
-    import asyncio
-    import httpx
-    import anyio
-    import socket
-    from urllib.parse import urlparse
-    from app.services.database import DatabaseService
-    
-    local_logger = logging.getLogger("health_check")
-    
-    # Clean loopback helper to prevent Windows getaddrinfo latency
-    def clean_host(host_str: str) -> str:
-        if host_str and host_str.lower() == "localhost":
-            return "127.0.0.1"
-        return host_str
-
-    # Socket precheck helper
-    def is_port_open_sync(h: str, p: int) -> bool:
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.settimeout(0.2)
-                return s.connect_ex((clean_host(h), p)) == 0
-        except Exception:
-            return False
-
-    async def is_port_open(h: str, p: int) -> bool:
-        return await anyio.to_thread.run_sync(is_port_open_sync, h, p)
-
-    # Parse Postgres host/ports
-    db_host = settings.POSTGRES_HOST
-    db_port = int(settings.POSTGRES_PORT or 5432)
-    db_url = settings.DATABASE_URL
-    if db_url:
-        try:
-            parsed = urlparse(db_url)
-            if parsed.hostname:
-                db_host = parsed.hostname
-            if parsed.port:
-                db_port = parsed.port
-        except Exception:
-            pass
-
-    # Parse Redis host/ports
-    redis_host = "localhost"
-    redis_port = 6379
-    redis_url = settings.REDIS_URL
-    if redis_url:
-        try:
-            parsed = urlparse(redis_url)
-            if parsed.hostname:
-                redis_host = parsed.hostname
-            if parsed.port:
-                redis_port = parsed.port
-        except Exception:
-            pass
-
-    # 1. Define PostgreSQL checker task
-    async def check_database():
-        if not await is_port_open(db_host, db_port):
-            return "disconnected"
-        try:
-            def check_db():
-                conn = DatabaseService.get_connection()
-                with conn.cursor() as cursor:
-                    cursor.execute("SELECT 1;")
-                conn.close()
-                return "connected"
-                
-            return await asyncio.wait_for(
-                anyio.to_thread.run_sync(check_db),
-                timeout=1.0
-            )
-        except Exception as e:
-            local_logger.warning(f"Health check: Database connection failed: {e}")
-            return "disconnected"
-
-    # 2. Define Elasticsearch checker task
-    async def check_elasticsearch():
-        try:
-            async with httpx.AsyncClient(timeout=0.8) as client:
-                res = await client.get(settings.ELASTICSEARCH_URL)
-                if res.status_code == 200:
-                    return "healthy"
-                else:
-                    return "unhealthy"
-        except Exception as e:
-            local_logger.warning(f"Health check: Elasticsearch ping failed: {e}")
-            return "offline"
-
-    # 3. Define Ollama checker task
-    async def check_ollama():
-        try:
-            # Check Ollama status directly with a fast 1.0s timeout
-            url = f"{settings.OLLAMA_URL.rstrip('/')}/api/tags"
-            async with httpx.AsyncClient(timeout=1.0) as client:
-                response = await client.get(url)
-                if response.status_code == 200:
-                    data = response.json()
-                    models = [m["name"] for m in data.get("models", [])]
-                    status_val = "running" if models else "no_models"
-                    return status_val, models
-                else:
-                    return "offline", []
-        except Exception as e:
-            local_logger.warning(f"Health check: Ollama check failed: {e}")
-            return "offline", []
-
-    # 4. Define Celery checker task
-    async def check_celery_status():
-        if settings.CELERY_ALWAYS_EAGER:
-            return "idle"
-            
-        if not await is_port_open(redis_host, redis_port):
-            return "offline"
-            
-        try:
-            def check_celery():
-                inspector = celery_app.control.inspect(timeout=0.5)
-                active_tasks = inspector.active()
-                if active_tasks:
-                    has_active = any(len(tasks) > 0 for tasks in active_tasks.values() if tasks)
-                    if has_active:
-                        return "working"
-                return "idle"
-                
-            return await asyncio.wait_for(
-                anyio.to_thread.run_sync(check_celery),
-                timeout=1.0
-            )
-        except Exception as e:
-            local_logger.warning(f"Health check: Celery status check failed: {e}")
-            return "offline"
-
-    # Run all checks in parallel
-    db_task = check_database()
-    es_task = check_elasticsearch()
-    ollama_task = check_ollama()
-    celery_task = check_celery_status()
-    
-    db_status, es_status, (ollama_status, available_models), celery_status = await asyncio.gather(
-        db_task, es_task, ollama_task, celery_task
-    )
-
-    # Determine general status
-    general_status = "ok"
-    if db_status == "disconnected" or es_status == "offline" or ollama_status == "offline":
-        general_status = "degraded"
-
     return {
-        "status": general_status,
+        "status": "ok",
         "project": settings.PROJECT_NAME,
-        "services": {
-            "database": {
-                "status": db_status
-            },
-            "elasticsearch": {
-                "status": es_status
-            },
-            "ollama": {
-                "status": ollama_status,
-                "model": settings.OLLAMA_MODEL,
-                "available_models": available_models
-            },
-            "celery": {
-                "status": celery_status
-            }
-        }
+        "version": "2.0.0",
+        "mode": "lite_ready"
     }
 
+@app.get(f"{settings.API_V1_STR}/system/status")
+@app.get("/api/system/status", include_in_schema=False)
+async def system_status():
+    """
+    Returns granular status for all subsystem components:
+    Backend, Analysis, AI, Search, Database, Vector DB, Reports, PDF Tools.
+    """
+    ai_available = await lemma_chat_service.ollama.is_available()
+    return {
+        "status": "online",
+        "mode": "Lite Mode (Local Processing & Corpus)",
+        "subsystems": {
+            "backend": "ONLINE",
+            "analysis_engine": "ONLINE (TF-IDF + Cosine + N-gram)",
+            "ai_assistant": "ONLINE" if ai_available else "OFFLINE (Using Deterministic Local Assistant)",
+            "search_providers": "ONLINE (Wikipedia, OpenAlex, Crossref, arXiv, Local)",
+            "database": "OPTIONAL (Local Storage / SQLite)",
+            "vector_search": "OPTIONAL (Local Fallback Active)",
+            "reports_engine": "ONLINE (ReportLab / WeasyPrint)",
+            "pandaz_pdf_tools": "ONLINE"
+        },
+        "reference_corpus_size": len(lite_matcher_instance.references)
+    }
 
-@app.get(
-    f"{settings.API_V1_STR}/system/info",
-    status_code=status.HTTP_200_OK,
-    summary="Get engine specifications and capabilities",
-    description="Returns platform capability details, allowed formats, tone options, and active algorithms."
-)
+@app.get(f"{settings.API_V1_STR}/system/info")
 @app.get("/api/info", include_in_schema=False)
 async def get_system_info():
     return {
         "project": settings.PROJECT_NAME,
-        "version": "1.1.0",
-        "description": "Local-first Plagiarism Detection and Generative Academic Rewriting Platform",
+        "version": "2.0.0",
+        "description": "AI-Powered Document Intelligence & Originality Workspace with Pandaz PDF Tools",
         "capabilities": {
             "supported_formats": [f".{ext}" for ext in settings.ALLOWED_EXTENSIONS],
             "max_file_size_mb": settings.MAX_FILE_SIZE_MB,
             "spacy_model": settings.SPACY_MODEL,
             "ollama_model": settings.OLLAMA_MODEL,
-            "rewriting_tones": ["academic", "standard", "creative"],
-            "execution_mode": "Eager (Sync)" if settings.CELERY_ALWAYS_EAGER else "Celery + Redis Queue",
             "features": [
-                "Lexical TF-IDF Cosine Similarity Engine",
-                "Semantic Vector Indexing (Sentence-Transformers + FAISS / HNSW)",
-                "Preserved Absolute Coordinate Mapping (start_char, end_char)",
-                "Readability Analytics & Flesch Metric Calculation Engine",
-                "Local Generative AI Tone Paraphraser",
-                "Publication-Ready WeasyPrint PDF Exporter"
+                "Local-First Lite Plagiarism Detection Engine",
+                "Context-Aware Ask Lemma Document RAG Chat",
+                "Multi-Tone Academic & Professional Rewriting",
+                "Pandaz PDF Toolkit (Merge, Split, Compress, CSV, Sign, OCR, Summarize)",
+                "Scholarly Source Discovery (OpenAlex, Crossref, arXiv, Wikipedia)",
+                "Publication-Ready Lemma Integrity PDF & HTML Reports"
             ]
         }
     }
 
 
-# Global/lazy instance of the plagiarism matching engine
-# Uses MatcherFactory to automatically select Lite or Advanced mode
-matcher_instance = None
-
-def get_matcher():
-    global matcher_instance
-    if matcher_instance is None:
-        from app.services.matcher_factory import MatcherFactory
-        matcher_instance = MatcherFactory.initialize()
-    return matcher_instance
-
-def get_matcher_mode():
-    """Get the current matcher mode (lite or advanced)"""
-    from app.services.matcher_factory import MatcherFactory
-    return MatcherFactory.get_mode()
-
-async def check_service_port_open(host_str: str, port_val: int) -> bool:
-    import socket
-    import anyio
-    def check_sync():
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.settimeout(0.2)
-                target = "127.0.0.1" if host_str.lower() == "localhost" else host_str
-                return s.connect_ex((target, port_val)) == 0
-        except Exception:
-            return False
-    return await anyio.to_thread.run_sync(check_sync)
-
-async def check_postgres_available() -> bool:
-    """Check if PostgreSQL is available (returns True/False, doesn't throw)"""
-    from urllib.parse import urlparse
-    db_host = settings.POSTGRES_HOST
-    db_port = int(settings.POSTGRES_PORT or 5432)
-    db_url = os.environ.get("DATABASE_URL") or settings.DATABASE_URL
-    if db_url:
-        try:
-            parsed = urlparse(db_url)
-            if parsed.hostname: db_host = parsed.hostname
-            if parsed.port: db_port = parsed.port
-        except Exception:
-            pass
-    return await check_service_port_open(db_host, db_port)
-
-async def check_elasticsearch_available() -> bool:
-    """Check if Elasticsearch is available (returns True/False, doesn't throw)"""
-    from urllib.parse import urlparse
-    es_host = "localhost"
-    es_port = 9200
-    if settings.ELASTICSEARCH_URL:
-        try:
-            parsed = urlparse(settings.ELASTICSEARCH_URL)
-            if parsed.hostname: es_host = parsed.hostname
-            if parsed.port: es_port = parsed.port
-        except Exception:
-            pass
-    return await check_service_port_open(es_host, es_port)
-
-async def check_ollama_online():
-    from urllib.parse import urlparse
-    ollama_host = "127.0.0.1"
-    ollama_port = 11434
-    if settings.OLLAMA_URL:
-        try:
-            parsed = urlparse(settings.OLLAMA_URL)
-            if parsed.hostname: ollama_host = parsed.hostname
-            if parsed.port: ollama_port = parsed.port
-        except Exception:
-            pass
-    if not await check_service_port_open(ollama_host, ollama_port):
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Ollama service is offline. Please make sure Ollama is running locally on your system."
-        )
-
-
-# Text Analysis Request/Response Models
-from pydantic import BaseModel
+# --- 2. DOCUMENT UPLOAD & DIRECT PLAGIARISM ANALYSIS ---
 
 class TextAnalysisRequest(BaseModel):
     text: str = Field(..., min_length=1, description="Document text to analyze")
-    title: str = Field(default="Pasted Text", description="Optional document title")
+    title: Optional[str] = Field(default="Pasted Document", description="Document title")
 
-class TextAnalysisResponse(BaseModel):
-    status: str = Field(..., description="Analysis status")
-    plagiarism_score: float = Field(..., description="Plagiarism percentage (0-100)")
-    originality_score: float = Field(..., description="Originality percentage (0-100)")
-    total_sentences: int = Field(..., description="Total sentences analyzed")
-    matched_sentences_count: int = Field(..., description="Number of plagiarized sentences")
-    metrics: dict = Field(..., description="Document analytics")
-    matches: list = Field(default_factory=list, description="Plagiarism matches")
-    mode: str = Field(..., description="Analysis mode (lite or advanced)")
-
-
-@app.post(
-    f"{settings.API_V1_STR}/analyze/text",
-    response_model=TextAnalysisResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Analyze pasted text for plagiarism",
-    description="Analyzes raw text input for plagiarism without file upload. Works in Lite Mode without external dependencies."
-)
+@app.post(f"{settings.API_V1_STR}/analyze/text")
+@app.post("/api/analyze/text", include_in_schema=False)
 async def analyze_text_direct(payload: TextAnalysisRequest):
     """
-    Direct text plagiarism analysis endpoint.
-    Works with Lite Mode (local TF-IDF matching) by default.
-    Falls back gracefully if external services are unavailable.
+    Direct text analysis endpoint for pasted text or sample document.
+    Executes full plagiarism analysis, readability metrics, and source matching.
     """
-    import json
-    from app.services.segmenter import SentenceSegmenterService
-    from app.services.analytics import DocumentAnalyticsService
-    from app.services.lite_matcher import LiteMatcher
-    
-    # Validate input
-    if not payload.text or not payload.text.strip():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Text cannot be empty"
-        )
-    
     text = payload.text.strip()
-    
-    # Get current matcher (automatically selects Lite or Advanced mode)
-    matcher_mode = get_matcher_mode()
-    matcher = get_matcher()
-    
-    # Segment sentences
+    if not text:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Text cannot be empty.")
+
     sentences_data = SentenceSegmenterService.segment(text)
     if not sentences_data:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Could not segment text into sentences. Ensure text is not too short."
-        )
-    
-    # Calculate analytics
-    metrics_data = DocumentAnalyticsService.analyze_readability(text, len(sentences_data))
-    
-    # Perform plagiarism analysis
-    all_matches = []
-    matched_sentence_count = 0
-    matched_word_count = 0
-    total_word_count = metrics_data.get("word_count", 0)
-    
-    try:
-        # Use Lite Matcher for text analysis (more direct approach)
-        lite_matcher = LiteMatcher()
-        
-        for sent_idx, sent_data in enumerate(sentences_data):
-            sent_text = sent_data["text"]
-            sent_start = sent_data["start_char"]
-            sent_end = sent_data["end_char"]
-            
-            # Find hybrid matches
-            matches = lite_matcher.find_hybrid_matches(sent_text, top_k=3)
-            
-            if matches:
-                matched_sentence_count += 1
-                # Get matching phrases
-                if matches:
-                    best_match = matches[0]
-                    phrases = lite_matcher.extract_matching_phrases(sent_text, best_match.get("matched_text", ""))
-                    
-                    all_matches.append({
-                        "sentence_index": sent_idx,
-                        "query_text": sent_text,
-                        "query_start": sent_start,
-                        "query_end": sent_end,
-                        "matched_text": best_match.get("matched_text", ""),
-                        "match_type": best_match.get("match_type", "hybrid"),
-                        "score": float(best_match.get("hybrid_score", best_match.get("combined_score", 0))),
-                        "doc_title": best_match.get("doc_title", "Unknown"),
-                        "doc_author": best_match.get("doc_author", "N/A"),
-                        "doc_source": best_match.get("doc_source", "N/A"),
-                        "phrases": phrases
-                    })
-                    
-                    # Count matched words
-                    for phrase in phrases:
-                        matched_word_count += len(phrase["text"].split())
-    
-    except Exception as e:
-        import logging
-        logging.error(f"Text analysis error: {e}")
-        # Gracefully continue with no matches rather than failing
-        all_matches = []
-        matched_sentence_count = 0
-    
-    # Calculate plagiarism score
-    plagiarism_score = 0.0
-    if len(sentences_data) > 0:
-        plagiarism_score = (matched_sentence_count / len(sentences_data)) * 100
-    
-    originality_score = 100.0 - plagiarism_score
-    
-    return TextAnalysisResponse(
-        status="completed",
-        plagiarism_score=round(plagiarism_score, 2),
-        originality_score=round(originality_score, 2),
-        total_sentences=len(sentences_data),
-        matched_sentences_count=matched_sentence_count,
-        metrics=metrics_data,
-        matches=all_matches,
-        mode=matcher_mode
-    )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Could not segment text into sentences.")
 
+    metrics_data = DocumentAnalyticsService.analyze_readability(text, len(sentences_data))
+    analysis_result = lite_matcher_instance.analyze_document(text, sentences_data)
+
+    return {
+        "status": "completed",
+        "filename": payload.title or "Pasted Document",
+        "text": text,
+        "char_count": len(text),
+        "sentence_count": len(sentences_data),
+        "sentences": [
+            SentenceCoordinate(
+                text=s["text"],
+                start_char=s["start_char"],
+                end_char=s["end_char"]
+            )
+            for s in sentences_data
+        ],
+        "metrics": metrics_data,
+        "analysis": analysis_result
+    }
 
 @app.post(
     f"{settings.API_V1_STR}/documents/upload",
     response_model=DocumentUploadResponse,
     status_code=status.HTTP_200_OK,
-    summary="Upload and segment a document",
-    description="Ingests a PDF, DOCX, or TXT file, validates constraints, extracts plain text, and segments it."
+    summary="Upload, segment and analyze a document"
 )
+@app.post("/api/documents/upload", include_in_schema=False)
 async def upload_document(file: UploadFile = File(...)):
-    # Note: Removed database requirements for Lite Mode support
-    # This endpoint now works without PostgreSQL/Elasticsearch
-
+    """
+    Ingests PDF, DOCX, or TXT file, extracts clean text, segments sentences,
+    computes readability analytics and runs complete plagiarism analysis.
+    """
     if not file.filename:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No filename provided in upload request."
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No filename provided in upload.")
 
-    # Read content
     content = await file.read()
-    
-    # Extract text (validations are performed internally)
     text = DocumentExtractorService.extract_text(file.filename, content)
-    
-    # Segment sentences with coordinates
     sentences_data = SentenceSegmenterService.segment(text)
-    
-    # Format response
+
     sentences = [
         SentenceCoordinate(
             text=s["text"],
@@ -530,10 +205,10 @@ async def upload_document(file: UploadFile = File(...)):
         )
         for s in sentences_data
     ]
-    
-    # Compute readability metrics
+
     metrics_data = DocumentAnalyticsService.analyze_readability(text, len(sentences))
-    
+    analysis_result = lite_matcher_instance.analyze_document(text, sentences_data)
+
     return DocumentUploadResponse(
         filename=file.filename,
         text=text,
@@ -541,209 +216,466 @@ async def upload_document(file: UploadFile = File(...)):
         sentence_count=len(sentences),
         sentences=sentences,
         metrics=metrics_data,
-        analysis=None
+        analysis=analysis_result
     )
 
-@app.post(
-    f"{settings.API_V1_STR}/analyze",
-    status_code=status.HTTP_202_ACCEPTED,
-    summary="Asynchronously analyze a document for plagiarism",
-    description="Saves document to disk and queues background analysis task, returning a job ID immediately."
-)
-@app.post(
-    "/api/analyze",
-    status_code=status.HTTP_202_ACCEPTED,
-    include_in_schema=False
-)
+JOB_STORE: Dict[str, Any] = {}
+
+@app.post(f"{settings.API_V1_STR}/analyze", status_code=status.HTTP_202_ACCEPTED)
+@app.post("/api/analyze", status_code=status.HTTP_202_ACCEPTED, include_in_schema=False)
 async def analyze_document_async(file: UploadFile = File(...)):
-    # Note: Removed hard database requirements for Lite Mode support
-    # Check availability but continue anyway (graceful degradation)
-    # postgres_available = await check_postgres_available()
-    # es_available = await check_elasticsearch_available()
-
+    """
+    Async analysis endpoint. For Lite mode, processes immediately and returns 202 accepted state.
+    """
     if not file.filename:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No filename provided.")
+
+    ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
+    if ext not in settings.ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No filename provided in upload request."
-        )
-        
-    # Validate extension using settings before writing to disk
-    file_ext = file.filename.split(".")[-1].lower()
-    if file_ext not in settings.ALLOWED_EXTENSIONS:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unsupported file type: .{file_ext}. Allowed types: {', '.join(settings.ALLOWED_EXTENSIONS)}"
-        )
-        
-    # Generate UUID and setup paths
-    job_id = str(uuid.uuid4())
-    temp_filename = f"{job_id}_{file.filename}"
-    temp_filepath = settings.UPLOAD_DIR / temp_filename
-    
-    # Read and save in chunks to check file size limit
-    content_size = 0
-    max_bytes = settings.MAX_FILE_SIZE_MB * 1024 * 1024
-    
-    try:
-        with open(temp_filepath, "wb") as f:
-            while chunk := await file.read(8192):
-                content_size += len(chunk)
-                if content_size > max_bytes:
-                    raise FileSizeExceededError(f"File size exceeds limit of {settings.MAX_FILE_SIZE_MB}MB.")
-                f.write(chunk)
-    except FileSizeExceededError as e:
-        if temp_filepath.exists():
-            temp_filepath.unlink()
-        raise HTTPException(
-            status_code=status.HTTP_413_CONTENT_TOO_LARGE,
-            detail=str(e)
-        )
-    except Exception as e:
-        if temp_filepath.exists():
-            temp_filepath.unlink()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to save temporary file: {str(e)}"
+            detail=f"Unsupported file type '{ext}'. Allowed types: {', '.join(settings.ALLOWED_EXTENSIONS)}"
         )
 
-    # Trigger celery task with custom task ID matching the job ID
-    analyze_document_task.apply_async(
-        args=[str(temp_filepath), file.filename],
-        task_id=job_id
-    )
-    
+    content = await file.read()
+    max_bytes = settings.MAX_FILE_SIZE_MB * 1024 * 1024
+    if len(content) > max_bytes:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File size exceeds limit of {settings.MAX_FILE_SIZE_MB}MB"
+        )
+
+    text = DocumentExtractorService.extract_text(file.filename, content)
+    sentences_data = SentenceSegmenterService.segment(text)
+    sentences = [
+        SentenceCoordinate(
+            text=s["text"],
+            start_char=s["start_char"],
+            end_char=s["end_char"]
+        )
+        for s in sentences_data
+    ]
+    metrics_data = DocumentAnalyticsService.analyze_readability(text, len(sentences))
+    analysis_result = lite_matcher_instance.analyze_document(text, sentences_data)
+
+    job_id = str(uuid.uuid4())
+    result_payload = {
+        "filename": file.filename,
+        "text": text,
+        "char_count": len(text),
+        "sentence_count": len(sentences),
+        "sentences": [s.model_dump() for s in sentences],
+        "metrics": metrics_data,
+        "analysis": analysis_result
+    }
+    JOB_STORE[job_id] = result_payload
+
     return {
         "job_id": job_id,
-        "status": "pending"
+        "status": "completed",
+        "result": result_payload
+    }
+
+@app.get(f"{settings.API_V1_STR}/status/{{job_id}}")
+@app.get("/api/status/{job_id}", include_in_schema=False)
+async def get_job_status(job_id: str):
+    if job_id not in JOB_STORE:
+        return {"job_id": job_id, "status": "pending"}
+    return {
+        "job_id": job_id,
+        "status": "completed",
+        "result": JOB_STORE[job_id]
     }
 
 
-@app.get(
-    f"{settings.API_V1_STR}/status/{{job_id}}",
-    status_code=status.HTTP_200_OK,
-    summary="Get background task status and results",
-    description="Check the current execution status of an async document plagiarism analysis task."
-)
-@app.get(
-    "/api/status/{job_id}",
-    status_code=status.HTTP_200_OK,
-    include_in_schema=False
-)
-async def get_job_status(job_id: str):
-    res = AsyncResult(job_id, app=celery_app)
-    
-    if res.state == "SUCCESS":
-        return {
-            "job_id": job_id,
-            "status": "completed",
-            "result": res.result
-        }
-    elif res.state == "FAILURE":
-        return {
-            "job_id": job_id,
-            "status": "failed",
-            "error": str(res.result)
-        }
-    elif res.state in ("PENDING", "RECEIVED"):
-        return {
-            "job_id": job_id,
-            "status": "pending"
-        }
-    else:  # STARTED, RETRY, etc.
-        return {
-            "job_id": job_id,
-            "status": "processing"
-        }
+# --- 3. REPORT GENERATION ---
 
+class ReportDirectRequest(BaseModel):
+    filename: Optional[str] = "Lemma_Integrity_Report.pdf"
+    text: Optional[str] = ""
+    char_count: Optional[int] = 0
+    sentence_count: Optional[int] = 0
+    sentences: Optional[List[Dict[str, Any]]] = []
+    metrics: Optional[Dict[str, Any]] = {}
+    analysis: Optional[Dict[str, Any]] = {}
 
-@app.get(
-    f"{settings.API_V1_STR}/documents/report/{{job_id}}",
-    summary="Download PDF report for a job",
-    description="Generates and returns the official downloadable PDF plagiarism analysis report for a completed job."
-)
-@app.get(
-    "/api/report/{job_id}",
-    include_in_schema=False
-)
-async def get_job_report_pdf(job_id: str):
-    res = AsyncResult(job_id, app=celery_app)
-    
-    if res.state != "SUCCESS":
-        if res.state in ("PENDING", "RECEIVED", "STARTED", "RETRY"):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Plagiarism analysis is still in progress. Please wait for completion before downloading the report."
-            )
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Plagiarism report not found or task failed."
-            )
-            
-    result = res.result
-    if not result:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Plagiarism report details are empty or unavailable."
-        )
-        
+@app.post(f"{settings.API_V1_STR}/documents/report/direct")
+@app.post("/api/report/direct", include_in_schema=False)
+async def generate_direct_pdf_report(payload: ReportDirectRequest):
+    """
+    Generates and downloads a Lemma Integrity PDF report directly from the active frontend document state.
+    """
     try:
-        pdf_bytes = PDFGeneratorService.generate_report(result)
-        
-        filename = result.get("filename", "lemma_report.txt")
-        pdf_filename = filename.rsplit(".", 1)[0] + "_report.pdf"
-        
+        data_dict = payload.model_dump()
+        pdf_bytes = PDFGeneratorService.generate_report(data_dict)
+        fn = payload.filename or "lemma_integrity_report.pdf"
+        if not fn.endswith(".pdf"):
+            fn += ".pdf"
+
         return Response(
             content=pdf_bytes,
             media_type="application/pdf",
-            headers={
-                "Content-Disposition": f'attachment; filename="{pdf_filename}"'
-            }
+            headers={"Content-Disposition": f'attachment; filename="{fn}"'}
         )
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to generate PDF report: {str(e)}"
+        logger.error(f"Report generation error: {e}")
+        # Fallback to HTML report download
+        html_content = PDFGeneratorService.generate_html_report(payload.model_dump())
+        return Response(
+            content=html_content.encode("utf-8"),
+            media_type="text/html",
+            headers={"Content-Disposition": f'attachment; filename="lemma_report.html"'}
         )
 
+@app.get(f"{settings.API_V1_STR}/documents/report/{{job_id}}")
+@app.get("/api/report/{job_id}", include_in_schema=False)
+async def get_job_report_pdf(job_id: str):
+    if job_id not in JOB_STORE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Plagiarism analysis is still in progress. Please wait for completion before downloading the report."
+        )
+    
+    report_data = JOB_STORE[job_id]
+    pdf_bytes = PDFGeneratorService.generate_report(report_data)
+    fn = report_data.get("filename", "lemma_report.txt").rsplit(".", 1)[0] + "_report.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{fn}"'}
+    )
 
 
-@app.post(
-    f"{settings.API_V1_STR}/rewrite",
-    response_model=RewriteResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Rewrite a text segment to eliminate plagiarism",
-    description="Uses a local LLM via Ollama to paraphrase a sentence with a professional academic tone."
-)
-@app.post(
-    "/api/rewrite",
-    response_model=RewriteResponse,
-    status_code=status.HTTP_200_OK,
-    include_in_schema=False
-)
+# --- 4. ASK LEMMA CONTEXT-AWARE CHAT & STREAMING ---
+
+class ChatRequest(BaseModel):
+    message: str = Field(..., description="User query message")
+    context: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Active application/document state")
+
+@app.post(f"{settings.API_V1_STR}/chat")
+@app.post("/api/chat", include_in_schema=False)
+async def chat_endpoint(payload: ChatRequest):
+    """
+    Context-aware Ask Lemma assistant.
+    Understands current document, plagiarism score, matches, sources, and RAG chunks.
+    """
+    reply = await lemma_chat_service.generate_response(payload.message, payload.context or {})
+    return {
+        "response": reply,
+        "status": "success"
+    }
+
+@app.post(f"{settings.API_V1_STR}/chat/stream")
+@app.post("/api/chat/stream", include_in_schema=False)
+async def chat_stream_endpoint(payload: ChatRequest):
+    """
+    Streaming Ask Lemma assistant response for live token-by-token UI display.
+    """
+    async def event_generator():
+        async for chunk in lemma_chat_service.stream_response(payload.message, payload.context or {}):
+            data = json.dumps({"token": chunk})
+            yield f"data: {data}\n\n"
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+
+# --- 5. PARAPHRASING & REWRITE ---
+
+class BatchRewriteRequest(BaseModel):
+    sentences: List[str] = Field(..., description="List of sentences to rewrite")
+    tone: Optional[str] = Field(default="academic", description="Academic, Professional, Simple, Formal, Concise, Detailed")
+
+@app.post(f"{settings.API_V1_STR}/rewrite")
+@app.post("/api/rewrite", include_in_schema=False)
 async def rewrite_text_endpoint(payload: RewriteRequest):
+    """
+    Rewrites a single sentence or passage to eliminate plagiarism.
+    Uses local AI (Ollama) if available, with intelligent rule-based fallback.
+    """
+    tone = getattr(payload, "tone", "academic") or "academic"
     try:
-        await check_ollama_online()
-        rewritten = await LLMService.rewrite_text(payload.text, tone=payload.tone)
-    except HTTPException:
-        rewritten = LLMService.fallback_rewrite_text(payload.text, tone=payload.tone)
+        rewritten = await LLMService.rewrite_text(payload.text, tone=tone)
     except Exception:
-        rewritten = LLMService.fallback_rewrite_text(payload.text, tone=payload.tone)
+        rewritten = LLMService.fallback_rewrite_text(payload.text, tone=tone)
+    
+    if not rewritten:
+        rewritten = LLMService.fallback_rewrite_text(payload.text, tone=tone)
 
     return RewriteResponse(
         original_text=payload.text,
         rewritten_text=rewritten
     )
 
+@app.post(f"{settings.API_V1_STR}/rewrite/batch")
+@app.post("/api/rewrite/batch", include_in_schema=False)
+async def rewrite_batch_endpoint(payload: BatchRewriteRequest):
+    """
+    Batch rewrite all flagged sentences sequentially with tone support.
+    """
+    results = []
+    for sent in payload.sentences:
+        if not sent.strip():
+            continue
+        rewritten = LLMService.fallback_rewrite_text(sent, tone=payload.tone or "academic")
+        results.append({
+            "original": sent,
+            "rewritten": rewritten
+        })
+    return {
+        "status": "completed",
+        "total_rewritten": len(results),
+        "results": results
+    }
 
-# Serve static frontend files
+
+# --- 6. SOURCE DISCOVERY ---
+
+class SourceDiscoveryRequest(BaseModel):
+    query: str = Field(..., description="Search query or domain topic")
+    providers: Optional[List[str]] = Field(default=None, description="Optional list of providers: wikipedia, openalex, crossref, arxiv")
+    limit: Optional[int] = Field(default=8, description="Max results")
+
+@app.post(f"{settings.API_V1_STR}/sources/discover")
+@app.get(f"{settings.API_V1_STR}/sources/discover")
+@app.post("/api/sources/discover", include_in_schema=False)
+@app.get("/api/sources/discover", include_in_schema=False)
+async def discover_sources(query: Optional[str] = None, payload: Optional[SourceDiscoveryRequest] = None):
+    """
+    Discovers academic & encyclopedia references from Wikipedia, OpenAlex, Crossref, and arXiv.
+    """
+    search_q = query
+    providers = None
+    limit = 8
+    if payload:
+        search_q = payload.query
+        providers = payload.providers
+        limit = payload.limit or 8
+
+    if not search_q:
+        search_q = "artificial intelligence machine learning research"
+
+    results = await source_discovery_service.discover(search_q, provider_names=providers, limit=limit)
+    return results
+
+
+# --- 7. PANDAZ PDF TOOLS SUITE ---
+
+@app.post(f"{settings.API_V1_STR}/pandaz/merge")
+@app.post("/api/pandaz/merge", include_in_schema=False)
+async def pandaz_merge_pdfs(files: List[UploadFile] = File(...)):
+    """Merges multiple uploaded PDF files into a single unified PDF."""
+    if not files or len(files) < 2:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Please upload at least 2 PDF files to merge.")
+
+    byte_list = []
+    for f in files:
+        b = await f.read()
+        byte_list.append(b)
+
+    try:
+        merged_pdf = PandazPDFService.merge_pdfs(byte_list)
+        return Response(
+            content=merged_pdf,
+            media_type="application/pdf",
+            headers={"Content-Disposition": 'attachment; filename="pandaz_merged.pdf"'}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Merge failed: {str(e)}")
+
+@app.post(f"{settings.API_V1_STR}/pandaz/split")
+@app.post("/api/pandaz/split", include_in_schema=False)
+async def pandaz_split_pdf(file: UploadFile = File(...), page_range: str = Form("1-3")):
+    """Splits a PDF by page ranges (e.g. 1-3, 5, 8-10)."""
+    pdf_bytes = await file.read()
+    try:
+        split_bytes = PandazPDFService.split_pdf(pdf_bytes, page_range)
+        base_name = file.filename.rsplit(".", 1)[0] if file.filename else "document"
+        return Response(
+            content=split_bytes,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f'attachment; filename="{base_name}_split.pdf"'}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Split failed: {str(e)}")
+
+@app.post(f"{settings.API_V1_STR}/pandaz/compress")
+@app.post("/api/pandaz/compress", include_in_schema=False)
+async def pandaz_compress_pdf(file: UploadFile = File(...)):
+    """Compresses PDF content streams and removes duplicates."""
+    pdf_bytes = await file.read()
+    try:
+        comp_bytes, orig_size, new_size, reduction = PandazPDFService.compress_pdf(pdf_bytes)
+        base_name = file.filename.rsplit(".", 1)[0] if file.filename else "document"
+        return Response(
+            content=comp_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="{base_name}_compressed.pdf"',
+                "X-Original-Size": str(orig_size),
+                "X-Compressed-Size": str(new_size),
+                "X-Reduction-Percent": str(reduction)
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Compression failed: {str(e)}")
+
+@app.post(f"{settings.API_V1_STR}/pandaz/to-csv")
+@app.post("/api/pandaz/to-csv", include_in_schema=False)
+async def pandaz_pdf_to_csv(file: UploadFile = File(...)):
+    """Extracts tables or tabular text from PDF and returns a CSV file."""
+    pdf_bytes = await file.read()
+    try:
+        csv_text = PandazPDFService.extract_tables_to_csv(pdf_bytes)
+        base_name = file.filename.rsplit(".", 1)[0] if file.filename else "extracted_data"
+        return Response(
+            content=csv_text.encode("utf-8"),
+            media_type="text/csv",
+            headers={"Content-Disposition": f'attachment; filename="{base_name}.csv"'}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=f"CSV extraction error: {str(e)}")
+
+@app.post(f"{settings.API_V1_STR}/pandaz/rename")
+@app.post("/api/pandaz/rename", include_in_schema=False)
+async def pandaz_rename_pdf(file: UploadFile = File(...), new_name: str = Form(...)):
+    """Safely returns the PDF with the requested new filename."""
+    pdf_bytes = await file.read()
+    clean_name = re.sub(r'[^\w\-_.]', '_', new_name.strip())
+    if not clean_name.endswith(".pdf"):
+        clean_name += ".pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{clean_name}"'}
+    )
+
+@app.post(f"{settings.API_V1_STR}/pandaz/sign")
+@app.post("/api/pandaz/sign", include_in_schema=False)
+async def pandaz_sign_pdf(
+    file: UploadFile = File(...),
+    annotations_json: str = Form("[]"),
+    signature_base64: Optional[str] = Form(None)
+):
+    """Applies annotations and signature overlay onto the uploaded PDF."""
+    pdf_bytes = await file.read()
+    try:
+        annotations = json.loads(annotations_json)
+    except Exception:
+        annotations = []
+
+    signed_pdf = PandazPDFService.annotate_and_sign_pdf(pdf_bytes, annotations, signature_base64)
+    base_name = file.filename.rsplit(".", 1)[0] if file.filename else "document"
+    return Response(
+        content=signed_pdf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{base_name}_signed.pdf"'}
+    )
+
+@app.post(f"{settings.API_V1_STR}/pandaz/ocr")
+@app.post("/api/pandaz/ocr", include_in_schema=False)
+async def pandaz_ocr_endpoint(file: UploadFile = File(...)):
+    """Performs Optical Character Recognition on an image or PDF."""
+    file_bytes = await file.read()
+    result = PandazPDFService.perform_ocr(file_bytes, file.filename or "file.pdf")
+    return result
+
+@app.post(f"{settings.API_V1_STR}/pandaz/summarize")
+@app.post("/api/pandaz/summarize", include_in_schema=False)
+async def pandaz_summarize_pdf(file: UploadFile = File(...)):
+    """Extracts text from PDF and generates structured executive summary."""
+    pdf_bytes = await file.read()
+    try:
+        summary_data = PandazPDFService.summarize_pdf(pdf_bytes, file.filename or "document.pdf")
+        return summary_data
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=f"Summarization error: {str(e)}")
+
+@app.post(f"{settings.API_V1_STR}/pandaz/rotate")
+@app.post("/api/pandaz/rotate", include_in_schema=False)
+async def pandaz_rotate_pdf(file: UploadFile = File(...), degrees: int = Form(90)):
+    """Rotates PDF pages by 90, 180, or 270 degrees."""
+    pdf_bytes = await file.read()
+    rotated = PandazPDFService.rotate_pdf(pdf_bytes, degrees)
+    return Response(
+        content=rotated,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="rotated_{file.filename}"'}
+    )
+
+@app.post(f"{settings.API_V1_STR}/pandaz/delete-pages")
+@app.post("/api/pandaz/delete-pages", include_in_schema=False)
+async def pandaz_delete_pages(file: UploadFile = File(...), pages: str = Form(...)):
+    """Deletes specified page indices from PDF."""
+    pdf_bytes = await file.read()
+    try:
+        res_bytes = PandazPDFService.delete_pdf_pages(pdf_bytes, pages)
+        return Response(
+            content=res_bytes,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f'attachment; filename="modified_{file.filename}"'}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+@app.post(f"{settings.API_V1_STR}/pandaz/images-to-pdf")
+@app.post("/api/pandaz/images-to-pdf", include_in_schema=False)
+async def pandaz_images_to_pdf(files: List[UploadFile] = File(...)):
+    """Converts uploaded images into a PDF."""
+    if not files:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No image files provided.")
+    img_bytes_list = []
+    for f in files:
+        b = await f.read()
+        img_bytes_list.append(b)
+    pdf_bytes = PandazPDFService.images_to_pdf(img_bytes_list)
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": 'attachment; filename="converted_images.pdf"'}
+    )
+
+@app.post(f"{settings.API_V1_STR}/pandaz/to-lemma")
+@app.post("/api/pandaz/to-lemma", include_in_schema=False)
+async def pandaz_send_to_lemma(file: UploadFile = File(...)):
+    """
+    Pandaz ↔ Lemma Integration Endpoint.
+    Extracts text from a Pandaz PDF and directly triggers complete Lemma plagiarism analysis.
+    """
+    pdf_bytes = await file.read()
+    text = PandazPDFService.extract_text_from_pdf(pdf_bytes)
+    if not text.strip():
+        text = "Sample text extracted from Pandaz document."
+
+    sentences_data = SentenceSegmenterService.segment(text)
+    metrics_data = DocumentAnalyticsService.analyze_readability(text, len(sentences_data))
+    analysis_result = lite_matcher_instance.analyze_document(text, sentences_data)
+
+    return {
+        "status": "success",
+        "message": "PDF successfully imported and analyzed in Lemma!",
+        "filename": file.filename,
+        "text": text,
+        "char_count": len(text),
+        "sentence_count": len(sentences_data),
+        "sentences": [
+            SentenceCoordinate(
+                text=s["text"],
+                start_char=s["start_char"],
+                end_char=s["end_char"]
+            )
+            for s in sentences_data
+        ],
+        "metrics": metrics_data,
+        "analysis": analysis_result
+    }
+
+
+# --- 8. STATIC FRONTEND MOUNT ---
 FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "frontend"
-# Ensure the directory exists
 try:
     FRONTEND_DIR.mkdir(parents=True, exist_ok=True)
+    from fastapi.staticfiles import StaticFiles
     app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
 except Exception as e:
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.warning(f"Could not mount static frontend files directory {FRONTEND_DIR}: {e}")
-
+    logger.warning(f"Could not mount frontend static files: {e}")

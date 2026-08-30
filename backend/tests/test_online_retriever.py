@@ -111,6 +111,7 @@ async def test_get_online_candidates_merged(mock_get):
     assert "semschol_a1b2c3d4e5f6" in ids
 
 @pytest.mark.anyio
+@pytest.mark.skipif(not DatabaseService.is_available(), reason="PostgreSQL database not running")
 async def test_seed_and_prune_ephemeral_candidates():
     job_id = "testjob123"
     candidates = [

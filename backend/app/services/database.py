@@ -26,6 +26,17 @@ class DatabaseService:
         return conn
 
     @classmethod
+    def is_available(cls) -> bool:
+        """Checks if PostgreSQL server and database are reachable."""
+        try:
+            with cls.get_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT 1;")
+                    return True
+        except Exception:
+            return False
+
+    @classmethod
     def initialize_db(cls):
         """Creates the PostgreSQL tables and extensions if they do not already exist."""
         with cls.get_connection() as conn:

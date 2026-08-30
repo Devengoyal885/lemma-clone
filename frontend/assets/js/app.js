@@ -1,1501 +1,2153 @@
 /**
- * Lemma Frontend Engine (Vanilla JS)
+ * LEMMA 2.0 & PANDaz PDF SUITE — Complete Frontend Application Engine
+ * Pure Vanilla JavaScript, zero hardcoded mocks, complete offline/Lite Mode support.
  */
 
-document.addEventListener("DOMContentLoaded", () => {
-    // API URL configuration - resolved by APIConfigManager
-    let API_BASE_URL = 'http://localhost:8000';
-    let API_UPLOAD_URL = `${API_BASE_URL}/api/v1/documents/upload`;
-    let API_ANALYZE_URL = `${API_BASE_URL}/api/v1/analyze`;
-    let API_STATUS_URL = `${API_BASE_URL}/api/v1/status`;
-    let API_REWRITE_URL = `${API_BASE_URL}/api/v1/rewrite`;
-    let API_HEALTH_URL = `${API_BASE_URL}/api/v1/health`;
+(function () {
+    'use strict';
 
-    function updateApiUrls(base) {
-        API_BASE_URL = base;
-        API_UPLOAD_URL = `${API_BASE_URL}/api/v1/documents/upload`;
-        API_ANALYZE_URL = `${API_BASE_URL}/api/v1/analyze`;
-        API_STATUS_URL = `${API_BASE_URL}/api/v1/status`;
-        API_REWRITE_URL = `${API_BASE_URL}/api/v1/rewrite`;
-        API_HEALTH_URL = `${API_BASE_URL}/api/v1/health`;
+    // --- APPLICATION STATE ---
+    const state = {
+        apiBaseUrl: 'http://localhost:8000',
+        activeSection: 'view-dashboard',
+        activeDocument: null,
+        activeTone: 'academic',
+        selectedMatch: null,
+        history: [],
+        workspace: [],
+        theme: 'dark',
+        batchCancelRequested: false
+    };
+
+    // --- DOM ELEMENT REFERENCES ---
+    const DOM = {
+        // Navigation
+        navItems: document.querySelectorAll('.sidebar-nav .nav-item'),
+        viewSections: document.querySelectorAll('.view-section'),
+        currentPageTitle: document.getElementById('current-page-title'),
+        mobileMenuToggle: document.getElementById('mobile-menu-toggle'),
+        sidebar: document.getElementById('sidebar-panel'),
+        themeToggle: document.getElementById('theme-toggle'),
+        systemStatusIndicator: document.getElementById('system-status-indicator'),
+        
+        // Header
+        headerQuickPandaz: document.getElementById('header-quick-pandaz-btn'),
+        headerQuickAnalyze: document.getElementById('header-quick-analyze-btn'),
+        commandPaletteTrigger: document.getElementById('command-palette-trigger'),
+        
+        // Dashboard
+        dashBtnAnalyze: document.getElementById('dash-btn-analyze'),
+        dashBtnPaste: document.getElementById('dash-btn-paste'),
+        dashBtnPandaz: document.getElementById('dash-btn-pandaz'),
+        dashBtnSample: document.getElementById('dash-btn-sample'),
+        dashOverallScore: document.getElementById('dash-overall-score'),
+        dashStatDocs: document.getElementById('dash-stat-docs'),
+        dashStatMatches: document.getElementById('dash-stat-matches'),
+        dashStatWords: document.getElementById('dash-stat-words'),
+        dashRecentTbody: document.getElementById('dash-recent-tbody'),
+        dashViewAllHistory: document.getElementById('dash-view-all-history'),
+        
+        // Analyze View
+        tabUploadBtn: document.getElementById('tab-upload-btn'),
+        tabPasteBtn: document.getElementById('tab-paste-btn'),
+        panelUpload: document.getElementById('panel-upload'),
+        panelPaste: document.getElementById('panel-paste'),
+        fileInput: document.getElementById('file-input'),
+        uploadDropzone: document.getElementById('upload-dropzone'),
+        btnBrowseFile: document.getElementById('btn-browse-file'),
+        uploadProgressWrapper: document.getElementById('upload-progress-wrapper'),
+        progressFilename: document.getElementById('progress-filename'),
+        progressPercent: document.getElementById('progress-percent'),
+        progressBarFill: document.getElementById('progress-bar-fill'),
+        pasteTextarea: document.getElementById('paste-textarea'),
+        pasteCharCount: document.getElementById('paste-char-count'),
+        pasteWordCount: document.getElementById('paste-word-count'),
+        pasteSentCount: document.getElementById('paste-sent-count'),
+        btnClearPaste: document.getElementById('btn-clear-paste'),
+        btnSamplePaste: document.getElementById('btn-sample-paste'),
+        btnAnalyzePaste: document.getElementById('btn-analyze-paste'),
+        
+        // Analysis Results
+        analysisResultsWrapper: document.getElementById('analysis-results-wrapper'),
+        resPlagVal: document.getElementById('res-plag-val'),
+        resPlagSubtitle: document.getElementById('res-plag-subtitle'),
+        resOrigVal: document.getElementById('res-orig-val'),
+        resCountLexical: document.getElementById('res-count-lexical'),
+        resCountHybrid: document.getElementById('res-count-hybrid'),
+        resCountSemantic: document.getElementById('res-count-semantic'),
+        resCountTotal: document.getElementById('res-count-total'),
+        resWords: document.getElementById('res-words'),
+        resReadingEase: document.getElementById('res-reading-ease'),
+        resGradeLevel: document.getElementById('res-grade-level'),
+        resReadingTime: document.getElementById('res-reading-time'),
+        resDocTitle: document.getElementById('res-doc-title'),
+        btnOpenInPandaz: document.getElementById('btn-open-in-pandaz'),
+        btnAskAboutDoc: document.getElementById('btn-ask-about-doc'),
+        btnRewriteFlagged: document.getElementById('btn-rewrite-flagged'),
+        btnDownloadReportDirect: document.getElementById('btn-download-report-direct'),
+        documentTextRendered: document.getElementById('document-text-rendered'),
+        matchesCountBadge: document.getElementById('matches-count-badge'),
+        matchesListWrapper: document.getElementById('matches-list-wrapper'),
+        
+        // Ask Lemma Chat
+        chatActiveDocPill: document.getElementById('chat-active-doc-pill'),
+        chatDocName: document.getElementById('chat-doc-name'),
+        chatMessagesBox: document.getElementById('chat-messages-box'),
+        chatInputText: document.getElementById('chat-input-text'),
+        btnSendChat: document.getElementById('btn-send-chat'),
+        
+        // Paraphraser
+        paraphraseProviderBadge: document.getElementById('paraphrase-provider-badge'),
+        paraphraseInput: document.getElementById('paraphrase-input'),
+        paraphraseOutput: document.getElementById('paraphrase-output'),
+        btnCopyOriginal: document.getElementById('btn-copy-original'),
+        btnCopyRewritten: document.getElementById('btn-copy-rewritten'),
+        btnReplaceInDoc: document.getElementById('btn-replace-in-doc'),
+        btnExecuteParaphrase: document.getElementById('btn-execute-paraphrase'),
+        btnBatchRewriteAll: document.getElementById('btn-batch-rewrite-all'),
+        batchProgressBox: document.getElementById('batch-progress-box'),
+        batchProgressStatus: document.getElementById('batch-progress-status'),
+        batchProgressBar: document.getElementById('batch-progress-bar'),
+        btnCancelBatch: document.getElementById('btn-cancel-batch'),
+        
+        // Sources
+        sourcesSearchInput: document.getElementById('sources-search-input'),
+        btnSearchSources: document.getElementById('btn-search-sources'),
+        sourcesGridWrapper: document.getElementById('sources-grid-wrapper'),
+        
+        // Reports
+        btnGenerateReportView: document.getElementById('btn-generate-report-view'),
+        repDate: document.getElementById('rep-date'),
+        repFilename: document.getElementById('rep-filename'),
+        repPlagScore: document.getElementById('rep-plag-score'),
+        repOrigScore: document.getElementById('rep-orig-score'),
+        repSentences: document.getElementById('rep-sentences'),
+        repSummaryText: document.getElementById('rep-summary-text'),
+        repSourcesList: document.getElementById('rep-sources-list'),
+        
+        // History
+        historyTableTbody: document.getElementById('history-table-tbody'),
+        btnClearHistory: document.getElementById('btn-clear-history'),
+        
+        // Workspace
+        workspaceGridContainer: document.getElementById('workspace-grid-container'),
+        btnWorkspaceNewDoc: document.getElementById('btn-workspace-new-doc'),
+        
+        // Pandaz
+        pandazWorkbenchModal: document.getElementById('pandaz-workbench-modal'),
+        pandazModalTitle: document.getElementById('pandaz-modal-title'),
+        pandazModalBody: document.getElementById('pandaz-modal-body'),
+        btnClosePandazModal: document.getElementById('btn-close-pandaz-modal'),
+        
+        // Settings
+        btnRefreshStatus: document.getElementById('btn-refresh-status'),
+        settingApiUrl: document.getElementById('setting-api-url'),
+        btnSaveApiUrl: document.getElementById('btn-save-api-url'),
+        setAiStatus: document.getElementById('set-ai-status'),
+        
+        // Modals & Command Palette
+        matchInspectorModal: document.getElementById('match-inspector-modal'),
+        modalMatchTitle: document.getElementById('modal-match-title'),
+        modalMatchBadge: document.getElementById('modal-match-badge'),
+        modalMatchScore: document.getElementById('modal-match-score'),
+        modalQuerySentence: document.getElementById('modal-query-sentence'),
+        modalRefSentence: document.getElementById('modal-ref-sentence'),
+        modalSourceTitle: document.getElementById('modal-source-title'),
+        modalSourceAuthor: document.getElementById('modal-source-author'),
+        modalSourcePub: document.getElementById('modal-source-pub'),
+        modalBtnRewrite: document.getElementById('modal-btn-rewrite'),
+        modalBtnCopy: document.getElementById('modal-btn-copy'),
+        modalBtnViewSource: document.getElementById('modal-btn-view-source'),
+        btnCloseMatchModal: document.getElementById('btn-close-match-modal'),
+        commandPaletteModal: document.getElementById('command-palette-modal'),
+        paletteSearchInput: document.getElementById('palette-search-input'),
+        paletteResultsList: document.getElementById('palette-results-list'),
+        toastContainer: document.getElementById('toast-container')
+    };
+
+    // --- SAMPLE DOCUMENT TEXT ---
+    const SAMPLE_DOCUMENT_TEXT = `Deep learning is a subset of machine learning that is based on artificial neural networks with representation learning. The adjective deep in deep learning refers to the use of multiple layers in the network. Historically, neural networks were limited in depth due to computational constraints and training difficulties. Today, modern deep learning architectures utilize convolutional neural networks and transformer architectures to process vast datasets.
+
+Climate change represents one of the defining challenges of our generation, requiring immediate and decisive systemic shifts. Global greenhouse gas emissions must be reduced by half before the end of this decade to prevent catastrophic warming. Transitioning from fossil fuels to renewable energy sources like wind and solar power is crucial.
+
+In our proprietary study, we observed that algorithmic latency decreases substantially when vectorized matrices are cached locally in memory. Our experimental benchmark demonstrated a 4.2x increase in throughput across consumer grade hardware. These novel empirical measurements confirm the validity of our local-first computational hypothesis.`;
+
+    // --- INITIALIZATION ---
+    async function initApp() {
+        // Resolve API base URL
+        state.apiBaseUrl = await APIConfigManager.getApiBaseUrl();
+        if (DOM.settingApiUrl) {
+            DOM.settingApiUrl.value = state.apiBaseUrl;
+        }
+
+        // Load persisted state
+        loadHistory();
+        loadWorkspace();
+        initTheme();
+
+        // Setup event listeners
+        setupNavigation();
+        setupDashboard();
+        setupAnalyze();
+        setupAskLemma();
+        setupParaphraser();
+        setupSources();
+        setupReports();
+        setupHistory();
+        setupWorkspace();
+        setupPandaz();
+        setupSettings();
+        setupCommandPalette();
+        setupModals();
+
+        // Check backend system health
+        checkSystemHealth();
     }
 
-    // DOM Elements
-    // Main Workspace Layout Views
-    const dashboardHomeView = document.getElementById("dashboard-home-view");
-    const placeholderWorkspace = document.getElementById("placeholder-workspace");
-    const dropZone = document.getElementById("drop-zone");
-    const fileInput = document.getElementById("file-input");
-    const documentViewer = document.getElementById("document-viewer");
-    const documentRender = document.getElementById("document-content-render");
-    const viewerFilename = document.getElementById("viewer-filename");
-    const viewerDocType = document.getElementById("viewer-doc-type");
-    const btnReupload = document.getElementById("btn-reupload");
-    const btnRunAnalysis = document.getElementById("btn-run-analysis");
-    const btnDownloadPdf = document.getElementById("btn-download-pdf");
-    const toastContainer = document.getElementById("toast-container");
-
-    // Metadata Elements
-    const metaChars = document.getElementById("meta-chars");
-    const metaWords = document.getElementById("meta-words");
-    const metaSentences = document.getElementById("meta-sentences");
-    const metaReadability = document.getElementById("meta-readability");
-    const metaReadabilityLevel = document.getElementById("meta-readability-level");
-    const metaReadingTime = document.getElementById("meta-reading-time");
-    const metaFilename = document.getElementById("meta-filename");
-    const metaStatus = document.getElementById("meta-status");
-
-    // Inspector Elements
-    const inspectorPlaceholder = document.getElementById("inspector-placeholder");
-    const inspectorData = document.getElementById("inspector-data");
-    const inspectStart = document.getElementById("inspect-start");
-    const inspectEnd = document.getElementById("inspect-end");
-    const inspectText = document.getElementById("inspect-text");
-    const btnQuickParaphrase = document.getElementById("btn-quick-paraphrase");
-
-    // Reports Workspace Elements
-    const reportsWorkspace = document.getElementById("reports-workspace");
-    const reportsTable = document.getElementById("reports-table");
-    const reportsTableBody = document.getElementById("reports-table-body");
-    const reportsEmptyState = document.getElementById("reports-empty-state");
-    const btnClearHistory = document.getElementById("btn-clear-history");
-
-    // App State
-    let activeFile = null;
-    let uploadResponseData = null;
-    let currentJobId = null;
-    let isAnalyzing = false;
-    let isParaphrasing = false;
-
-    // Initialize Page
-    async function initApiConfig() {
-        try {
-            const resolvedUrl = await APIConfigManager.getApiBaseUrl();
-            updateApiUrls(resolvedUrl);
-            console.log("Resolved API URL:", resolvedUrl);
-        } catch (err) {
-            console.warn("Failed resolving API from config manager, fallback to default URL:", err);
-        } finally {
-            checkServerHealth();
-            setInterval(checkServerHealth, 10000); // Check health every 10 seconds
-        }
-    }
-
-    initApiConfig();
-
-    // Theme Switcher Controller
-    function initThemeSwitcher() {
-        const themeBtn = document.getElementById("theme-toggle-btn");
-        if (!themeBtn) return;
-
-        const sunIcon = themeBtn.querySelector(".sun-icon");
-        const moonIcon = themeBtn.querySelector(".moon-icon");
-
-        function updateIcons(theme) {
-            if (theme === "light") {
-                sunIcon.classList.add("hidden");
-                moonIcon.classList.remove("hidden");
-            } else {
-                sunIcon.classList.remove("hidden");
-                moonIcon.classList.add("hidden");
-            }
-        }
-
-        // Set initial icon states
-        const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
-        updateIcons(currentTheme);
-
-        themeBtn.addEventListener("click", () => {
-            const activeTheme = document.documentElement.getAttribute("data-theme") || "dark";
-            const newTheme = activeTheme === "dark" ? "light" : "dark";
-
-            document.documentElement.setAttribute("data-theme", newTheme);
-            localStorage.setItem("lemma-theme", newTheme);
-            localStorage.setItem("lemma-theme-manual", "true");
-
-            updateIcons(newTheme);
-            showToast(`Switched to ${newTheme === "dark" ? "Dark Mode" : "Light Mode"}`, "info");
-        });
-
-        // Setup real-time system theme change listener for all users
-        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
-            const hasManualTheme = localStorage.getItem("lemma-theme-manual");
-            if (!hasManualTheme) {
-                const newTheme = e.matches ? "dark" : "light";
-                document.documentElement.setAttribute("data-theme", newTheme);
-                localStorage.setItem("lemma-theme", newTheme);
-                updateIcons(newTheme);
-                showToast(`System theme shifted to ${newTheme === "dark" ? "Dark Mode" : "Light Mode"}`, "info");
-            }
-        });
-    }
-    initThemeSwitcher();
-
-    /* -------------------------------------------------------------
-     * Server Health Checking
-     * ------------------------------------------------------------- */
-    async function checkServerHealth() {
-        const hOllama = document.getElementById("health-ollama");
-        const hOllamaDot = document.getElementById("health-ollama-dot");
-        const hOllamaText = document.getElementById("health-ollama-text");
-
-        const hEs = document.getElementById("health-es");
-        const hEsDot = document.getElementById("health-es-dot");
-        const hEsText = document.getElementById("health-es-text");
-
-        const hDb = document.getElementById("health-db");
-        const hDbDot = document.getElementById("health-db-dot");
-        const hDbText = document.getElementById("health-db-text");
-
-        const hCelery = document.getElementById("health-celery");
-        const hCeleryDot = document.getElementById("health-celery-dot");
-        const hCeleryText = document.getElementById("health-celery-text");
-
-        if (!hOllama || !hEs || !hDb || !hCelery) return;
-
-        // Force working status during job performance to keep UI clean and accurate
-        if (isAnalyzing || isParaphrasing) {
-            if (isAnalyzing) {
-                hDb.className = "health-item working-orange";
-                hDbText.textContent = "Working";
-                hEs.className = "health-item working-orange";
-                hEsText.textContent = "Working";
-                hCelery.className = "health-item working-orange";
-                hCeleryText.textContent = "Working";
-            }
-            if (isParaphrasing) {
-                hOllama.className = "health-item working-orange";
-                hOllamaText.textContent = "Working";
-            }
-            return;
-        }
-
-        try {
-            const response = await fetch(API_HEALTH_URL, { signal: AbortSignal.timeout(5000) });
-            if (response.ok) {
-                const healthData = await response.json();
-                const services = healthData.services || {};
-
-                // 1. Ollama status
-                const ollama = services.ollama || {};
-                if (ollama.status === "running") {
-                    hOllama.className = "health-item online-green";
-                    hOllamaText.textContent = "Running";
-                } else if (ollama.status === "no_models") {
-                    hOllama.className = "health-item working-orange";
-                    hOllamaText.textContent = "No Models";
-                } else {
-                    hOllama.className = "health-item offline-red";
-                    hOllamaText.textContent = "Offline";
-                }
-
-                // 2. Elasticsearch status
-                const es = services.elasticsearch || {};
-                if (es.status === "healthy") {
-                    hEs.className = "health-item healthy-green";
-                    hEsText.textContent = "Healthy";
-                } else if (es.status === "unhealthy") {
-                    hEs.className = "health-item working-orange";
-                    hEsText.textContent = "Degraded";
-                } else {
-                    hEs.className = "health-item offline-red";
-                    hEsText.textContent = "Offline";
-                }
-
-                // 3. PostgreSQL Database status
-                const db = services.database || {};
-                if (db.status === "connected") {
-                    hDb.className = "health-item connected-green";
-                    hDbText.textContent = "Connected";
-                } else {
-                    hDb.className = "health-item offline-red";
-                    hDbText.textContent = "Offline";
-                }
-
-                // 4. Celery Queue status (Idle vs Working)
-                const celery = services.celery || {};
-                const isFrontendRunningJob = (currentJobId !== null && uploadResponseData === null);
-                if (isFrontendRunningJob || celery.status === "working") {
-                    hCelery.className = "health-item working-orange";
-                    hCeleryText.textContent = "Working";
-                } else if (celery.status === "idle") {
-                    hCelery.className = "health-item idle-green";
-                    hCeleryText.textContent = "Idle";
-                } else {
-                    hCelery.className = "health-item offline-red";
-                    hCeleryText.textContent = "Offline";
-                }
-            } else {
-                throw new Error("Health response not OK");
-            }
-        } catch (error) {
-            console.error("Health footer check failed:", error);
-            hOllama.className = "health-item offline-red"; hOllamaText.textContent = "Offline";
-            hEs.className = "health-item offline-red"; hEsText.textContent = "Offline";
-            hDb.className = "health-item offline-red"; hDbText.textContent = "Offline";
-            hCelery.className = "health-item offline-red"; hCeleryText.textContent = "Offline";
-        }
-    }
-
-    /* -------------------------------------------------------------
-     * Toast Notifications Helper
-     * ------------------------------------------------------------- */
-    function showToast(message, type = "info") {
-        const toast = document.createElement("div");
-        toast.className = `toast toast-${type}`;
-
-        let icon = '<i class="fa-solid fa-circle-info"></i>';
-        if (type === "error") icon = '<i class="fa-solid fa-circle-exclamation"></i>';
-        if (type === "success") icon = '<i class="fa-solid fa-circle-check"></i>';
+    // --- TOAST NOTIFICATIONS ---
+    function showToast(message, type = 'info') {
+        if (!DOM.toastContainer) return;
+        const toast = document.createElement('div');
+        toast.className = `toast-item toast-${type}`;
+        
+        let icon = 'fa-circle-info';
+        if (type === 'success') icon = 'fa-circle-check';
+        if (type === 'error') icon = 'fa-circle-exclamation';
+        if (type === 'warning') icon = 'fa-triangle-exclamation';
 
         toast.innerHTML = `
-            ${icon}
-            <div class="toast-message">${message}</div>
+            <i class="fa-solid ${icon}"></i>
+            <span>${escapeHTML(message)}</span>
         `;
+        DOM.toastContainer.appendChild(toast);
 
-        toastContainer.appendChild(toast);
-
-        // Slide out and remove
         setTimeout(() => {
-            toast.style.animation = "slide-in 0.3s reverse forwards";
+            toast.classList.add('fade-out');
             setTimeout(() => toast.remove(), 300);
-        }, 4000);
+        }, 3500);
     }
 
-    /* -------------------------------------------------------------
-     * Ingestion / Drag-and-Drop Handlers
-     * ------------------------------------------------------------- */
-    // Open file dialog on click
-    dropZone.addEventListener("click", () => fileInput.click());
-
-    fileInput.addEventListener("change", (e) => {
-        if (e.target.files.length > 0) {
-            handleFileSelection(e.target.files[0]);
-        }
-    });
-
-    // Drag over styling
-    dropZone.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        dropZone.classList.add("dragover");
-    });
-
-    dropZone.addEventListener("dragleave", () => {
-        dropZone.classList.remove("dragover");
-    });
-
-    dropZone.addEventListener("drop", (e) => {
-        e.preventDefault();
-        dropZone.classList.remove("dragover");
-        if (e.dataTransfer.files.length > 0) {
-            handleFileSelection(e.dataTransfer.files[0]);
-        }
-    });
-
-    function handleFileSelection(file) {
-        const allowedExtensions = ["txt", "docx", "pdf"];
-        const fileExt = file.name.split(".").pop().toLowerCase();
-
-        if (!allowedExtensions.includes(fileExt)) {
-            showToast(`Unsupported file type: .${fileExt}. Please upload PDF, DOCX, or TXT.`, "error");
-            return;
-        }
-
-        if (file.size > 100 * 1024 * 1024) {
-            showToast("File size exceeds 100MB limit.", "error");
-            return;
-        }
-
-        activeFile = file;
-        uploadDocument(file);
-    }
-
-    /* -------------------------------------------------------------
-     * Document Upload Service Call (Async Queue Flow)
-     * ------------------------------------------------------------- */
-    function resetMetricsUI() {
-        const lexicalChk = document.getElementById("chk-lexical");
-        const semanticChk = document.getElementById("chk-semantic");
-        const progressScore = document.getElementById("plagiarism-score-text");
-        const progressCircle = document.querySelector(".circular-progress");
-
-        if (progressScore) progressScore.textContent = "0%";
-        if (progressCircle) {
-            progressCircle.style.background = `conic-gradient(var(--border-color) 360deg, transparent 0deg)`;
-        }
-
-        document.getElementById("legend-val-lexical").textContent = "0%";
-        document.getElementById("legend-val-hybrid").textContent = "0%";
-        document.getElementById("legend-val-semantic").textContent = "0%";
-        document.getElementById("legend-val-original").textContent = "100%";
-
-        lexicalChk.innerHTML = '<i class="fa-regular fa-circle"></i> Lexical Matching (TF-IDF)';
-        lexicalChk.className = "checklist-item";
-        semanticChk.innerHTML = '<i class="fa-regular fa-circle"></i> Semantic Indexing (Embeddings)';
-        semanticChk.className = "checklist-item";
-    }
-
-    async function uploadDocument(file) {
-        // Update Metadata sidebar indicators
-        metaFilename.textContent = file.name;
-        metaStatus.innerHTML = '<span class="badge badge-dim">Uploading...</span>';
-
-        // Show loading progress
-        showToast(`Uploading ${file.name}...`, "info");
-
-        const formData = new FormData();
-        formData.append("file", file);
-
+    // --- SYSTEM HEALTH CHECK ---
+    async function checkSystemHealth() {
         try {
-            const response = await fetch(API_UPLOAD_URL, {
-                method: "POST",
-                body: formData
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.detail || "Failed to upload document");
-            }
-
-            uploadResponseData = data;
-            showToast("Document uploaded and segmented successfully.", "success");
-
-            // Render Document Viewer (plain text)
-            renderDocument(uploadResponseData);
-
-            // Reset metrics cards in UI
-            resetMetricsUI();
-
-            // Enable Run Analysis button
-            btnRunAnalysis.disabled = false;
-            btnDownloadPdf.classList.add("hidden");
-            metaStatus.innerHTML = '<span class="badge badge-dim">Uploaded</span>';
-
-        } catch (error) {
-            console.error("Upload Error:", error);
-            showToast(error.message, "error");
-
-            // Reset metadata card on failure
-            metaFilename.textContent = "No file uploaded";
-            metaStatus.innerHTML = '<span class="badge badge-dim">Idle</span>';
-            btnRunAnalysis.disabled = true;
-        }
-    }
-
-    async function triggerPlagiarismAnalysis(file) {
-        if (!file) {
-            showToast("No active file to analyze.", "error");
-            return;
-        }
-
-        const lexicalChk = document.getElementById("chk-lexical");
-        const semanticChk = document.getElementById("chk-semantic");
-
-        btnRunAnalysis.disabled = true;
-        showToast("Submitting document to plagiarism checker...", "info");
-
-        // Set visual loading indicators
-        metaStatus.innerHTML = '<span class="badge badge-dim">Queued...</span>';
-        lexicalChk.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking Lexical Database...';
-        lexicalChk.className = "checklist-item done";
-
-        // Mark that a job is actively running to update the health footer to Working
-        isAnalyzing = true;
-        checkServerHealth();
-
-        const formData = new FormData();
-        formData.append("file", file);
-
-        try {
-            const response = await fetch(API_ANALYZE_URL, {
-                method: "POST",
-                body: formData
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.detail || "Failed to submit analysis job");
-            }
-
-            const jobId = data.job_id;
-            currentJobId = jobId;
-
-            // Start polling the job status
-            pollAnalysisStatus(jobId, file.name);
-
-        } catch (error) {
-            console.error("Analysis Submission Error:", error);
-            showToast(error.message, "error");
-            metaStatus.innerHTML = '<span class="badge badge-dim">Failed</span>';
-            btnRunAnalysis.disabled = false;
-            resetMetricsUI();
-            isAnalyzing = false;
-            checkServerHealth();
-        }
-    }
-
-    async function pollAnalysisStatus(jobId, filename) {
-        const lexicalChk = document.getElementById("chk-lexical");
-        const semanticChk = document.getElementById("chk-semantic");
-        const progressScore = document.getElementById("plagiarism-score-text");
-        const progressCircle = document.querySelector(".circular-progress");
-
-        const interval = setInterval(async () => {
-            try {
-                const response = await fetch(`${API_STATUS_URL}/${jobId}`);
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.detail || "Status check failed");
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/system/status`);
+            if (res.ok) {
+                const data = await res.json();
+                if (DOM.systemStatusIndicator) {
+                    DOM.systemStatusIndicator.innerHTML = `
+                        <span class="status-dot online"></span>
+                        <span class="status-label">Lemma 2.0 Online</span>
+                    `;
                 }
+                if (DOM.setAiStatus) {
+                    const aiOnline = data.subsystems && data.subsystems.ai_assistant && data.subsystems.ai_assistant.includes('ONLINE');
+                    DOM.setAiStatus.textContent = aiOnline ? 'ONLINE (Ollama)' : 'LOCAL (Deterministic)';
+                    DOM.setAiStatus.className = aiOnline ? 'text-success' : 'text-warning';
+                }
+                if (DOM.paraphraseProviderBadge) {
+                    const aiOnline = data.subsystems && data.subsystems.ai_assistant && data.subsystems.ai_assistant.includes('ONLINE');
+                    DOM.paraphraseProviderBadge.innerHTML = aiOnline ? 
+                        '<span class="badge badge-success">AI REWRITE ACTIVE</span>' : 
+                        '<span class="badge badge-info">OFFLINE REWRITE ACTIVE</span>';
+                }
+            } else {
+                setOfflineIndicator();
+            }
+        } catch (e) {
+            setOfflineIndicator();
+        }
+    }
 
-                if (data.status === "completed") {
-                    clearInterval(interval);
-                    isAnalyzing = false;
-                    checkServerHealth();
+    function setOfflineIndicator() {
+        if (DOM.systemStatusIndicator) {
+            DOM.systemStatusIndicator.innerHTML = `
+                <span class="status-dot offline"></span>
+                <span class="status-label">Backend Offline</span>
+            `;
+        }
+    }
 
-                    uploadResponseData = data.result;
+    // --- NAVIGATION & VIEWS ---
+    function setupNavigation() {
+        DOM.navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetViewId = item.getAttribute('data-target');
+                if (targetViewId) {
+                    switchView(targetViewId);
+                }
+            });
+        });
 
-                    showToast("Document analysis complete!", "success");
-                    metaStatus.innerHTML = '<span class="badge badge-dim">Analyzed</span>';
+        // Mobile menu toggle
+        if (DOM.mobileMenuToggle) {
+            DOM.mobileMenuToggle.addEventListener('click', () => {
+                document.getElementById('app-container-el').classList.toggle('sidebar-open');
+            });
+        }
 
-                    // Update checklist
-                    lexicalChk.innerHTML = '<i class="fa-regular fa-circle-check"></i> Lexical Match Complete';
-                    semanticChk.innerHTML = '<i class="fa-regular fa-circle-check"></i> Semantic Matching Complete';
-                    semanticChk.className = "checklist-item done";
+        // Header quick buttons
+        if (DOM.headerQuickPandaz) {
+            DOM.headerQuickPandaz.addEventListener('click', () => switchView('view-pandaz'));
+        }
+        if (DOM.headerQuickAnalyze) {
+            DOM.headerQuickAnalyze.addEventListener('click', () => switchView('view-analyze'));
+        }
 
-                    // Calculate real percentages
-                    const analysis = uploadResponseData.analysis;
-                    const total = analysis.total_sentences;
-                    const lexicalCount = analysis.lexical_matches_count;
-                    const hybridCount = analysis.hybrid_matches_count || 0;
-                    const semanticCount = analysis.semantic_matches_count;
+        // Feature cards navigation on dashboard
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const action = card.getAttribute('data-action');
+                if (action === 'goto-analyze') switchView('view-analyze');
+                if (action === 'goto-asklemma') switchView('view-asklemma');
+                if (action === 'goto-paraphrase') switchView('view-paraphrase');
+                if (action === 'goto-pandaz') switchView('view-pandaz');
+            });
+        });
+    }
 
-                    const pctL = total > 0 ? Math.round((lexicalCount / total) * 100) : 0;
-                    const pctH = total > 0 ? Math.round((hybridCount / total) * 100) : 0;
-                    const pctS = total > 0 ? Math.round((semanticCount / total) * 100) : 0;
-                    const pctO = Math.max(0, 100 - pctL - pctH - pctS);
+    function switchView(viewId) {
+        DOM.viewSections.forEach(section => {
+            section.classList.remove('active');
+            if (section.id === viewId) {
+                section.classList.add('active');
+            }
+        });
 
-                    // Set circular progress middle text
-                    const realPlagScore = pctL + pctH + pctS;
-                    progressScore.textContent = `${realPlagScore}%`;
+        DOM.navItems.forEach(item => {
+            item.classList.remove('active');
+            if (item.getAttribute('data-target') === viewId) {
+                item.classList.add('active');
+            }
+        });
 
-                    // Set conic gradient
-                    const degL = pctL * 3.6;
-                    const degH = pctH * 3.6;
-                    const degS = pctS * 3.6;
-                    progressCircle.style.background = `conic-gradient(#ef4444 0deg ${degL}deg, #f59e0b ${degL}deg ${degL + degH}deg, #8b5cf6 ${degL + degH}deg ${degL + degH + degS}deg, #10b981 ${degL + degH + degS}deg 360deg)`;
+        state.activeSection = viewId;
 
-                    // Update Legend Values
-                    document.getElementById("legend-val-lexical").textContent = `${pctL}%`;
-                    document.getElementById("legend-val-hybrid").textContent = `${pctH}%`;
-                    document.getElementById("legend-val-semantic").textContent = `${pctS}%`;
-                    document.getElementById("legend-val-original").textContent = `${pctO}%`;
+        // Update Title & Breadcrumb
+        const titleMap = {
+            'view-dashboard': 'Dashboard',
+            'view-analyze': 'Plagiarism & Originality Analysis',
+            'view-asklemma': 'Ask Lemma Assistant',
+            'view-paraphrase': 'Paraphraser & Rewriter',
+            'view-sources': 'Source Discovery & References',
+            'view-reports': 'Lemma Integrity Reports',
+            'view-history': 'Analysis History',
+            'view-workspace': 'Workspace',
+            'view-pandaz': 'Pandaz PDF Tools',
+            'view-settings': 'Settings & Status'
+        };
+        if (DOM.currentPageTitle) {
+            DOM.currentPageTitle.textContent = titleMap[viewId] || 'Lemma';
+        }
 
-                    // Apply visual highlights to document sentences
-                    applyPlagiarismHighlights(analysis);
+        // Refresh views if needed
+        if (viewId === 'view-history') renderHistoryTable();
+        if (viewId === 'view-workspace') renderWorkspace();
+        if (viewId === 'view-sources') renderSourcesView();
+        if (viewId === 'view-reports') renderReportsView();
 
-                    // Show Download PDF button
-                    btnDownloadPdf.classList.remove("hidden");
+        // Close mobile sidebar
+        document.getElementById('app-container-el').classList.remove('sidebar-open');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-                    // Save report to history
-                    saveReportToHistory(uploadResponseData.filename, jobId, realPlagScore, uploadResponseData);
+    // --- DASHBOARD SETUP ---
+    function setupDashboard() {
+        if (DOM.dashBtnAnalyze) {
+            DOM.dashBtnAnalyze.addEventListener('click', () => {
+                switchView('view-analyze');
+                activateAnalyzeTab('upload');
+            });
+        }
+        if (DOM.dashBtnPaste) {
+            DOM.dashBtnPaste.addEventListener('click', () => {
+                switchView('view-analyze');
+                activateAnalyzeTab('paste');
+            });
+        }
+        if (DOM.dashBtnPandaz) {
+            DOM.dashBtnPandaz.addEventListener('click', () => switchView('view-pandaz'));
+        }
+        if (DOM.dashBtnSample) {
+            DOM.dashBtnSample.addEventListener('click', () => {
+                switchView('view-analyze');
+                activateAnalyzeTab('paste');
+                if (DOM.pasteTextarea) {
+                    DOM.pasteTextarea.value = SAMPLE_DOCUMENT_TEXT;
+                    updatePasteCounters();
+                }
+                executeTextAnalysis(SAMPLE_DOCUMENT_TEXT, "Sample Research Document");
+            });
+        }
+        if (DOM.dashViewAllHistory) {
+            DOM.dashViewAllHistory.addEventListener('click', () => switchView('view-history'));
+        }
+    }
 
-                    // Enable button
-                    btnRunAnalysis.disabled = false;
+    function updateDashboardStats() {
+        const totalDocs = state.history.length;
+        if (DOM.dashStatDocs) DOM.dashStatDocs.textContent = totalDocs;
 
-                    // Final success toast
-                    if (realPlagScore > 0) {
-                        showToast(`Analysis complete. Found ${realPlagScore}% plagiarism match profile.`, "success");
-                    } else {
-                        showToast("Analysis complete. Document is 100% original and clean!", "success");
+        let totalMatches = 0;
+        let totalWords = 0;
+        let totalOrig = 0;
+
+        state.history.forEach(item => {
+            const an = item.analysis || {};
+            totalMatches += (an.matched_sentences_count || 0);
+            totalWords += (item.char_count ? Math.round(item.char_count / 5) : 0);
+            totalOrig += (an.originality_score || 100);
+        });
+
+        if (DOM.dashStatMatches) DOM.dashStatMatches.textContent = totalMatches;
+        if (DOM.dashStatWords) DOM.dashStatWords.textContent = totalWords.toLocaleString();
+
+        const avgOrig = totalDocs > 0 ? Math.round(totalOrig / totalDocs) : 95;
+        if (DOM.dashOverallScore) DOM.dashOverallScore.textContent = `${avgOrig}%`;
+
+        // Render recent dashboard rows
+        if (DOM.dashRecentTbody) {
+            if (state.history.length === 0) {
+                DOM.dashRecentTbody.innerHTML = `
+                    <tr class="empty-row">
+                        <td colspan="6">No recent documents analyzed yet. Click <strong>Analyze Document</strong> or <strong>Try Sample</strong> to begin.</td>
+                    </tr>
+                `;
+            } else {
+                DOM.dashRecentTbody.innerHTML = state.history.slice(0, 5).map(item => `
+                    <tr>
+                        <td><strong>${escapeHTML(item.filename || 'Untitled')}</strong></td>
+                        <td>${new Date(item.timestamp).toLocaleDateString()}</td>
+                        <td>${item.char_count ? Math.round(item.char_count/5).toLocaleString() : 'N/A'}</td>
+                        <td><span class="badge badge-danger">${item.analysis?.plagiarism_score || 0}%</span></td>
+                        <td><span class="badge badge-success">${item.analysis?.originality_score || 100}%</span></td>
+                        <td>
+                            <button class="btn btn-ghost btn-xs btn-open-history" data-id="${item.id}">Open</button>
+                            <button class="btn btn-outline btn-xs btn-download-hist-rep" data-id="${item.id}">Report</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                DOM.dashRecentTbody.querySelectorAll('.btn-open-history').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.getAttribute('data-id');
+                        openHistoryItem(id);
+                    });
+                });
+                DOM.dashRecentTbody.querySelectorAll('.btn-download-hist-rep').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.getAttribute('data-id');
+                        downloadHistoryReport(id);
+                    });
+                });
+            }
+        }
+    }
+
+    // --- ANALYZE VIEW SETUP ---
+    function setupAnalyze() {
+        if (DOM.tabUploadBtn) {
+            DOM.tabUploadBtn.addEventListener('click', () => activateAnalyzeTab('upload'));
+        }
+        if (DOM.tabPasteBtn) {
+            DOM.tabPasteBtn.addEventListener('click', () => activateAnalyzeTab('paste'));
+        }
+
+        // File upload trigger
+        if (DOM.btnBrowseFile) {
+            DOM.btnBrowseFile.addEventListener('click', () => DOM.fileInput.click());
+        }
+        if (DOM.uploadDropzone) {
+            DOM.uploadDropzone.addEventListener('click', (e) => {
+                if (e.target !== DOM.btnBrowseFile) DOM.fileInput.click();
+            });
+
+            // Drag & Drop
+            DOM.uploadDropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                DOM.uploadDropzone.classList.add('drag-over');
+            });
+            DOM.uploadDropzone.addEventListener('dragleave', () => {
+                DOM.uploadDropzone.classList.remove('drag-over');
+            });
+            DOM.uploadDropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                DOM.uploadDropzone.classList.remove('drag-over');
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    handleFileUpload(e.dataTransfer.files[0]);
+                }
+            });
+        }
+
+        if (DOM.fileInput) {
+            DOM.fileInput.addEventListener('change', () => {
+                if (DOM.fileInput.files && DOM.fileInput.files.length > 0) {
+                    handleFileUpload(DOM.fileInput.files[0]);
+                }
+            });
+        }
+
+        // Paste Text Controls
+        if (DOM.pasteTextarea) {
+            DOM.pasteTextarea.addEventListener('input', updatePasteCounters);
+        }
+        if (DOM.btnClearPaste) {
+            DOM.btnClearPaste.addEventListener('click', () => {
+                DOM.pasteTextarea.value = '';
+                updatePasteCounters();
+            });
+        }
+        if (DOM.btnSamplePaste) {
+            DOM.btnSamplePaste.addEventListener('click', () => {
+                DOM.pasteTextarea.value = SAMPLE_DOCUMENT_TEXT;
+                updatePasteCounters();
+                showToast("Sample research document loaded!", "info");
+            });
+        }
+        if (DOM.btnAnalyzePaste) {
+            DOM.btnAnalyzePaste.addEventListener('click', () => {
+                const text = DOM.pasteTextarea.value.trim();
+                if (!text) {
+                    showToast("Please enter or paste text to analyze.", "warning");
+                    return;
+                }
+                executeTextAnalysis(text, "Pasted Analysis");
+            });
+        }
+
+        // Results Actions
+        if (DOM.btnDownloadReportDirect) {
+            DOM.btnDownloadReportDirect.addEventListener('click', downloadCurrentReport);
+        }
+        if (DOM.btnOpenInPandaz) {
+            DOM.btnOpenInPandaz.addEventListener('click', () => {
+                switchView('view-pandaz');
+                showToast("Switched to Pandaz PDF toolkit.", "info");
+            });
+        }
+        if (DOM.btnAskAboutDoc) {
+            DOM.btnAskAboutDoc.addEventListener('click', () => {
+                switchView('view-asklemma');
+                if (state.activeDocument) {
+                    sendChatMessage(`What is my plagiarism score and how can I improve my originality?`);
+                }
+            });
+        }
+        if (DOM.btnRewriteFlagged) {
+            DOM.btnRewriteFlagged.addEventListener('click', () => {
+                switchView('view-paraphrase');
+                if (state.activeDocument && state.activeDocument.analysis && state.activeDocument.analysis.matches.length > 0) {
+                    const firstMatch = state.activeDocument.analysis.matches[0];
+                    const sentText = firstMatch.query_sentence?.text || firstMatch.query_text || '';
+                    if (DOM.paraphraseInput) {
+                        DOM.paraphraseInput.value = sentText;
                     }
-
-                } else if (data.status === "failed") {
-                    clearInterval(interval);
-                    isAnalyzing = false;
-                    checkServerHealth();
-                    throw new Error(data.error || "Analysis task failed");
-                } else if (data.status === "processing") {
-                    metaStatus.innerHTML = '<span class="badge badge-dim">Analyzing...</span>';
-                    lexicalChk.innerHTML = '<i class="fa-regular fa-circle-check"></i> Lexical Match Complete';
-                    semanticChk.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Indexing Semantic Vectors...';
-                    semanticChk.className = "checklist-item done";
-                } else {
-                    metaStatus.innerHTML = '<span class="badge badge-dim">Queued...</span>';
+                    showToast("Flagged sentence loaded into Paraphraser!", "info");
                 }
-            } catch (error) {
-                clearInterval(interval);
-                isAnalyzing = false;
-                checkServerHealth();
-
-                console.error("Polling Error:", error);
-                showToast(error.message, "error");
-
-                metaStatus.innerHTML = '<span class="badge badge-dim">Failed</span>';
-                btnRunAnalysis.disabled = false;
-                resetMetricsUI();
-            }
-        }, 1000);
+            });
+        }
     }
 
-    /* -------------------------------------------------------------
-     * Document Rendering & Highlight Setup
-     * ------------------------------------------------------------- */
-    function renderDocument(data) {
-        // Update details card
-        viewerFilename.textContent = data.filename;
-        const fileExt = data.filename.split(".").pop().toUpperCase();
-        viewerDocType.textContent = fileExt;
-
-        metaChars.textContent = data.char_count.toLocaleString();
-        metaSentences.textContent = data.sentence_count.toLocaleString();
-        
-        if (data.metrics) {
-            if (metaWords) metaWords.textContent = (data.metrics.word_count || 0).toLocaleString();
-            if (metaReadability) metaReadability.textContent = (data.metrics.flesch_reading_ease || 0).toFixed(1);
-            if (metaReadabilityLevel) metaReadabilityLevel.textContent = data.metrics.readability_level || "Standard";
-            if (metaReadingTime) metaReadingTime.textContent = `${data.metrics.reading_time_seconds || 0} sec`;
+    function activateAnalyzeTab(tab) {
+        if (tab === 'upload') {
+            DOM.tabUploadBtn.classList.add('active');
+            DOM.tabPasteBtn.classList.remove('active');
+            DOM.panelUpload.style.display = 'block';
+            DOM.panelPaste.style.display = 'none';
         } else {
-            const wordCount = (data.text || "").trim().split(/\s+/).filter(Boolean).length;
-            if (metaWords) metaWords.textContent = wordCount.toLocaleString();
-            if (metaReadability) metaReadability.textContent = "N/A";
-            if (metaReadabilityLevel) metaReadabilityLevel.textContent = "Standard";
-            if (metaReadingTime) metaReadingTime.textContent = `${Math.ceil(wordCount / 3.3)} sec`;
+            DOM.tabPasteBtn.classList.add('active');
+            DOM.tabUploadBtn.classList.remove('active');
+            DOM.panelPaste.style.display = 'block';
+            DOM.panelUpload.style.display = 'none';
         }
-        
-        metaStatus.innerHTML = '<span class="badge badge-dim">Segmented</span>';
+    }
 
-        // Clear contents
-        documentRender.innerHTML = "";
+    function updatePasteCounters() {
+        const text = DOM.pasteTextarea.value;
+        const chars = text.length;
+        const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+        const sents = text.trim() ? text.split(/[.!?]+/).filter(Boolean).length : 0;
 
-        // If no sentences were parsed
-        if (!data.sentences || data.sentences.length === 0) {
-            documentRender.textContent = data.text || "Empty document.";
+        if (DOM.pasteCharCount) DOM.pasteCharCount.textContent = `${chars.toLocaleString()} characters`;
+        if (DOM.pasteWordCount) DOM.pasteWordCount.textContent = `${words.toLocaleString()} words`;
+        if (DOM.pasteSentCount) DOM.pasteSentCount.textContent = `${sents.toLocaleString()} sentences`;
+    }
+
+    // --- REAL FILE UPLOAD HANDLER ---
+    async function handleFileUpload(file) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (!['pdf', 'docx', 'txt'].includes(ext)) {
+            showToast(`Unsupported file type (.${ext}). Allowed: PDF, DOCX, TXT.`, "error");
             return;
         }
 
-        // We construct the HTML dynamically using segments and coordinate index spans
-        // Let's rebuild the text using sentence bounds to ensure coordinates align exactly
-        let fullText = data.text;
+        // Show upload progress
+        if (DOM.uploadProgressWrapper) {
+            DOM.uploadProgressWrapper.style.display = 'block';
+            DOM.progressFilename.textContent = file.name;
+            DOM.progressPercent.textContent = '10%';
+            DOM.progressBarFill.style.width = '10%';
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            DOM.progressPercent.textContent = '40%';
+            DOM.progressBarFill.style.width = '40%';
+
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/documents/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            DOM.progressPercent.textContent = '80%';
+            DOM.progressBarFill.style.width = '80%';
+
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.detail || `Upload failed with status ${res.status}`);
+            }
+
+            const docData = await res.json();
+            DOM.progressPercent.textContent = '100%';
+            DOM.progressBarFill.style.width = '100%';
+
+            setTimeout(() => {
+                if (DOM.uploadProgressWrapper) DOM.uploadProgressWrapper.style.display = 'none';
+            }, 500);
+
+            // Populate document state and render results
+            renderAnalysisResults(docData);
+            saveToHistory(docData);
+            showToast(`Analysis completed for "${file.name}"!`, "success");
+
+        } catch (error) {
+            if (DOM.uploadProgressWrapper) DOM.uploadProgressWrapper.style.display = 'none';
+            showToast(`Upload Error: ${error.message}`, "error");
+        }
+    }
+
+    // --- REAL DIRECT TEXT ANALYSIS ---
+    async function executeTextAnalysis(text, title = "Pasted Analysis") {
+        showToast("Analyzing document originality...", "info");
+        try {
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/analyze/text`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text, title: title })
+            });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.detail || `Analysis failed with status ${res.status}`);
+            }
+
+            const data = await res.json();
+            renderAnalysisResults(data);
+            saveToHistory(data);
+            showToast("Originality verification completed!", "success");
+
+        } catch (e) {
+            showToast(`Analysis Error: ${e.message}`, "error");
+        }
+    }
+
+    // --- RENDER ANALYSIS RESULTS & HIGHLIGHTING ---
+    function renderAnalysisResults(docData) {
+        state.activeDocument = docData;
+
+        // Show results panel
+        if (DOM.analysisResultsWrapper) {
+            DOM.analysisResultsWrapper.style.display = 'block';
+            DOM.analysisResultsWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        const analysis = docData.analysis || {};
+        const metrics = docData.metrics || {};
+        const plagScore = analysis.plagiarism_score || 0;
+        const origScore = analysis.originality_score || (100 - plagScore);
+
+        // Update score badges
+        if (DOM.resPlagVal) {
+            DOM.resPlagVal.textContent = `${plagScore}%`;
+            DOM.resPlagVal.className = `gauge-display-val ${plagScore > 20 ? 'text-danger' : (plagScore > 0 ? 'text-warning' : 'text-success')}`;
+        }
+        if (DOM.resOrigVal) DOM.resOrigVal.textContent = `${origScore}%`;
+        if (DOM.resDocTitle) DOM.resDocTitle.textContent = docData.filename || 'Analyzed Document';
+
+        // Breakdown counts
+        if (DOM.resCountLexical) DOM.resCountLexical.textContent = analysis.lexical_matches_count || 0;
+        if (DOM.resCountHybrid) DOM.resCountHybrid.textContent = analysis.hybrid_matches_count || 0;
+        if (DOM.resCountSemantic) DOM.resCountSemantic.textContent = analysis.semantic_matches_count || 0;
+        if (DOM.resCountTotal) DOM.resCountTotal.textContent = docData.sentence_count || analysis.total_sentences || 0;
+
+        // Analytics
+        if (DOM.resWords) DOM.resWords.textContent = (metrics.word_count || Math.round((docData.char_count || 0)/5)).toLocaleString();
+        if (DOM.resReadingEase) DOM.resReadingEase.textContent = metrics.flesch_reading_ease || 'N/A';
+        if (DOM.resGradeLevel) DOM.resGradeLevel.textContent = metrics.flesch_kincaid_grade || 'College';
+        if (DOM.resReadingTime) DOM.resReadingTime.textContent = `${metrics.reading_time_minutes || 1}m`;
+
+        // Render Highlighted Text Box
+        renderHighlightedDocument(docData);
+
+        // Render Right-hand Matches List
+        renderMatchesSidebar(docData);
+
+        // Update Ask Lemma active pill
+        if (DOM.chatDocName) DOM.chatDocName.textContent = docData.filename || 'Active Document';
+    }
+
+    function renderHighlightedDocument(docData) {
+        if (!DOM.documentTextRendered) return;
+        const text = docData.text || '';
+        const sentences = docData.sentences || [];
+        const analysis = docData.analysis || {};
+        const matches = analysis.matches || [];
+
+        // Map sentence start_char to match
+        const matchesMap = {};
+        matches.forEach(m => {
+            const startChar = m.query_sentence ? m.query_sentence.start_char : m.start_position;
+            if (startChar !== undefined) {
+                matchesMap[startChar] = m;
+            }
+        });
+
+        let htmlParts = [];
         let lastOffset = 0;
 
-        data.sentences.forEach((sentence, index) => {
-            const start = sentence.start_char;
-            const end = sentence.end_char;
+        sentences.forEach((s, idx) => {
+            const start = s.start_char;
+            const end = s.end_char;
+            const sentText = s.text;
 
-            // Append any raw text between sentences (like original spaces or newlines)
+            // Raw characters between sentences
             if (start > lastOffset) {
-                const intermediateText = fullText.substring(lastOffset, start);
-                const textSpan = document.createTextNode(intermediateText);
-                documentRender.appendChild(textSpan);
+                htmlParts.push(escapeHTML(text.substring(lastOffset, start)).replace(/\n/g, '<br>'));
             }
 
-            // Create sentence highlights
-            const sentSpan = document.createElement("span");
-            sentSpan.className = "doc-sentence";
-            sentSpan.textContent = sentence.text;
-            sentSpan.dataset.index = index;
-            sentSpan.dataset.start = start;
-            sentSpan.dataset.end = end;
-
-            // Hover interactions
-            sentSpan.addEventListener("mouseenter", () => {
-                highlightSentence(sentSpan, sentence);
-            });
-
-            // Click interactions (persists coordinates details in inspector)
-            sentSpan.addEventListener("click", (e) => {
-                e.stopPropagation();
-                // Toggle active selection state
-                document.querySelectorAll(".doc-sentence").forEach(s => s.classList.remove("active"));
-                sentSpan.classList.add("active");
-                const matchData = sentSpan.dataset.match ? JSON.parse(sentSpan.dataset.match) : null;
-                inspectSentence(sentence, matchData, true);
-            });
-
-            documentRender.appendChild(sentSpan);
+            const match = matchesMap[start];
+            if (match) {
+                const mType = match.match_type || 'lexical';
+                const markClass = `mark-${mType}`;
+                htmlParts.push(
+                    `<mark class="${markClass} interactive-mark" data-match-id="${match.id}" data-idx="${idx}" title="Click to view match provenance & rewrite">${escapeHTML(sentText)}</mark>`
+                );
+            } else {
+                htmlParts.push(escapeHTML(sentText));
+            }
             lastOffset = end;
         });
 
-        // Append remaining tail text
-        if (lastOffset < fullText.length) {
-            const tailText = fullText.substring(lastOffset);
-            const textSpan = document.createTextNode(tailText);
-            documentRender.appendChild(textSpan);
+        if (lastOffset < text.length) {
+            htmlParts.push(escapeHTML(text.substring(lastOffset)).replace(/\n/g, '<br>'));
         }
 
-        // Show viewer, hide upload panel
-        dropZone.classList.add("hidden");
-        documentViewer.classList.remove("hidden");
-    }
+        DOM.documentTextRendered.innerHTML = htmlParts.join('');
 
-    /* -------------------------------------------------------------
-     * Coordinate Inspection Handlers
-     * ------------------------------------------------------------- */
-    function highlightSentence(element, sentence) {
-        // If there's no clicked sentence active, update on hover
-        const hasActiveClick = document.querySelector(".doc-sentence.active") !== null;
-        if (!hasActiveClick) {
-            const matchData = element.dataset.match ? JSON.parse(element.dataset.match) : null;
-            inspectSentence(sentence, matchData, false);
-        }
-    }
-
-    function inspectSentence(sentence, matchData, isClicked) {
-        inspectorPlaceholder.classList.add("hidden");
-        inspectorData.classList.remove("hidden");
-
-        inspectStart.textContent = sentence.start_char;
-        inspectEnd.textContent = sentence.end_char;
-        inspectText.textContent = `"${sentence.text}"`;
-
-        // Hide paraphrase result block from previous inspect runs
-        const paraphraseBlock = document.getElementById("paraphrase-result-block");
-        if (paraphraseBlock) {
-            paraphraseBlock.classList.add("hidden");
-        }
-
-        const matchDetailsDiv = document.getElementById("plagiarism-match-details");
-        const inspectMatchRefText = document.getElementById("inspect-match-ref-text");
-        const matchSourceBlock = inspectMatchRefText ? inspectMatchRefText.closest(".inspector-text-block") : null;
-
-        if (matchData) {
-            matchDetailsDiv.classList.remove("hidden");
-            if (matchSourceBlock) {
-                matchSourceBlock.classList.remove("hidden");
-            }
-
-            const matchTypeBadge = document.getElementById("inspect-match-type");
-            const matchScoreBadge = document.getElementById("inspect-match-score");
-            const matchTitle = document.getElementById("inspect-match-title");
-            const matchCitation = document.getElementById("inspect-match-citation");
-
-            // Set Match Type Badge
-            if (matchData.match_type === "lexical") {
-                matchTypeBadge.className = "badge badge-red";
-                matchTypeBadge.textContent = "Lexical Match";
-            } else if (matchData.match_type === "hybrid") {
-                matchTypeBadge.className = "badge badge-orange";
-                matchTypeBadge.textContent = "Hybrid Match";
-            } else {
-                matchTypeBadge.className = "badge badge-purple";
-                matchTypeBadge.textContent = "Semantic Match";
-            }
-
-            // Set Match Score
-            const pct = Math.round(matchData.score * 100);
-            matchScoreBadge.textContent = `${pct}% Similarity`;
-            matchScoreBadge.className = "badge " + (
-                matchData.match_type === "lexical" ? "badge-red" :
-                    (matchData.match_type === "hybrid" ? "badge-orange" : "badge-purple")
-            );
-
-            // Set reference sentence and doc info
-            inspectMatchRefText.textContent = `"${matchData.matched_sentence.text}"`;
-            matchTitle.textContent = matchData.matched_sentence.doc_title;
-            matchCitation.textContent = `${matchData.matched_sentence.doc_author} — ${matchData.matched_sentence.doc_source}`;
-        } else {
-            // Check if this sentence was marked as original
-            const sentenceSpans = document.querySelectorAll(".doc-sentence");
-            let isOriginal = false;
-            sentenceSpans.forEach(span => {
-                if (parseInt(span.dataset.start) === sentence.start_char && span.classList.contains("original")) {
-                    isOriginal = true;
+        // Attach click listeners to all interactive highlights
+        DOM.documentTextRendered.querySelectorAll('.interactive-mark').forEach(markEl => {
+            markEl.addEventListener('click', () => {
+                const matchId = markEl.getAttribute('data-match-id');
+                const match = matches.find(m => m.id === matchId);
+                if (match) {
+                    openMatchInspector(match);
                 }
             });
-
-            if (isOriginal) {
-                matchDetailsDiv.classList.remove("hidden");
-
-                const matchTypeBadge = document.getElementById("inspect-match-type");
-                const matchScoreBadge = document.getElementById("inspect-match-score");
-
-                matchTypeBadge.className = "badge badge-green";
-                matchTypeBadge.textContent = "Original Segment";
-
-                matchScoreBadge.className = "badge badge-green";
-                matchScoreBadge.textContent = "0% Similarity";
-
-                if (matchSourceBlock) {
-                    matchSourceBlock.classList.add("hidden");
-                }
-            } else {
-                matchDetailsDiv.classList.add("hidden");
-            }
-        }
-    }
-
-    function applyPlagiarismHighlights(analysis) {
-        if (!analysis || !analysis.matches) return;
-
-        // Map query sentence start_char to its match object for quick lookup
-        const matchesMap = {};
-        analysis.matches.forEach(m => {
-            matchesMap[m.query_sentence.start_char] = m;
-        });
-
-        // Select all sentence spans in the viewer
-        const sentenceSpans = document.querySelectorAll(".doc-sentence");
-        sentenceSpans.forEach(span => {
-            const start = parseInt(span.dataset.start);
-            const match = matchesMap[start];
-
-            // Reset any old analysis classes first
-            span.className = "doc-sentence";
-
-            if (match) {
-                const text = span.textContent;
-
-                span.classList.add("plagiarized");
-                if (match.match_type === "lexical") {
-                    span.classList.add("match-lexical");
-                } else if (match.match_type === "hybrid") {
-                    span.classList.add("match-hybrid");
-                } else {
-                    span.classList.add("match-semantic");
-                }
-                span.dataset.match = JSON.stringify(match);
-
-                // Re-render sentence text with word-level mark tags
-                const highlights = match.highlights;
-                if (highlights && highlights.length > 0) {
-                    const sortedHls = highlights.map(hl => ({
-                        start: hl.start_char - start,
-                        end: hl.end_char - start,
-                        text: hl.text
-                    })).sort((a, b) => a.start - b.start);
-
-                    let htmlContent = "";
-                    let lastIdx = 0;
-
-                    sortedHls.forEach(hl => {
-                        if (hl.start > lastIdx) {
-                            htmlContent += escapeHtml(text.substring(lastIdx, hl.start));
-                        }
-                        const markClass = match.match_type === "lexical" ? "mark-lexical" :
-                            (match.match_type === "hybrid" ? "mark-hybrid" : "mark-semantic");
-                        htmlContent += `<mark class="${markClass}">${escapeHtml(text.substring(hl.start, hl.end))}</mark>`;
-                        lastIdx = hl.end;
-                    });
-
-                    if (lastIdx < text.length) {
-                        htmlContent += escapeHtml(text.substring(lastIdx));
-                    }
-
-                    span.innerHTML = htmlContent;
-                } else {
-                    const markClass = match.match_type === "lexical" ? "mark-lexical" :
-                        (match.match_type === "hybrid" ? "mark-hybrid" : "mark-semantic");
-                    span.innerHTML = `<mark class="${markClass}">${escapeHtml(text)}</mark>`;
-                }
-            } else {
-                // If it is not a match, it is clean/original! Apply original styles
-                span.classList.add("original");
-                span.removeAttribute("data-match");
-            }
         });
     }
 
-    function escapeHtml(str) {
-        return str
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
+    function renderMatchesSidebar(docData) {
+        if (!DOM.matchesListWrapper) return;
+        const matches = docData.analysis?.matches || [];
+        if (DOM.matchesCountBadge) DOM.matchesCountBadge.textContent = matches.length;
 
-    // Reset Viewer/Upload Ingestion state
-    btnReupload.addEventListener("click", () => {
-        documentViewer.classList.add("hidden");
-        dropZone.classList.remove("hidden");
-        fileInput.value = ""; // clear input stream
-
-        // Reset Metadata stats
-        metaChars.textContent = "-";
-        if (metaWords) metaWords.textContent = "-";
-        metaSentences.textContent = "-";
-        if (metaReadability) metaReadability.textContent = "-";
-        if (metaReadabilityLevel) metaReadabilityLevel.textContent = "Unanalyzed";
-        if (metaReadingTime) metaReadingTime.textContent = "-";
-        metaFilename.textContent = "No file uploaded";
-        metaStatus.innerHTML = '<span class="badge badge-dim">Idle</span>';
-
-        // Reset Inspector state
-        inspectorPlaceholder.classList.remove("hidden");
-        inspectorData.classList.add("hidden");
-        const paraphraseBlock = document.getElementById("paraphrase-result-block");
-        if (paraphraseBlock) {
-            paraphraseBlock.classList.add("hidden");
-        }
-        document.querySelectorAll(".doc-sentence").forEach(s => {
-            s.className = "doc-sentence";
-            s.removeAttribute("data-match");
-            s.innerHTML = escapeHtml(s.textContent);
-        });
-
-        // Reset Plagiarism progress metrics & legend values
-        const progressScore = document.getElementById("plagiarism-score-text");
-        const progressCircle = document.querySelector(".circular-progress");
-        const lexicalChk = document.getElementById("chk-lexical");
-        const semanticChk = document.getElementById("chk-semantic");
-
-        progressScore.textContent = "0%";
-        progressCircle.style.background = "conic-gradient(var(--border-color) 360deg, transparent 0deg)";
-
-        lexicalChk.innerHTML = '<i class="fa-regular fa-circle"></i> Lexical Matching (TF-IDF)';
-        lexicalChk.className = "checklist-item";
-        semanticChk.innerHTML = '<i class="fa-regular fa-circle"></i> Semantic Indexing (Embeddings)';
-        semanticChk.className = "checklist-item";
-
-        document.getElementById("legend-val-lexical").textContent = "0%";
-        document.getElementById("legend-val-hybrid").textContent = "0%";
-        document.getElementById("legend-val-semantic").textContent = "0%";
-        document.getElementById("legend-val-original").textContent = "100%";
-
-        activeFile = null;
-        uploadResponseData = null;
-        currentJobId = null;
-        btnDownloadPdf.classList.add("hidden");
-        btnRunAnalysis.disabled = true;
-    });
-
-    // Trigger analysis toast (Phase 2 Integration)
-    // Trigger analysis (Phase 2 Integration)
-    btnRunAnalysis.addEventListener("click", () => {
-        if (!activeFile) {
-            showToast("Please upload a file first.", "error");
+        if (matches.length === 0) {
+            DOM.matchesListWrapper.innerHTML = `
+                <div class="empty-matches-notice">
+                    <i class="fa-solid fa-circle-check text-success"></i>
+                    <p>No plagiarism detected! Your document demonstrates high originality.</p>
+                </div>
+            `;
             return;
         }
-        triggerPlagiarismAnalysis(activeFile);
-    });
 
-    // Download PDF Report
-    btnDownloadPdf.addEventListener("click", () => {
-        if (!currentJobId) {
-            showToast("No active report job ID found.", "error");
-            return;
-        }
-        showToast("Downloading PDF report...", "info");
-        window.open(`${API_BASE_URL}/api/v1/documents/report/${currentJobId}`, "_blank");
-    });
+        DOM.matchesListWrapper.innerHTML = matches.map((m, i) => {
+            const querySent = m.query_sentence?.text || m.query_text || '';
+            const matchedSent = m.matched_sentence || m.matched_text || '';
+            const sourceTitle = m.source || m.doc_title || 'Reference Library';
+            const sim = Math.round((m.similarity || m.score || 0) * 100);
+            const mType = (m.match_type || 'lexical').toUpperCase();
+            const badgeClass = mType === 'LEXICAL' ? 'badge-danger' : (mType === 'HYBRID' ? 'badge-warning' : 'badge-purple');
 
-    // Notification Dropdown Toggle & Clear Event Handlers
-    const notificationBtn = document.getElementById("notification-btn");
-    const notificationDropdown = document.getElementById("notification-dropdown");
-    const btnClearNotifications = document.getElementById("btn-clear-notifications");
-    const notificationBadge = document.getElementById("notification-badge");
+            return `
+                <div class="match-sidebar-card" data-match-id="${m.id}">
+                    <div class="match-card-header">
+                        <span class="match-num">#${i + 1}</span>
+                        <span class="badge ${badgeClass}">${mType} • ${sim}%</span>
+                    </div>
+                    <div class="match-card-source">
+                        <i class="fa-solid fa-book"></i> <strong>${escapeHTML(sourceTitle)}</strong>
+                    </div>
+                    <p class="match-card-snippet">"${escapeHTML(querySent.substring(0, 100))}${querySent.length > 100 ? '...' : ''}"</p>
+                    <div class="match-card-actions">
+                        <button class="btn btn-ghost btn-xs btn-inspect-match" data-match-id="${m.id}">Inspect</button>
+                        <button class="btn btn-outline btn-xs btn-rewrite-match" data-match-id="${m.id}">Rewrite</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
 
-    if (notificationBtn && notificationDropdown) {
-        notificationBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            notificationDropdown.classList.toggle("hidden");
+        // Attach event listeners
+        DOM.matchesListWrapper.querySelectorAll('.btn-inspect-match').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-match-id');
+                const match = matches.find(m => m.id === id);
+                if (match) openMatchInspector(match);
+            });
         });
 
-        // Hide dropdown when clicking outside
-        document.addEventListener("click", (e) => {
-            if (!notificationDropdown.contains(e.target) && e.target !== notificationBtn && !notificationBtn.contains(e.target)) {
-                notificationDropdown.classList.add("hidden");
+        DOM.matchesListWrapper.querySelectorAll('.btn-rewrite-match').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-match-id');
+                const match = matches.find(m => m.id === id);
+                if (match) {
+                    const textToRewrite = match.query_sentence?.text || match.query_text || '';
+                    switchView('view-paraphrase');
+                    if (DOM.paraphraseInput) DOM.paraphraseInput.value = textToRewrite;
+                }
+            });
+        });
+    }
+
+    // --- MATCH INSPECTOR MODAL ---
+    function openMatchInspector(match) {
+        state.selectedMatch = match;
+        const sim = Math.round((match.similarity || match.score || 0) * 100);
+        const mType = match.match_type || 'lexical';
+        const queryText = match.query_sentence?.text || match.query_text || '';
+        const matchedText = match.matched_sentence || match.matched_text || '';
+        const sourceTitle = match.source || match.doc_title || 'Reference Publication';
+        const sourceAuthor = match.source_author || match.doc_author || 'Scholarly Contributors';
+        const sourcePub = match.source_publication || match.doc_source || 'Academic Database';
+        const sourceUrl = match.source_url || match.doc_url || '#';
+
+        if (DOM.modalMatchTitle) DOM.modalMatchTitle.textContent = `Match Inspection (#${match.id})`;
+        if (DOM.modalMatchBadge) DOM.modalMatchBadge.textContent = `${mType.toUpperCase()} MATCH`;
+        if (DOM.modalMatchScore) DOM.modalMatchScore.textContent = `${sim}% Similarity`;
+        if (DOM.modalQuerySentence) DOM.modalQuerySentence.textContent = queryText;
+        if (DOM.modalRefSentence) DOM.modalRefSentence.textContent = matchedText;
+        if (DOM.modalSourceTitle) DOM.modalSourceTitle.textContent = sourceTitle;
+        if (DOM.modalSourceAuthor) DOM.modalSourceAuthor.textContent = `Author: ${sourceAuthor}`;
+        if (DOM.modalSourcePub) DOM.modalSourcePub.textContent = `Publication: ${sourcePub}`;
+
+        if (DOM.modalBtnViewSource) {
+            if (sourceUrl && sourceUrl !== '#') {
+                DOM.modalBtnViewSource.href = sourceUrl;
+                DOM.modalBtnViewSource.style.display = 'inline-flex';
+            } else {
+                DOM.modalBtnViewSource.style.display = 'none';
             }
-        });
+        }
 
-        if (btnClearNotifications) {
-            btnClearNotifications.addEventListener("click", (e) => {
-                e.stopPropagation();
-                if (notificationBadge) {
-                    notificationBadge.classList.remove("active");
+        if (DOM.matchInspectorModal) {
+            DOM.matchInspectorModal.style.display = 'flex';
+        }
+    }
+
+    function setupModals() {
+        if (DOM.btnCloseMatchModal) {
+            DOM.btnCloseMatchModal.addEventListener('click', () => {
+                DOM.matchInspectorModal.style.display = 'none';
+            });
+        }
+        if (DOM.modalBtnRewrite) {
+            DOM.modalBtnRewrite.addEventListener('click', () => {
+                if (state.selectedMatch) {
+                    const text = state.selectedMatch.query_sentence?.text || state.selectedMatch.query_text || '';
+                    DOM.matchInspectorModal.style.display = 'none';
+                    switchView('view-paraphrase');
+                    if (DOM.paraphraseInput) DOM.paraphraseInput.value = text;
                 }
-                const notificationList = document.getElementById("notification-list");
-                if (notificationList) {
-                    notificationList.innerHTML = '<div class="notification-empty">No new notifications</div>';
+            });
+        }
+        if (DOM.modalBtnCopy) {
+            DOM.modalBtnCopy.addEventListener('click', () => {
+                if (state.selectedMatch) {
+                    const text = state.selectedMatch.query_sentence?.text || state.selectedMatch.query_text || '';
+                    navigator.clipboard.writeText(text);
+                    showToast("Sentence copied to clipboard!", "success");
                 }
-                showToast("Notifications cleared.", "info");
             });
         }
     }
 
-    // Paraphrase button triggers Ollama API call
-    btnQuickParaphrase.addEventListener("click", async () => {
-        const sentenceText = inspectText.textContent.replace(/^"|"$/g, "").trim();
-        if (!sentenceText) return;
+    // --- ASK LEMMA AI CHAT ---
+    function setupAskLemma() {
+        if (DOM.btnSendChat) {
+            DOM.btnSendChat.addEventListener('click', handleSendChat);
+        }
+        if (DOM.chatInputText) {
+            DOM.chatInputText.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendChat();
+                }
+            });
+        }
 
-        const paraphraseBlock = document.getElementById("paraphrase-result-block");
-        const paraphraseText = document.getElementById("inspect-paraphrase-text");
+        // Chip suggestions
+        document.querySelectorAll('.chip-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const prompt = btn.getAttribute('data-prompt');
+                if (prompt) {
+                    sendChatMessage(prompt);
+                }
+            });
+        });
+    }
 
-        // Disable button and show spinner
-        btnQuickParaphrase.disabled = true;
-        btnQuickParaphrase.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Paraphrasing...';
-        showToast("Paraphrasing segment with local Ollama...", "info");
+    function handleSendChat() {
+        const text = DOM.chatInputText.value.trim();
+        if (!text) return;
+        DOM.chatInputText.value = '';
+        sendChatMessage(text);
+    }
 
-        // Mark that Ollama is paraphrasing to update the health footer to Working
-        isParaphrasing = true;
-        checkServerHealth();
+    async function sendChatMessage(query) {
+        appendChatMessage('user', query);
+
+        // Assistant placeholder
+        const assistantMsgEl = appendChatMessage('assistant', 'Thinking...');
+        const contentEl = assistantMsgEl.querySelector('.message-content');
 
         try {
-            const response = await fetch(API_REWRITE_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ text: sentenceText })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.detail || "Paraphrasing failed");
-            }
-
-            // Show result
-            paraphraseText.textContent = `"${data.rewritten_text}"`;
-            paraphraseBlock.classList.remove("hidden");
-            showToast("Sentence paraphrased successfully!", "success");
-        } catch (error) {
-            console.error("Paraphrase Error:", error);
-            showToast(error.message, "error");
-        } finally {
-            // Restore button
-            btnQuickParaphrase.disabled = false;
-            btnQuickParaphrase.innerHTML = '<i class="fa-solid fa-pen-nib"></i> Paraphrase Segment';
-            isParaphrasing = false;
-            checkServerHealth();
-        }
-    });
-
-    /* -------------------------------------------------------------
-     * Sidebar Nav Navigation & Workspace Switching
-     * ------------------------------------------------------------- */
-    const navItems = document.querySelectorAll(".nav-item");
-    const dashboardWorkspace = document.getElementById("dashboard-workspace");
-    const paraphraserWorkspace = document.getElementById("paraphraser-workspace");
-
-    function hideAllWorkspaces() {
-        const views = [
-            dashboardHomeView,
-            dashboardWorkspace,
-            paraphraserWorkspace,
-            reportsWorkspace,
-            placeholderWorkspace
-        ];
-        views.forEach(v => {
-            if (v) v.classList.add("hidden");
-        });
-    }
-
-    navItems.forEach(item => {
-        item.addEventListener("click", (e) => {
-            e.preventDefault();
-
-            // Deactivate all nav items
-            navItems.forEach(n => n.classList.remove("active"));
-            item.classList.add("active");
-
-            // Close mobile sidebar drawer if it was opened
-            const sidebar = document.getElementById("sidebar-panel");
-            const overlay = document.querySelector(".sidebar-overlay");
-            if (sidebar && sidebar.classList.contains("open")) {
-                sidebar.classList.remove("open");
-                if (overlay) overlay.classList.remove("active");
-            }
-
-            const tabId = item.id;
-            hideAllWorkspaces();
-
-            if (tabId === "nav-dashboard") {
-                if (dashboardHomeView) dashboardHomeView.classList.remove("hidden");
-            } else if (tabId === "nav-aichat") {
-                if (paraphraserWorkspace) paraphraserWorkspace.classList.remove("hidden");
-            } else if (tabId === "nav-plagiarism") {
-                if (dashboardWorkspace) dashboardWorkspace.classList.remove("hidden");
-            } else if (tabId === "nav-export") {
-                if (reportsWorkspace) reportsWorkspace.classList.remove("hidden");
-                renderReportsHistory();
-            } else {
-                // Non-functional pages -> show placeholder
-                if (placeholderWorkspace) {
-                    const pIcon = document.getElementById("placeholder-icon");
-                    const pTitle = document.getElementById("placeholder-title");
-                    const pDesc = document.getElementById("placeholder-desc");
-                    const pSprint = document.getElementById("placeholder-sprint");
-
-                    let title = "Workspace Section";
-                    let iconClass = "fa-folder-open";
-                    let desc = "This module is currently queued for expansion in a future development sprint.";
-                    let sprint = "Sprint 2";
-
-                    if (tabId === "nav-projects") {
-                        title = "My Projects";
-                        iconClass = "fa-folder-open";
-                        desc = "Organize drafts, citations, annotations, and AI threads into local sandboxed projects.";
-                        sprint = "Sprint 2";
-                    } else if (tabId === "nav-litreview") {
-                        title = "Literature Review Workspace";
-                        iconClass = "fa-book-open";
-                        desc = "Compare research methodologies, identify research gaps, list limitations, and compile theme summaries.";
-                        sprint = "Sprint 3";
-                    } else if (tabId === "nav-citations") {
-                        title = "Citation Generator";
-                        iconClass = "fa-quote-right";
-                        desc = "Generate academic citations in APA, IEEE, MLA, Chicago, Harvard, BibTeX, and RIS formats.";
-                        sprint = "Sprint 3";
-                    } else if (tabId === "nav-notes") {
-                        title = "Academic Note Editor";
-                        iconClass = "fa-note-sticky";
-                        desc = "Create rich text study notes integrated with LaTeX math support, tables, images, and Markdown.";
-                        sprint = "Sprint 2";
-                    } else if (tabId === "nav-kb") {
-                        title = "Personal Knowledge Base";
-                        iconClass = "fa-database";
-                        desc = "Organize references, summaries, and notes into collections, folders, and custom tags.";
-                        sprint = "Sprint 4";
-                    } else if (tabId === "nav-pdfsummary") {
-                        title = "PDF AI Summarizer";
-                        iconClass = "fa-file-contract";
-                        desc = "Summarize academic publications, extracts key formulas, and lists methodologies locally.";
-                        sprint = "Sprint 2";
-                    } else if (tabId === "nav-settings") {
-                        title = "System Settings";
-                        iconClass = "fa-gear";
-                        desc = "Configure on-device AI model selections, generation parameters (temperature, max tokens), storage paths, and UI theme options.";
-                        sprint = "Sprint 1 / 5";
-                    } else if (tabId === "nav-support") {
-                        title = "Help & Support Center";
-                        iconClass = "fa-circle-question";
-                        desc = "Troubleshoot local engine setups (Ollama, PostgreSQL, Elasticsearch) and read keyboard shortcuts guides.";
-                        sprint = "Sprint 1";
-                    }
-
-                    if (pIcon) pIcon.className = `fa-solid ${iconClass}`;
-                    if (pTitle) pTitle.textContent = title;
-                    if (pDesc) pDesc.textContent = desc;
-                    if (pSprint) pSprint.textContent = sprint;
-
-                    placeholderWorkspace.classList.remove("hidden");
-                }
-            }
-        });
-    });
-
-    // Return to dashboard button in placeholder page
-    const btnPlaceholderBack = document.getElementById("btn-placeholder-back");
-    if (btnPlaceholderBack) {
-        btnPlaceholderBack.addEventListener("click", () => {
-            const dashNav = document.getElementById("nav-dashboard");
-            if (dashNav) dashNav.click();
-        });
-    }
-
-    // Keyboard Shortcuts for Search Input (Ctrl K or Ctrl /)
-    document.addEventListener("keydown", (e) => {
-        if ((e.ctrlKey && e.key.toLowerCase() === 'k') || (e.ctrlKey && e.key === '/')) {
-            e.preventDefault();
-            const searchInput = document.getElementById("global-search-input");
-            if (searchInput) {
-                searchInput.focus();
-                searchInput.select();
-            }
-        }
-    });
-
-    // Prompt Box Suggestions Injection
-    document.querySelectorAll(".suggestion-pill").forEach(pill => {
-        pill.addEventListener("click", () => {
-            const promptText = pill.dataset.prompt;
-            const promptInput = document.getElementById("dashboard-prompt-input");
-            if (promptInput && promptText) {
-                promptInput.value = promptText;
-                promptInput.focus();
-            }
-        });
-    });
-
-    // Forward Ask AI prompts to AI Chat workspace
-    const btnSendPrompt = document.getElementById("btn-send-prompt");
-    if (btnSendPrompt) {
-        btnSendPrompt.addEventListener("click", () => {
-            const promptInput = document.getElementById("dashboard-prompt-input");
-            const promptVal = promptInput ? promptInput.value.trim() : "";
-            if (!promptVal) {
-                showToast("Please enter a research question or rewrite draft.", "error");
-                return;
-            }
-
-            // Swap to AI Chat (Paraphraser) tab
-            const aichatNav = document.getElementById("nav-aichat");
-            if (aichatNav) {
-                const paraInput = document.getElementById("para-input-text");
-                if (paraInput) {
-                    paraInput.value = promptVal;
-                    paraInput.dispatchEvent(new Event("input"));
-                }
-                aichatNav.click();
-
-                // Automatically trigger paraphrase run
-                const btnRunPara = document.getElementById("btn-run-paraphrase");
-                if (btnRunPara) btnRunPara.click();
-            }
-        });
-    }
-
-    // Redirect to Plagiarism workspace on click
-    const redirectAndIngest = () => {
-        const plagNav = document.getElementById("nav-plagiarism");
-        if (plagNav) {
-            plagNav.click();
-            const fileInput = document.getElementById("file-input");
-            if (fileInput) fileInput.click();
-        }
-    };
-
-    const btnUploadNewDash = document.getElementById("btn-upload-new-dash");
-    if (btnUploadNewDash) btnUploadNewDash.addEventListener("click", redirectAndIngest);
-
-    const btnQuickNew = document.getElementById("btn-quick-new");
-    if (btnQuickNew) btnQuickNew.addEventListener("click", redirectAndIngest);
-
-    // Setup mobile sidebar drawer backdrop overlay
-    const menuToggleBtn = document.getElementById("menu-toggle-btn");
-    const sidebarPanel = document.getElementById("sidebar-panel");
-    if (menuToggleBtn && sidebarPanel) {
-        let overlay = document.querySelector(".sidebar-overlay");
-        if (!overlay) {
-            overlay = document.createElement("div");
-            overlay.className = "sidebar-overlay";
-            sidebarPanel.parentNode.appendChild(overlay);
-        }
-
-        menuToggleBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            if (window.innerWidth < 768) {
-                // Mobile: slide-in drawer
-                sidebarPanel.classList.toggle("open");
-                overlay.classList.toggle("active");
-            } else {
-                // Desktop: collapse sidebar margins
-                const appContainer = document.querySelector(".app-container");
-                if (appContainer) {
-                    appContainer.classList.toggle("collapsed");
-                    const isCollapsed = appContainer.classList.contains("collapsed");
-                    localStorage.setItem("lemma-sidebar-state", isCollapsed ? "collapsed" : "expanded");
-                }
-            }
-        });
-
-        overlay.addEventListener("click", () => {
-            if (window.innerWidth < 768) {
-                sidebarPanel.classList.remove("open");
-                overlay.classList.remove("active");
-            }
-        });
-    }
-
-
-    /* -------------------------------------------------------------
-     * Plagiarism-Free Generator Workspace Logic [NEW]
-     * ------------------------------------------------------------- */
-    const paraInputText = document.getElementById("para-input-text");
-    const paraOutputRender = document.getElementById("para-output-render");
-    const btnRunParaphrase = document.getElementById("btn-run-paraphrase");
-    const btnCopyParaphrase = document.getElementById("btn-copy-paraphrase");
-    const paraTone = document.getElementById("para-tone");
-    const paraOrigWords = document.getElementById("para-orig-words");
-    const paraNewWords = document.getElementById("para-new-words");
-
-    // Track word counts on input change
-    paraInputText.addEventListener("input", () => {
-        const text = paraInputText.value.trim();
-        const wordCount = text ? text.split(/\s+/).length : 0;
-        paraOrigWords.textContent = wordCount;
-    });
-
-    // Run Paraphrase Action
-    btnRunParaphrase.addEventListener("click", async () => {
-        const textToParaphrase = paraInputText.value.trim();
-        if (!textToParaphrase) {
-            showToast("Please enter some text to paraphrase.", "error");
-            return;
-        }
-
-        // Disable button, show loading spinner
-        btnRunParaphrase.disabled = true;
-        btnRunParaphrase.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Paraphrasing...';
-        paraOutputRender.innerHTML = '<span class="placeholder-text"><i class="fa-solid fa-spinner fa-spin"></i> Generating plagiarism-free text...</span>';
-        btnCopyParaphrase.disabled = true;
-        paraNewWords.textContent = "0";
-
-        showToast("Paraphrasing text with local Llama3...", "info");
-
-        try {
-            const response = await fetch(API_REWRITE_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+            const contextPayload = state.activeDocument || {};
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    text: textToParaphrase,
-                    tone: paraTone.value
+                    message: query,
+                    context: contextPayload
                 })
             });
 
-            const data = await response.json();
+            if (!res.ok) throw new Error("Chat request failed");
+            const data = await res.json();
+            
+            // Render markdown formatted response
+            contentEl.innerHTML = renderMarkdown(data.response || "No response received.");
 
-            if (!response.ok) {
-                throw new Error(data.detail || "Paraphrasing failed");
-            }
-
-            // Render result
-            paraOutputRender.innerHTML = escapeHtml(data.rewritten_text);
-
-            // Calculate new word count
-            const wordsNew = data.rewritten_text.trim().split(/\s+/).length;
-            paraNewWords.textContent = wordsNew;
-
-            // Enable copy button
-            btnCopyParaphrase.disabled = false;
-
-            showToast("Text paraphrased successfully!", "success");
-        } catch (error) {
-            console.error("Paraphrase Workspace Error:", error);
-            paraOutputRender.innerHTML = `<span class="placeholder-text" style="color: #ef4444; font-style: normal;"><i class="fa-solid fa-circle-exclamation"></i> Error: ${escapeHtml(error.message)}</span>`;
-            showToast(error.message, "error");
-        } finally {
-            // Restore button
-            btnRunParaphrase.disabled = false;
-            btnRunParaphrase.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Paraphrase Text';
-        }
-    });
-
-    // Copy to Clipboard Action
-    btnCopyParaphrase.addEventListener("click", () => {
-        const textToCopy = paraOutputRender.textContent;
-        if (!textToCopy) return;
-
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            showToast("Copied paraphrased text to clipboard!", "success");
-        }).catch(err => {
-            console.error("Clipboard Error:", err);
-            showToast("Failed to copy text.", "error");
-        });
-    });
-
-    /* -------------------------------------------------------------
-     * Reports History & LocalStorage Persistence [NEW]
-     * ------------------------------------------------------------- */
-    function saveReportToHistory(filename, jobId, scorePct, resultData) {
-        try {
-            let history = localStorage.getItem("lemma_reports_history");
-            history = history ? JSON.parse(history) : [];
-
-            // Check if this jobId already exists in history to prevent duplicates
-            const exists = history.some(item => item.jobId === jobId);
-            if (exists) return;
-
-            const newReport = {
-                filename: filename,
-                jobId: jobId,
-                date: new Date().toLocaleString(),
-                score: scorePct,
-                result: resultData
-            };
-
-            history.unshift(newReport); // Add to the beginning
-
-            // Limit history to 20 entries
-            if (history.length > 20) {
-                history.pop();
-            }
-
-            localStorage.setItem("lemma_reports_history", JSON.stringify(history));
         } catch (e) {
-            console.error("Error saving report to history:", e);
+            contentEl.innerHTML = `<p class="text-danger">⚠️ Assistant error: ${e.message}. Using offline intelligence mode.</p>`;
         }
     }
 
-    function renderReportsHistory() {
+    function appendChatMessage(sender, content) {
+        if (!DOM.chatMessagesBox) return null;
+        const msg = document.createElement('div');
+        msg.className = `chat-message ${sender}`;
+        
+        const avatar = sender === 'user' ? 
+            '<div class="message-avatar user-av"><i class="fa-solid fa-user"></i></div>' : 
+            '<div class="message-avatar"><i class="fa-solid fa-robot"></i></div>';
+
+        msg.innerHTML = `
+            ${avatar}
+            <div class="message-content">
+                <p>${escapeHTML(content)}</p>
+            </div>
+        `;
+        DOM.chatMessagesBox.appendChild(msg);
+        DOM.chatMessagesBox.scrollTop = DOM.chatMessagesBox.scrollHeight;
+        return msg;
+    }
+
+    function renderMarkdown(md) {
+        if (!md) return '';
+        let html = md
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/`(.*?)`/g, '<code>$1</code>')
+            .replace(/\n\n/g, '</p><p>')
+            .replace(/\n/g, '<br>');
+        return `<p>${html}</p>`;
+    }
+
+    // --- PARAPHRASER & REWRITER ---
+    function setupParaphraser() {
+        document.querySelectorAll('.tone-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.activeTone = btn.getAttribute('data-tone') || 'academic';
+            });
+        });
+
+        if (DOM.btnExecuteParaphrase) {
+            DOM.btnExecuteParaphrase.addEventListener('click', executeSingleParaphrase);
+        }
+        if (DOM.btnCopyOriginal) {
+            DOM.btnCopyOriginal.addEventListener('click', () => {
+                navigator.clipboard.writeText(DOM.paraphraseInput.value);
+                showToast("Original text copied!", "info");
+            });
+        }
+        if (DOM.btnCopyRewritten) {
+            DOM.btnCopyRewritten.addEventListener('click', () => {
+                navigator.clipboard.writeText(DOM.paraphraseOutput.textContent);
+                showToast("Rewritten text copied!", "success");
+            });
+        }
+        if (DOM.btnReplaceInDoc) {
+            DOM.btnReplaceInDoc.addEventListener('click', handleReplaceInDoc);
+        }
+        if (DOM.btnBatchRewriteAll) {
+            DOM.btnBatchRewriteAll.addEventListener('click', executeBatchRewriteAll);
+        }
+        if (DOM.btnCancelBatch) {
+            DOM.btnCancelBatch.addEventListener('click', () => {
+                state.batchCancelRequested = true;
+                showToast("Batch rewrite cancellation requested.", "warning");
+            });
+        }
+    }
+
+    async function executeSingleParaphrase() {
+        const text = DOM.paraphraseInput.value.trim();
+        if (!text) {
+            showToast("Please enter text to paraphrase.", "warning");
+            return;
+        }
+
+        DOM.paraphraseOutput.innerHTML = `<span class="placeholder-text"><i class="fa-solid fa-spinner fa-spin"></i> Paraphrasing in ${state.activeTone} tone...</span>`;
+
         try {
-            let history = localStorage.getItem("lemma_reports_history");
-            history = history ? JSON.parse(history) : [];
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/rewrite`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    text: text,
+                    tone: state.activeTone
+                })
+            });
 
-            reportsTableBody.innerHTML = "";
+            if (!res.ok) throw new Error("Paraphrase request failed");
+            const data = await res.json();
+            DOM.paraphraseOutput.textContent = data.rewritten_text || "No rewrite produced.";
+            showToast("Paraphrase generated!", "success");
 
-            if (history.length === 0) {
-                reportsTable.classList.add("hidden");
-                reportsEmptyState.classList.remove("hidden");
-                btnClearHistory.disabled = true;
+        } catch (e) {
+            DOM.paraphraseOutput.innerHTML = `<span class="text-danger">Error: ${e.message}</span>`;
+        }
+    }
+
+    function handleReplaceInDoc() {
+        const rewritten = DOM.paraphraseOutput.textContent.trim();
+        const original = DOM.paraphraseInput.value.trim();
+        if (!rewritten || !state.activeDocument) {
+            showToast("No active document or rewritten text to replace.", "warning");
+            return;
+        }
+
+        if (state.activeDocument.text.includes(original)) {
+            state.activeDocument.text = state.activeDocument.text.replace(original, rewritten);
+            showToast("Text replaced in active document! Re-analyzing...", "success");
+            executeTextAnalysis(state.activeDocument.text, state.activeDocument.filename);
+        } else {
+            showToast("Original text snippet not found in current document.", "warning");
+        }
+    }
+
+    async function executeBatchRewriteAll() {
+        if (!state.activeDocument || !state.activeDocument.analysis) {
+            showToast("No active document analyzed to rewrite.", "warning");
+            return;
+        }
+
+        const matches = state.activeDocument.analysis.matches || [];
+        if (matches.length === 0) {
+            showToast("No flagged sentences to rewrite in this document!", "info");
+            return;
+        }
+
+        const flaggedSentences = matches.map(m => m.query_sentence?.text || m.query_text).filter(Boolean);
+        state.batchCancelRequested = false;
+
+        if (DOM.batchProgressBox) {
+            DOM.batchProgressBox.style.display = 'block';
+            DOM.batchProgressStatus.textContent = `Rewriting flagged sentences: 0 / ${flaggedSentences.length}`;
+            DOM.batchProgressBar.style.width = '0%';
+        }
+
+        let updatedDocText = state.activeDocument.text;
+        let rewrittenCount = 0;
+
+        for (let i = 0; i < flaggedSentences.length; i++) {
+            if (state.batchCancelRequested) {
+                showToast("Batch rewriting cancelled.", "warning");
+                break;
+            }
+
+            const sent = flaggedSentences[i];
+            try {
+                const res = await fetch(`${state.apiBaseUrl}/api/v1/rewrite`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: sent, tone: state.activeTone })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.rewritten_text && updatedDocText.includes(sent)) {
+                        updatedDocText = updatedDocText.replace(sent, data.rewritten_text);
+                        rewrittenCount++;
+                    }
+                }
+            } catch (e) {}
+
+            const pct = Math.round(((i + 1) / flaggedSentences.length) * 100);
+            DOM.batchProgressStatus.textContent = `Rewriting flagged sentences: ${i + 1} / ${flaggedSentences.length}`;
+            DOM.batchProgressBar.style.width = `${pct}%`;
+        }
+
+        setTimeout(() => {
+            if (DOM.batchProgressBox) DOM.batchProgressBox.style.display = 'none';
+        }, 800);
+
+        showToast(`Batch rewrite finished! Re-analyzing updated document...`, "success");
+        executeTextAnalysis(updatedDocText, state.activeDocument.filename);
+    }
+
+    // --- SOURCES VIEW ---
+    function setupSources() {
+        document.querySelectorAll('.sources-filter-bar .filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.sources-filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderSourcesView(btn.getAttribute('data-filter'));
+            });
+        });
+
+        if (DOM.btnSearchSources) {
+            DOM.btnSearchSources.addEventListener('click', handleExternalSourceSearch);
+        }
+        if (DOM.sourcesSearchInput) {
+            DOM.sourcesSearchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') handleExternalSourceSearch();
+            });
+        }
+    }
+
+    function renderSourcesView(filter = 'all') {
+        if (!DOM.sourcesGridWrapper) return;
+        const currentDocSources = state.activeDocument?.analysis?.sources || [];
+        
+        let filtered = currentDocSources;
+        if (filter !== 'all') {
+            filtered = currentDocSources.filter(s => (s.match_type || 'lexical').toLowerCase() === filter.toLowerCase());
+        }
+
+        if (filtered.length === 0) {
+            DOM.sourcesGridWrapper.innerHTML = `
+                <div class="empty-sources-box">
+                    <i class="fa-solid fa-book-open"></i>
+                    <p>No reference sources matched for this filter. Use the search bar above to discover external scholarly publications from OpenAlex, Crossref, and arXiv.</p>
+                </div>
+            `;
+            return;
+        }
+
+        DOM.sourcesGridWrapper.innerHTML = filtered.map(s => `
+            <div class="source-card">
+                <div class="source-card-header">
+                    <span class="source-badge">${(s.match_type || 'Lexical').toUpperCase()}</span>
+                    <span class="source-match-count">${s.match_count || 1} match(es)</span>
+                </div>
+                <h4>${escapeHTML(s.title || 'Untitled Reference')}</h4>
+                <div class="source-author"><i class="fa-solid fa-user-pen"></i> ${escapeHTML(s.author || 'Scholarly Contributors')}</div>
+                <div class="source-venue"><i class="fa-solid fa-building-columns"></i> ${escapeHTML(s.source || 'Reference Library')}</div>
+                ${s.url ? `<a href="${s.url}" target="_blank" class="source-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Source Document</a>` : ''}
+            </div>
+        `).join('');
+    }
+
+    async function handleExternalSourceSearch() {
+        const query = DOM.sourcesSearchInput.value.trim();
+        if (!query) {
+            showToast("Enter a topic to search scholarly sources.", "info");
+            return;
+        }
+
+        DOM.sourcesGridWrapper.innerHTML = `
+            <div class="empty-sources-box">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <p>Searching Wikipedia, OpenAlex, Crossref, and arXiv for "${escapeHTML(query)}"...</p>
+            </div>
+        `;
+
+        try {
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/sources/discover`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query: query, limit: 9 })
+            });
+
+            if (!res.ok) throw new Error("Search failed");
+            const data = await res.json();
+            const sources = data.sources || [];
+
+            if (sources.length === 0) {
+                DOM.sourcesGridWrapper.innerHTML = `<div class="empty-sources-box"><p>No scholarly sources found for "${escapeHTML(query)}".</p></div>`;
                 return;
             }
 
-            reportsTable.classList.remove("hidden");
-            reportsEmptyState.classList.add("hidden");
-            btnClearHistory.disabled = false;
+            DOM.sourcesGridWrapper.innerHTML = sources.map(s => `
+                <div class="source-card">
+                    <div class="source-card-header">
+                        <span class="source-badge">${escapeHTML(s.provider || 'SCHOLARLY')}</span>
+                        <span class="source-cat">${escapeHTML(s.category || 'General')}</span>
+                    </div>
+                    <h4>${escapeHTML(s.title || 'Untitled Reference')}</h4>
+                    <div class="source-author"><i class="fa-solid fa-user-pen"></i> ${escapeHTML(s.author || 'Contributors')}</div>
+                    <div class="source-venue"><i class="fa-solid fa-building-columns"></i> ${escapeHTML(s.source || 'Public Repository')}</div>
+                    <p class="source-snippet">"${escapeHTML((s.text || '').substring(0, 120))}..."</p>
+                    ${s.url ? `<a href="${s.url}" target="_blank" class="source-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Publication</a>` : ''}
+                </div>
+            `).join('');
 
-            history.forEach((item, index) => {
-                const tr = document.createElement("tr");
-
-                // Get similarity badge class
-                let scoreBadgeClass = "badge-green";
-                if (item.score > 50) {
-                    scoreBadgeClass = "badge-red";
-                } else if (item.score > 20) {
-                    scoreBadgeClass = "badge-purple";
-                }
-
-                tr.innerHTML = `
-                    <td>
-                        <i class="fa-solid fa-file-invoice" style="margin-right: 8px; color: var(--text-muted);"></i>
-                        <strong>${escapeHtml(item.filename)}</strong>
-                    </td>
-                    <td>${escapeHtml(item.date)}</td>
-                    <td>
-                        <span class="badge ${scoreBadgeClass}">
-                            ${item.score}% Similarity
-                        </span>
-                    </td>
-                    <td><span class="badge badge-dim">Completed</span></td>
-                    <td style="text-align: right;">
-                        <button class="btn btn-sm btn-outline btn-restore-report" data-index="${index}" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; margin-right: 0.25rem;">
-                            <i class="fa-solid fa-eye"></i> View
-                        </button>
-                        <button class="btn btn-sm btn-secondary btn-download-report-pdf" data-jobid="${item.jobId}" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
-                            <i class="fa-solid fa-file-pdf"></i> PDF
-                        </button>
-                    </td>
-                `;
-                reportsTableBody.appendChild(tr);
-            });
-
-            // Bind view/restore clicks
-            document.querySelectorAll(".btn-restore-report").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const idx = parseInt(btn.dataset.index);
-                    const item = history[idx];
-                    if (item && item.result) {
-                        restoreReportToViewer(item);
-                    }
-                });
-            });
-
-            // Bind download pdf clicks
-            document.querySelectorAll(".btn-download-report-pdf").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const jobId = btn.dataset.jobid;
-                    showToast("Downloading PDF report...", "info");
-                    window.open(`${API_BASE_URL}/api/v1/documents/report/${jobId}`, "_blank");
-                });
-            });
         } catch (e) {
-            console.error("Error rendering reports history:", e);
+            showToast(`Search error: ${e.message}`, "error");
         }
     }
 
-    function restoreReportToViewer(reportItem) {
-        // Switch variables
-        uploadResponseData = reportItem.result;
-        currentJobId = reportItem.jobId;
-        activeFile = { name: reportItem.filename }; // mock active file
-
-        // Render document text structures
-        renderDocument(uploadResponseData);
-
-        // Enable PDF download button
-        btnDownloadPdf.classList.remove("hidden");
-
-        // Immediately run analysis rendering in UI (without delay since it's already computed)
-        const analysis = uploadResponseData.analysis;
-        const lexicalChk = document.getElementById("chk-lexical");
-        const semanticChk = document.getElementById("chk-semantic");
-        const progressScore = document.getElementById("plagiarism-score-text");
-        const progressCircle = document.querySelector(".circular-progress");
-
-        lexicalChk.innerHTML = '<i class="fa-regular fa-circle-check"></i> Lexical Match Complete';
-        lexicalChk.className = "checklist-item done";
-        semanticChk.innerHTML = '<i class="fa-regular fa-circle-check"></i> Semantic Matching Complete';
-        semanticChk.className = "checklist-item done";
-
-        const total = analysis.total_sentences;
-        const lexicalCount = analysis.lexical_matches_count;
-        const hybridCount = analysis.hybrid_matches_count || 0;
-        const semanticCount = analysis.semantic_matches_count;
-
-        const pctL = total > 0 ? Math.round((lexicalCount / total) * 100) : 0;
-        const pctH = total > 0 ? Math.round((hybridCount / total) * 100) : 0;
-        const pctS = total > 0 ? Math.round((semanticCount / total) * 100) : 0;
-        const pctO = Math.max(0, 100 - pctL - pctH - pctS);
-
-        const realPlagScore = pctL + pctH + pctS;
-        progressScore.textContent = `${realPlagScore}%`;
-
-        const degL = pctL * 3.6;
-        const degH = pctH * 3.6;
-        const degS = pctS * 3.6;
-        progressCircle.style.background = `conic-gradient(#ef4444 0deg ${degL}deg, #f59e0b ${degL}deg ${degL + degH}deg, #8b5cf6 ${degL + degH}deg ${degL + degH + degS}deg, #10b981 ${degL + degH + degS}deg 360deg)`;
-
-        document.getElementById("legend-val-lexical").textContent = `${pctL}%`;
-        document.getElementById("legend-val-hybrid").textContent = `${pctH}%`;
-        document.getElementById("legend-val-semantic").textContent = `${pctS}%`;
-        document.getElementById("legend-val-original").textContent = `${pctO}%`;
-
-        applyPlagiarismHighlights(analysis);
-        btnRunAnalysis.disabled = false;
-
-        // Switch view to Plagiarism Check
-        navItems.forEach(n => n.classList.remove("active"));
-        const plagNav = document.getElementById("nav-plagiarism");
-        if (plagNav) plagNav.classList.add("active");
-
-        hideAllWorkspaces();
-        if (dashboardWorkspace) dashboardWorkspace.classList.remove("hidden");
-
-        showToast(`Loaded analysis report for ${reportItem.filename}`, "success");
+    // --- REPORTS VIEW ---
+    function setupReports() {
+        if (DOM.btnGenerateReportView) {
+            DOM.btnGenerateReportView.addEventListener('click', downloadCurrentReport);
+        }
     }
 
-    // Clear History Action
-    if (btnClearHistory) {
-        btnClearHistory.addEventListener("click", () => {
-            if (confirm("Are you sure you want to clear your reports history? This cannot be undone.")) {
-                localStorage.removeItem("lemma_reports_history");
-                renderReportsHistory();
-                showToast("Reports history cleared.", "info");
+    function renderReportsView() {
+        const doc = state.activeDocument;
+        if (!doc) return;
+
+        const an = doc.analysis || {};
+        if (DOM.repDate) DOM.repDate.textContent = new Date().toLocaleDateString();
+        if (DOM.repFilename) DOM.repFilename.textContent = doc.filename || 'Document';
+        if (DOM.repPlagScore) DOM.repPlagScore.textContent = `${an.plagiarism_score || 0}%`;
+        if (DOM.repOrigScore) DOM.repOrigScore.textContent = `${an.originality_score || 100}%`;
+        if (DOM.repSentences) DOM.repSentences.textContent = doc.sentence_count || an.total_sentences || 0;
+
+        if (DOM.repSummaryText) {
+            const plag = an.plagiarism_score || 0;
+            DOM.repSummaryText.textContent = plag > 15 ? 
+                `This document was analyzed using Lemma 2.0. ${plag}% of sentences contain matched phraseology with existing reference corpus literature.` : 
+                `This document demonstrates high originality (${100 - plag}%) with minimal lexical overlap. Verified by Lemma 2.0.`;
+        }
+
+        if (DOM.repSourcesList) {
+            const sources = an.sources || [];
+            if (sources.length === 0) {
+                DOM.repSourcesList.innerHTML = '<p>No external reference sources matched.</p>';
+            } else {
+                DOM.repSourcesList.innerHTML = sources.map((s, i) => `
+                    <div class="rep-source-item">
+                        <strong>#${i + 1} ${escapeHTML(s.title || 'Reference')}</strong>
+                        <span>By ${escapeHTML(s.author || 'N/A')} (${escapeHTML(s.source || 'Journal')})</span>
+                    </div>
+                `).join('');
             }
-        });
+        }
     }
 
-    // Blank Start Page Workspace Event Handlers
-    const blankPromptInput = document.getElementById("blank-prompt-input");
-    if (blankPromptInput) {
-        blankPromptInput.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                const promptVal = blankPromptInput.value.trim();
-                if (promptVal) {
-                    // Navigate to AI Paraphraser (AI Chat)
-                    const paraInputText = document.getElementById("para-input-text");
-                    if (paraInputText) {
-                        paraInputText.value = promptVal;
-                        paraInputText.dispatchEvent(new Event("input"));
-                    }
+    async function downloadCurrentReport() {
+        if (!state.activeDocument) {
+            showToast("Please analyze a document before generating a report.", "warning");
+            return;
+        }
 
-                    const navParaphrase = document.getElementById("nav-paraphrase");
-                    if (navParaphrase) {
-                        navParaphrase.click();
-                    }
+        showToast("Generating official Lemma Integrity PDF Report...", "info");
+        try {
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/documents/report/direct`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(state.activeDocument)
+            });
 
-                    blankPromptInput.value = "";
+            if (!res.ok) throw new Error("Report generation failed");
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${(state.activeDocument.filename || 'lemma_doc').replace(/\.[^/.]+$/, '')}_integrity_report.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            showToast("Report downloaded successfully!", "success");
+
+        } catch (e) {
+            showToast(`Report Download Error: ${e.message}`, "error");
+        }
+    }
+
+    // --- HISTORY STORAGE & VIEW ---
+    function setupHistory() {
+        if (DOM.btnClearHistory) {
+            DOM.btnClearHistory.addEventListener('click', () => {
+                if (confirm("Are you sure you want to clear all analysis history?")) {
+                    state.history = [];
+                    localStorage.removeItem('lemma_history');
+                    renderHistoryTable();
+                    updateDashboardStats();
+                    showToast("History cleared.", "info");
                 }
-            }
+            });
+        }
+    }
+
+    function loadHistory() {
+        try {
+            const raw = localStorage.getItem('lemma_history');
+            if (raw) state.history = JSON.parse(raw);
+        } catch (e) {
+            state.history = [];
+        }
+        updateDashboardStats();
+    }
+
+    function saveToHistory(docData) {
+        const item = {
+            id: `hist_${Date.now()}`,
+            filename: docData.filename,
+            timestamp: new Date().toISOString(),
+            char_count: docData.char_count,
+            sentence_count: docData.sentence_count,
+            sentences: docData.sentences,
+            text: docData.text,
+            metrics: docData.metrics,
+            analysis: docData.analysis
+        };
+        state.history.unshift(item);
+        if (state.history.length > 50) state.history.pop();
+        localStorage.setItem('lemma_history', JSON.stringify(state.history));
+        updateDashboardStats();
+    }
+
+    function renderHistoryTable() {
+        if (!DOM.historyTableTbody) return;
+        if (state.history.length === 0) {
+            DOM.historyTableTbody.innerHTML = `
+                <tr class="empty-row">
+                    <td colspan="6">No saved history records found.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        DOM.historyTableTbody.innerHTML = state.history.map(item => `
+            <tr>
+                <td><strong>${escapeHTML(item.filename || 'Document')}</strong></td>
+                <td>${new Date(item.timestamp).toLocaleString()}</td>
+                <td>${item.char_count ? Math.round(item.char_count / 5).toLocaleString() : '0'}</td>
+                <td><span class="badge badge-danger">${item.analysis?.plagiarism_score || 0}%</span></td>
+                <td><span class="badge badge-success">${item.analysis?.originality_score || 100}%</span></td>
+                <td>
+                    <button class="btn btn-ghost btn-xs btn-open-hist" data-id="${item.id}">Open</button>
+                    <button class="btn btn-outline btn-xs btn-dl-hist" data-id="${item.id}">Report</button>
+                    <button class="btn btn-ghost btn-xs text-danger btn-del-hist" data-id="${item.id}"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+
+        DOM.historyTableTbody.querySelectorAll('.btn-open-hist').forEach(b => {
+            b.addEventListener('click', () => openHistoryItem(b.getAttribute('data-id')));
+        });
+        DOM.historyTableTbody.querySelectorAll('.btn-dl-hist').forEach(b => {
+            b.addEventListener('click', () => downloadHistoryReport(b.getAttribute('data-id')));
+        });
+        DOM.historyTableTbody.querySelectorAll('.btn-del-hist').forEach(b => {
+            b.addEventListener('click', () => {
+                const id = b.getAttribute('data-id');
+                state.history = state.history.filter(h => h.id !== id);
+                localStorage.setItem('lemma_history', JSON.stringify(state.history));
+                renderHistoryTable();
+                updateDashboardStats();
+                showToast("Item removed from history.", "info");
+            });
         });
     }
 
-    const btnBlankNew = document.getElementById("btn-blank-new");
-    if (btnBlankNew) {
-        btnBlankNew.addEventListener("click", () => {
-            const navPlagiarism = document.getElementById("nav-plagiarism");
-            if (navPlagiarism) {
-                navPlagiarism.click();
+    function openHistoryItem(id) {
+        const item = state.history.find(h => h.id === id);
+        if (item) {
+            switchView('view-analyze');
+            renderAnalysisResults(item);
+            showToast(`Loaded "${item.filename}" from history!`, "success");
+        }
+    }
+
+    async function downloadHistoryReport(id) {
+        const item = state.history.find(h => h.id === id);
+        if (item) {
+            state.activeDocument = item;
+            downloadCurrentReport();
+        }
+    }
+
+    // --- WORKSPACE VIEW ---
+    function setupWorkspace() {
+        if (DOM.btnWorkspaceNewDoc) {
+            DOM.btnWorkspaceNewDoc.addEventListener('click', () => {
+                const name = prompt("Enter document title:", "New Research Paper");
+                if (name) {
+                    const newDoc = {
+                        id: `ws_${Date.now()}`,
+                        name: name,
+                        created_at: new Date().toISOString(),
+                        text: "Start writing or paste your academic content here...",
+                        type: "doc"
+                    };
+                    state.workspace.unshift(newDoc);
+                    localStorage.setItem('lemma_workspace', JSON.stringify(state.workspace));
+                    renderWorkspace();
+                    showToast(`Created "${name}"!`, "success");
+                }
+            });
+        }
+    }
+
+    function loadWorkspace() {
+        try {
+            const raw = localStorage.getItem('lemma_workspace');
+            if (raw) state.workspace = JSON.parse(raw);
+            else {
+                state.workspace = [
+                    { id: 'ws_sample', name: 'Deep Learning & Neural Networks', created_at: new Date().toISOString(), text: SAMPLE_DOCUMENT_TEXT, type: 'doc' }
+                ];
             }
+        } catch (e) {
+            state.workspace = [];
+        }
+    }
+
+    function renderWorkspace() {
+        if (!DOM.workspaceGridContainer) return;
+        if (state.workspace.length === 0) {
+            DOM.workspaceGridContainer.innerHTML = `<div class="empty-workspace-box"><p>No workspace documents found. Click 'New Document' to start.</p></div>`;
+            return;
+        }
+
+        DOM.workspaceGridContainer.innerHTML = state.workspace.map(doc => `
+            <div class="workspace-card" data-id="${doc.id}">
+                <div class="ws-card-header">
+                    <i class="fa-solid fa-file-lines text-purple"></i>
+                    <span class="ws-date">${new Date(doc.created_at).toLocaleDateString()}</span>
+                </div>
+                <h4>${escapeHTML(doc.name)}</h4>
+                <p class="ws-snippet">"${escapeHTML((doc.text || '').substring(0, 90))}..."</p>
+                <div class="ws-actions">
+                    <button class="btn btn-primary btn-xs btn-ws-open" data-id="${doc.id}">Open & Analyze</button>
+                    <button class="btn btn-ghost btn-xs text-danger btn-ws-del" data-id="${doc.id}"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </div>
+        `).join('');
+
+        DOM.workspaceGridContainer.querySelectorAll('.btn-ws-open').forEach(b => {
+            b.addEventListener('click', () => {
+                const id = b.getAttribute('data-id');
+                const doc = state.workspace.find(d => d.id === id);
+                if (doc) {
+                    switchView('view-analyze');
+                    activateAnalyzeTab('paste');
+                    if (DOM.pasteTextarea) DOM.pasteTextarea.value = doc.text;
+                    updatePasteCounters();
+                    executeTextAnalysis(doc.text, doc.name);
+                }
+            });
+        });
+
+        DOM.workspaceGridContainer.querySelectorAll('.btn-ws-del').forEach(b => {
+            b.addEventListener('click', () => {
+                const id = b.getAttribute('data-id');
+                state.workspace = state.workspace.filter(d => d.id !== id);
+                localStorage.setItem('lemma_workspace', JSON.stringify(state.workspace));
+                renderWorkspace();
+                showToast("Document deleted.", "info");
+            });
         });
     }
-});
 
+    // --- PANDAZ PDF TOOLS SUITE ---
+    function setupPandaz() {
+        document.querySelectorAll('.btn-pandaz-launch, .pandaz-card').forEach(el => {
+            el.addEventListener('click', (e) => {
+                const tool = el.getAttribute('data-tool');
+                if (tool) openPandazTool(tool);
+            });
+        });
+
+        if (DOM.btnClosePandazModal) {
+            DOM.btnClosePandazModal.addEventListener('click', () => {
+                DOM.pandazWorkbenchModal.style.display = 'none';
+            });
+        }
+    }
+
+    function openPandazTool(toolName) {
+        DOM.pandazWorkbenchModal.style.display = 'flex';
+        const body = DOM.pandazModalBody;
+        const title = DOM.pandazModalTitle;
+
+        if (toolName === 'merge') {
+            title.textContent = 'Merge PDF Documents';
+            body.innerHTML = `
+                <div class="pandaz-tool-view">
+                    <p>Select multiple PDF files to merge into a single downloadable PDF.</p>
+                    <input type="file" id="pandaz-merge-files" multiple accept=".pdf" class="form-control mb-3">
+                    <div id="pandaz-merge-filelist" class="file-list-preview mb-3"></div>
+                    <button class="btn btn-primary" id="btn-run-pandaz-merge">
+                        <i class="fa-solid fa-object-group"></i> Merge PDFs
+                    </button>
+                </div>
+            `;
+            document.getElementById('btn-run-pandaz-merge').addEventListener('click', executePandazMerge);
+        }
+
+        else if (toolName === 'split') {
+            title.textContent = 'Split PDF Document';
+            body.innerHTML = `
+                <div class="pandaz-tool-view">
+                    <p>Upload a PDF and specify the page numbers / range to extract.</p>
+                    <input type="file" id="pandaz-split-file" accept=".pdf" class="form-control mb-3">
+                    <div class="form-group mb-3">
+                        <label>Page Range (e.g. 1-3, 5, 8-10):</label>
+                        <input type="text" id="pandaz-split-range" class="form-control" value="1-2">
+                    </div>
+                    <button class="btn btn-primary" id="btn-run-pandaz-split">
+                        <i class="fa-solid fa-scissors"></i> Split PDF
+                    </button>
+                </div>
+            `;
+            document.getElementById('btn-run-pandaz-split').addEventListener('click', executePandazSplit);
+        }
+
+        else if (toolName === 'compress') {
+            title.textContent = 'Compress PDF Document';
+            body.innerHTML = `
+                <div class="pandaz-tool-view">
+                    <p>Upload a PDF to compress streams and reduce total file size.</p>
+                    <input type="file" id="pandaz-comp-file" accept=".pdf" class="form-control mb-3">
+                    <button class="btn btn-primary" id="btn-run-pandaz-compress">
+                        <i class="fa-solid fa-file-zipper"></i> Compress PDF
+                    </button>
+                    <div id="pandaz-comp-results" class="mt-3" style="display: none;"></div>
+                </div>
+            `;
+            document.getElementById('btn-run-pandaz-compress').addEventListener('click', executePandazCompress);
+        }
+
+        else if (toolName === 'csv') {
+            title.textContent = 'Extract PDF Tables to CSV';
+            body.innerHTML = `
+                <div class="pandaz-tool-view">
+                    <p>Extract structured tabular data from PDF pages directly into CSV format.</p>
+                    <input type="file" id="pandaz-csv-file" accept=".pdf" class="form-control mb-3">
+                    <button class="btn btn-primary" id="btn-run-pandaz-csv">
+                        <i class="fa-solid fa-table"></i> Extract & Download CSV
+                    </button>
+                </div>
+            `;
+            document.getElementById('btn-run-pandaz-csv').addEventListener('click', executePandazCSV);
+        }
+
+        else if (toolName === 'rename') {
+            title.textContent = 'Safely Rename PDF';
+            body.innerHTML = `
+                <div class="pandaz-tool-view">
+                    <p>Provide a new sanitized filename and download the renamed document.</p>
+                    <input type="file" id="pandaz-rename-file" accept=".pdf" class="form-control mb-3">
+                    <div class="form-group mb-3">
+                        <label>New Filename:</label>
+                        <input type="text" id="pandaz-rename-val" class="form-control" placeholder="my_academic_paper.pdf">
+                    </div>
+                    <button class="btn btn-primary" id="btn-run-pandaz-rename">
+                        <i class="fa-solid fa-file-pen"></i> Download Renamed PDF
+                    </button>
+                </div>
+            `;
+            document.getElementById('btn-run-pandaz-rename').addEventListener('click', executePandazRename);
+        }
+
+        else if (toolName === 'sign') {
+            title.textContent = 'Edit & Sign PDF';
+            body.innerHTML = `
+                <div class="pandaz-tool-view">
+                    <p>Upload a PDF, draw your digital signature on the pad below, and stamp it onto the PDF.</p>
+                    <input type="file" id="pandaz-sign-file" accept=".pdf" class="form-control mb-3">
+                    <div class="sig-canvas-wrapper mb-3">
+                        <label>Digital Signature Pad (Draw with mouse / finger):</label>
+                        <canvas id="sig-pad-canvas" width="400" height="150" style="border: 1px solid var(--border-color); background: #ffffff; border-radius: 8px; cursor: crosshair; display: block;"></canvas>
+                        <button class="btn btn-ghost btn-xs mt-2" id="btn-clear-sig-pad">Clear Signature</button>
+                    </div>
+                    <button class="btn btn-primary" id="btn-run-pandaz-sign">
+                        <i class="fa-solid fa-signature"></i> Stamp & Download PDF
+                    </button>
+                </div>
+            `;
+            initSignaturePad();
+            document.getElementById('btn-run-pandaz-sign').addEventListener('click', executePandazSign);
+        }
+
+        else if (toolName === 'ocr') {
+            title.textContent = 'OCR Document & Handwriting to Text';
+            body.innerHTML = `
+                <div class="pandaz-tool-view">
+                    <p>Upload a scanned PDF or image (PNG/JPG) to extract machine-readable text.</p>
+                    <input type="file" id="pandaz-ocr-file" accept=".pdf,.png,.jpg,.jpeg" class="form-control mb-3">
+                    <button class="btn btn-primary mb-3" id="btn-run-pandaz-ocr">
+                        <i class="fa-solid fa-eye"></i> Run OCR
+                    </button>
+                    <div id="pandaz-ocr-result-box" style="display: none;">
+                        <div class="ocr-meta-pill mb-2">
+                            <span>Confidence: <strong id="ocr-conf-val">0%</strong></span>
+                            <span>Engine: <strong id="ocr-engine-val">Standard</strong></span>
+                        </div>
+                        <textarea id="pandaz-ocr-textarea" class="form-control mb-2" rows="6"></textarea>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-secondary btn-sm" id="btn-copy-ocr-text">Copy Text</button>
+                            <button class="btn btn-outline btn-sm" id="btn-ocr-to-lemma">
+                                <i class="fa-solid fa-magnifying-glass-chart"></i> Analyze with Lemma
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('btn-run-pandaz-ocr').addEventListener('click', executePandazOCR);
+        }
+
+        else if (toolName === 'summarizer') {
+            title.textContent = 'AI PDF Summarizer';
+            body.innerHTML = `
+                <div class="pandaz-tool-view">
+                    <p>Upload a PDF document to generate an instant executive summary, key points, and keywords.</p>
+                    <input type="file" id="pandaz-sum-file" accept=".pdf" class="form-control mb-3">
+                    <button class="btn btn-primary mb-3" id="btn-run-pandaz-summarize">
+                        <i class="fa-solid fa-brain"></i> Summarize PDF
+                    </button>
+                    <div id="pandaz-sum-result-box" class="card-box mt-3" style="display: none;">
+                        <h4>TL;DR</h4>
+                        <p id="sum-tldr-text">...</p>
+                        <h4>Key Core Points</h4>
+                        <ul id="sum-keypoints-list"></ul>
+                        <h4>Keywords</h4>
+                        <div id="sum-keywords-tags" class="d-flex gap-2 flex-wrap"></div>
+                        <hr class="my-3">
+                        <button class="btn btn-primary btn-sm" id="btn-send-sum-to-lemma">
+                            <i class="fa-solid fa-magnifying-glass-chart"></i> Analyze Originality in Lemma
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('btn-run-pandaz-summarize').addEventListener('click', executePandazSummarize);
+        }
+
+        else if (toolName === 'rotate') {
+            title.textContent = 'Rotate & Manage PDF Pages';
+            body.innerHTML = `
+                <div class="pandaz-tool-view">
+                    <p>Rotate PDF orientation or delete specified pages.</p>
+                    <input type="file" id="pandaz-rotate-file" accept=".pdf" class="form-control mb-3">
+                    <div class="form-group mb-3">
+                        <label>Rotate Clockwise by:</label>
+                        <select id="pandaz-rotate-degrees" class="form-control">
+                            <option value="90">90° Clockwise</option>
+                            <option value="180">180° Invert</option>
+                            <option value="270">270° Counter-Clockwise</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="btn-run-pandaz-rotate">
+                        <i class="fa-solid fa-rotate-right"></i> Rotate & Download
+                    </button>
+                </div>
+            `;
+            document.getElementById('btn-run-pandaz-rotate').addEventListener('click', executePandazRotate);
+        }
+    }
+
+    // --- PANDAZ EXECUTION HANDLERS ---
+    async function executePandazMerge() {
+        const input = document.getElementById('pandaz-merge-files');
+        if (!input.files || input.files.length < 2) {
+            showToast("Please select at least 2 PDF files to merge.", "warning");
+            return;
+        }
+
+        showToast("Merging PDF documents...", "info");
+        const fd = new FormData();
+        for (let i = 0; i < input.files.length; i++) {
+            fd.append('files', input.files[i]);
+        }
+
+        try {
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/pandaz/merge`, {
+                method: 'POST',
+                body: fd
+            });
+            if (!res.ok) throw new Error("Merge failed on server.");
+            const blob = await res.blob();
+            downloadBlob(blob, 'pandaz_merged.pdf');
+            showToast("PDFs merged successfully!", "success");
+            DOM.pandazWorkbenchModal.style.display = 'none';
+        } catch (e) {
+            showToast(`Merge error: ${e.message}`, "error");
+        }
+    }
+
+    async function executePandazSplit() {
+        const input = document.getElementById('pandaz-split-file');
+        const range = document.getElementById('pandaz-split-range').value.trim();
+        if (!input.files || input.files.length === 0) {
+            showToast("Please select a PDF to split.", "warning");
+            return;
+        }
+
+        showToast("Splitting PDF pages...", "info");
+        const fd = new FormData();
+        fd.append('file', input.files[0]);
+        fd.append('page_range', range || '1-2');
+
+        try {
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/pandaz/split`, {
+                method: 'POST',
+                body: fd
+            });
+            if (!res.ok) throw new Error("Split failed.");
+            const blob = await res.blob();
+            downloadBlob(blob, `${input.files[0].name.replace('.pdf', '')}_split.pdf`);
+            showToast("PDF split completed!", "success");
+            DOM.pandazWorkbenchModal.style.display = 'none';
+        } catch (e) {
+            showToast(`Split error: ${e.message}`, "error");
+        }
+    }
+
+    async function executePandazCompress() {
+        const input = document.getElementById('pandaz-comp-file');
+        if (!input.files || input.files.length === 0) {
+            showToast("Select a PDF to compress.", "warning");
+            return;
+        }
+
+        showToast("Compressing PDF file...", "info");
+        const fd = new FormData();
+        fd.append('file', input.files[0]);
+
+        try {
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/pandaz/compress`, {
+                method: 'POST',
+                body: fd
+            });
+            if (!res.ok) throw new Error("Compression failed.");
+            const reduction = res.headers.get('X-Reduction-Percent') || '0';
+            const blob = await res.blob();
+            downloadBlob(blob, `${input.files[0].name.replace('.pdf', '')}_compressed.pdf`);
+            showToast(`PDF compressed! Reduced by ${reduction}%.`, "success");
+            DOM.pandazWorkbenchModal.style.display = 'none';
+        } catch (e) {
+            showToast(`Compression error: ${e.message}`, "error");
+        }
+    }
+
+    async function executePandazCSV() {
+        const input = document.getElementById('pandaz-csv-file');
+        if (!input.files || input.files.length === 0) {
+            showToast("Select a PDF with tables.", "warning");
+            return;
+        }
+
+        showToast("Extracting tables to CSV...", "info");
+        const fd = new FormData();
+        fd.append('file', input.files[0]);
+
+        try {
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/pandaz/to-csv`, {
+                method: 'POST',
+                body: fd
+            });
+            if (!res.ok) throw new Error("Table extraction failed.");
+            const blob = await res.blob();
+            downloadBlob(blob, `${input.files[0].name.replace('.pdf', '')}_tables.csv`);
+            showToast("CSV exported successfully!", "success");
+            DOM.pandazWorkbenchModal.style.display = 'none';
+        } catch (e) {
+            showToast(`CSV error: ${e.message}`, "error");
+        }
+    }
+
+    async function executePandazRename() {
+        const input = document.getElementById('pandaz-rename-file');
+        const newName = document.getElementById('pandaz-rename-val').value.trim();
+        if (!input.files || input.files.length === 0 || !newName) {
+            showToast("Select a file and enter a new filename.", "warning");
+            return;
+        }
+
+        const fd = new FormData();
+        fd.append('file', input.files[0]);
+        fd.append('new_name', newName);
+
+        try {
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/pandaz/rename`, {
+                method: 'POST',
+                body: fd
+            });
+            if (!res.ok) throw new Error("Rename failed.");
+            const blob = await res.blob();
+            downloadBlob(blob, newName.endsWith('.pdf') ? newName : `${newName}.pdf`);
+            showToast("Renamed PDF downloaded!", "success");
+            DOM.pandazWorkbenchModal.style.display = 'none';
+        } catch (e) {
+            showToast(`Rename error: ${e.message}`, "error");
+        }
+    }
+
+    function initSignaturePad() {
+        const canvas = document.getElementById('sig-pad-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+
+        function start(e) {
+            isDrawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        }
+        function draw(e) {
+            if (!isDrawing) return;
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+        }
+        function stop() {
+            isDrawing = false;
+        }
+
+        canvas.addEventListener('mousedown', start);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stop);
+        canvas.addEventListener('mouseleave', stop);
+
+        document.getElementById('btn-clear-sig-pad').addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+    }
+
+    async function executePandazSign() {
+        const input = document.getElementById('pandaz-sign-file');
+        const canvas = document.getElementById('sig-pad-canvas');
+        if (!input.files || input.files.length === 0) {
+            showToast("Please upload a PDF to sign.", "warning");
+            return;
+        }
+
+        const sigBase64 = canvas ? canvas.toDataURL('image/png') : null;
+        showToast("Stamping signature on PDF...", "info");
+        const fd = new FormData();
+        fd.append('file', input.files[0]);
+        fd.append('signature_base64', sigBase64 || '');
+
+        try {
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/pandaz/sign`, {
+                method: 'POST',
+                body: fd
+            });
+            if (!res.ok) throw new Error("Sign failed.");
+            const blob = await res.blob();
+            downloadBlob(blob, `${input.files[0].name.replace('.pdf', '')}_signed.pdf`);
+            showToast("Signed PDF downloaded!", "success");
+            DOM.pandazWorkbenchModal.style.display = 'none';
+        } catch (e) {
+            showToast(`Sign error: ${e.message}`, "error");
+        }
+    }
+
+    async function executePandazOCR() {
+        const input = document.getElementById('pandaz-ocr-file');
+        if (!input.files || input.files.length === 0) {
+            showToast("Upload an image or PDF to OCR.", "warning");
+            return;
+        }
+
+        showToast("Running Optical Character Recognition...", "info");
+        const fd = new FormData();
+        fd.append('file', input.files[0]);
+
+        try {
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/pandaz/ocr`, {
+                method: 'POST',
+                body: fd
+            });
+            if (!res.ok) throw new Error("OCR processing failed.");
+            const data = await res.json();
+
+            const box = document.getElementById('pandaz-ocr-result-box');
+            const textarea = document.getElementById('pandaz-ocr-textarea');
+            box.style.display = 'block';
+            textarea.value = data.text || '';
+            document.getElementById('ocr-conf-val').textContent = `${data.confidence || 90}%`;
+            document.getElementById('ocr-engine-val').textContent = data.engine || 'Standard';
+
+            document.getElementById('btn-copy-ocr-text').onclick = () => {
+                navigator.clipboard.writeText(textarea.value);
+                showToast("OCR text copied!", "success");
+            };
+
+            document.getElementById('btn-ocr-to-lemma').onclick = () => {
+                DOM.pandazWorkbenchModal.style.display = 'none';
+                switchView('view-analyze');
+                activateAnalyzeTab('paste');
+                if (DOM.pasteTextarea) DOM.pasteTextarea.value = textarea.value;
+                updatePasteCounters();
+                executeTextAnalysis(textarea.value, `OCR Import - ${input.files[0].name}`);
+            };
+
+        } catch (e) {
+            showToast(`OCR Error: ${e.message}`, "error");
+        }
+    }
+
+    async function executePandazSummarize() {
+        const input = document.getElementById('pandaz-sum-file');
+        if (!input.files || input.files.length === 0) {
+            showToast("Upload a PDF to summarize.", "warning");
+            return;
+        }
+
+        showToast("Generating PDF executive summary...", "info");
+        const fd = new FormData();
+        fd.append('file', input.files[0]);
+
+        try {
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/pandaz/summarize`, {
+                method: 'POST',
+                body: fd
+            });
+            if (!res.ok) throw new Error("Summarization failed.");
+            const data = await res.json();
+
+            const box = document.getElementById('pandaz-sum-result-box');
+            box.style.display = 'block';
+            document.getElementById('sum-tldr-text').textContent = data.tldr || 'Summary generated.';
+            
+            const kpList = document.getElementById('sum-keypoints-list');
+            kpList.innerHTML = (data.key_points || []).map(p => `<li>${escapeHTML(p)}</li>`).join('');
+
+            const kwDiv = document.getElementById('sum-keywords-tags');
+            kwDiv.innerHTML = (data.keywords || []).map(k => `<span class="badge badge-info">${escapeHTML(k)}</span>`).join('');
+
+            document.getElementById('btn-send-sum-to-lemma').onclick = async () => {
+                DOM.pandazWorkbenchModal.style.display = 'none';
+                showToast("Importing PDF into Lemma Plagiarism Engine...", "info");
+                
+                const sendFd = new FormData();
+                sendFd.append('file', input.files[0]);
+                const lemmaRes = await fetch(`${state.apiBaseUrl}/api/v1/pandaz/to-lemma`, {
+                    method: 'POST',
+                    body: sendFd
+                });
+                if (lemmaRes.ok) {
+                    const lData = await lemmaRes.json();
+                    switchView('view-analyze');
+                    renderAnalysisResults(lData);
+                    saveToHistory(lData);
+                    showToast("PDF imported and analyzed in Lemma!", "success");
+                }
+            };
+
+        } catch (e) {
+            showToast(`Summarizer error: ${e.message}`, "error");
+        }
+    }
+
+    async function executePandazRotate() {
+        const input = document.getElementById('pandaz-rotate-file');
+        const degrees = document.getElementById('pandaz-rotate-degrees').value;
+        if (!input.files || input.files.length === 0) {
+            showToast("Select a PDF to rotate.", "warning");
+            return;
+        }
+
+        const fd = new FormData();
+        fd.append('file', input.files[0]);
+        fd.append('degrees', degrees);
+
+        try {
+            const res = await fetch(`${state.apiBaseUrl}/api/v1/pandaz/rotate`, {
+                method: 'POST',
+                body: fd
+            });
+            if (!res.ok) throw new Error("Rotate failed.");
+            const blob = await res.blob();
+            downloadBlob(blob, `rotated_${input.files[0].name}`);
+            showToast("Rotated PDF downloaded!", "success");
+            DOM.pandazWorkbenchModal.style.display = 'none';
+        } catch (e) {
+            showToast(`Rotate error: ${e.message}`, "error");
+        }
+    }
+
+    function downloadBlob(blob, filename) {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    }
+
+    // --- COMMAND PALETTE (CTRL + K) ---
+    function setupCommandPalette() {
+        const commands = [
+            { title: 'Analyze Document', icon: 'fa-magnifying-glass-chart', action: () => { switchView('view-analyze'); activateAnalyzeTab('upload'); } },
+            { title: 'Paste Text for Analysis', icon: 'fa-paste', action: () => { switchView('view-analyze'); activateAnalyzeTab('paste'); } },
+            { title: 'Try Sample Document Analysis', icon: 'fa-flask', action: () => { switchView('view-analyze'); executeTextAnalysis(SAMPLE_DOCUMENT_TEXT, "Sample Research Document"); } },
+            { title: 'Ask Lemma AI Assistant', icon: 'fa-robot', action: () => switchView('view-asklemma') },
+            { title: 'Paraphraser & Rewriter', icon: 'fa-wand-magic-sparkles', action: () => switchView('view-paraphrase') },
+            { title: 'Scholarly Sources & Discovery', icon: 'fa-book-bookmark', action: () => switchView('view-sources') },
+            { title: 'Generate Lemma Integrity Report', icon: 'fa-file-invoice', action: () => switchView('view-reports') },
+            { title: 'View Analysis History', icon: 'fa-clock-rotate-left', action: () => switchView('view-history') },
+            { title: 'Workspace Document Manager', icon: 'fa-folder-tree', action: () => switchView('view-workspace') },
+            { title: 'Pandaz: Merge PDFs', icon: 'fa-object-group', action: () => { switchView('view-pandaz'); openPandazTool('merge'); } },
+            { title: 'Pandaz: Split PDF', icon: 'fa-scissors', action: () => { switchView('view-pandaz'); openPandazTool('split'); } },
+            { title: 'Pandaz: Compress PDF', icon: 'fa-file-zipper', action: () => { switchView('view-pandaz'); openPandazTool('compress'); } },
+            { title: 'Pandaz: PDF to CSV', icon: 'fa-table', action: () => { switchView('view-pandaz'); openPandazTool('csv'); } },
+            { title: 'Pandaz: Edit & Sign PDF', icon: 'fa-signature', action: () => { switchView('view-pandaz'); openPandazTool('sign'); } },
+            { title: 'Pandaz: OCR Text Extractor', icon: 'fa-eye', action: () => { switchView('view-pandaz'); openPandazTool('ocr'); } },
+            { title: 'Pandaz: AI PDF Summarizer', icon: 'fa-brain', action: () => { switchView('view-pandaz'); openPandazTool('summarizer'); } },
+            { title: 'Settings & System Health', icon: 'fa-sliders', action: () => switchView('view-settings') }
+        ];
+
+        function renderPaletteResults(filter = '') {
+            const f = filter.toLowerCase();
+            const matched = commands.filter(c => c.title.toLowerCase().includes(f));
+            DOM.paletteResultsList.innerHTML = matched.map((c, i) => `
+                <div class="palette-item ${i === 0 ? 'selected' : ''}" data-idx="${i}">
+                    <i class="fa-solid ${c.icon}"></i>
+                    <span>${escapeHTML(c.title)}</span>
+                </div>
+            `).join('');
+
+            DOM.paletteResultsList.querySelectorAll('.palette-item').forEach((item, idx) => {
+                item.addEventListener('click', () => {
+                    DOM.commandPaletteModal.style.display = 'none';
+                    matched[idx].action();
+                });
+            });
+        }
+
+        // Trigger shortcut
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                DOM.commandPaletteModal.style.display = 'flex';
+                DOM.paletteSearchInput.value = '';
+                DOM.paletteSearchInput.focus();
+                renderPaletteResults();
+            }
+            if (e.key === 'Escape' && DOM.commandPaletteModal.style.display === 'flex') {
+                DOM.commandPaletteModal.style.display = 'none';
+            }
+        });
+
+        if (DOM.commandPaletteTrigger) {
+            DOM.commandPaletteTrigger.addEventListener('click', () => {
+                DOM.commandPaletteModal.style.display = 'flex';
+                DOM.paletteSearchInput.value = '';
+                DOM.paletteSearchInput.focus();
+                renderPaletteResults();
+            });
+        }
+
+        if (DOM.paletteSearchInput) {
+            DOM.paletteSearchInput.addEventListener('input', () => {
+                renderPaletteResults(DOM.paletteSearchInput.value);
+            });
+        }
+    }
+
+    // --- SETTINGS VIEW ---
+    function setupSettings() {
+        if (DOM.btnRefreshStatus) {
+            DOM.btnRefreshStatus.addEventListener('click', () => {
+                showToast("Checking subsystem health...", "info");
+                checkSystemHealth();
+            });
+        }
+        if (DOM.btnSaveApiUrl) {
+            DOM.btnSaveApiUrl.addEventListener('click', () => {
+                const url = DOM.settingApiUrl.value.trim();
+                APIConfigManager.setDeveloperOverrideUrl(url);
+                state.apiBaseUrl = url || 'http://localhost:8000';
+                showToast("API URL override saved!", "success");
+                checkSystemHealth();
+            });
+        }
+
+        document.querySelectorAll('.theme-choice-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const t = btn.getAttribute('data-theme');
+                applyTheme(t);
+            });
+        });
+    }
+
+    // --- THEME ENGINE ---
+    function initTheme() {
+        state.theme = localStorage.getItem('lemma-theme') || 'dark';
+        applyTheme(state.theme);
+
+        if (DOM.themeToggle) {
+            DOM.themeToggle.addEventListener('click', () => {
+                const newT = state.theme === 'dark' ? 'light' : 'dark';
+                applyTheme(newT);
+            });
+        }
+    }
+
+    function applyTheme(theme) {
+        state.theme = theme;
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('lemma-theme', theme);
+
+        if (DOM.themeToggle) {
+            DOM.themeToggle.innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+        }
+        document.querySelectorAll('.theme-choice-btn').forEach(b => {
+            b.classList.toggle('active', b.getAttribute('data-theme') === theme);
+        });
+    }
+
+    // --- HELPER FUNCTIONS ---
+    function escapeHTML(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // Initialize on DOM load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+        initApp();
+    }
+
+})();

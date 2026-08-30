@@ -1,3 +1,4 @@
+from typing import Optional, Any
 from pydantic import BaseModel, Field
 
 class SentenceCoordinate(BaseModel):
@@ -49,5 +50,6 @@ class DocumentUploadResponse(BaseModel):
     char_count: int = Field(..., description="Total characters in the document.")
     sentence_count: int = Field(..., description="Total segmented sentences in the document.")
     sentences: list[SentenceCoordinate] = Field(..., description="List of sentence coordinate objects.")
-    metrics: DocumentMetrics | None = Field(None, description="Document readability and statistical metrics.")
-    analysis: PlagiarismAnalysisReport | None = Field(None, description="Detailed plagiarism analysis report.")
+    metrics: Optional[Any] = Field(None, description="Document readability and statistical metrics.")
+    analysis: Optional[Any] = Field(None, description="Detailed plagiarism analysis report.")
+

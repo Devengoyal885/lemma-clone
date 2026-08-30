@@ -139,11 +139,18 @@ class PDFGeneratorService:
         sources_summary = {}
         for m in matches:
             ref = m.get("matched_sentence", {})
-            doc_id = ref.get("doc_id", "unknown")
-            doc_title = ref.get("doc_title", "Unknown Reference")
-            doc_author = ref.get("doc_author", "N/A")
-            doc_source = ref.get("doc_source", "N/A")
-            score = m.get("score", 0.0)
+            if isinstance(ref, dict):
+                doc_id = ref.get("doc_id", m.get("doc_id", "unknown"))
+                doc_title = ref.get("doc_title", m.get("source", "Unknown Reference"))
+                doc_author = ref.get("doc_author", m.get("source_author", "N/A"))
+                doc_source = ref.get("doc_source", m.get("source_publication", "N/A"))
+            else:
+                doc_id = m.get("source", "unknown")
+                doc_title = m.get("source", "Unknown Reference")
+                doc_author = m.get("source_author", "N/A")
+                doc_source = m.get("source_publication", "N/A")
+
+            score = float(m.get("score", m.get("similarity", 0.0)))
             m_type = m.get("match_type", "lexical")
             
             if doc_id not in sources_summary:
@@ -199,12 +206,19 @@ class PDFGeneratorService:
         detailed_comparisons = ""
         if matches:
             for idx, m in enumerate(matches, 1):
-                q_sent = m["query_sentence"]["text"]
-                r_sent = m["matched_sentence"]["text"]
-                ref_title = m["matched_sentence"]["doc_title"]
-                ref_citation = f"{m['matched_sentence']['doc_author']} — {m['matched_sentence']['doc_source']}"
-                score_pct = int(round(m["score"] * 100))
-                m_type = m["match_type"]
+                q_sent = m.get("query_sentence", {}).get("text", "") if isinstance(m.get("query_sentence"), dict) else str(m.get("query_text", ""))
+                ms = m.get("matched_sentence", {})
+                if isinstance(ms, dict):
+                    r_sent = ms.get("text", "")
+                    ref_title = ms.get("doc_title", "Reference Source")
+                    ref_citation = f"{ms.get('doc_author', 'N/A')} — {ms.get('doc_source', 'N/A')}"
+                else:
+                    r_sent = str(ms)
+                    ref_title = m.get("source", "Reference Source")
+                    ref_citation = m.get("source_publication", "Reference Library")
+
+                score_pct = int(round(float(m.get("score", m.get("similarity", 0.0))) * 100))
+                m_type = m.get("match_type", "lexical")
                 type_label = "Lexical Match" if m_type == "lexical" else ("Hybrid Match" if m_type == "hybrid" else "Semantic Match")
                 badge_class = "badge-lexical" if m_type == "lexical" else ("badge-hybrid" if m_type == "hybrid" else "badge-semantic")
                 
@@ -629,9 +643,193 @@ class PDFGeneratorService:
 </body>
 </html>
 """
-        # Compile HTML string to PDF bytes via WeasyPrint
-        if not WEASYPRINT_AVAILABLE:
-            raise RuntimeError("WeasyPrint / GTK renderer is not available on the server. Please install WeasyPrint dependencies to download PDF reports.")
-        pdf_bytes = io.BytesIO()
-        HTML(string=html_content).write_pdf(target=pdf_bytes)
-        return pdf_bytes.getvalue()
+        # Compile HTML string to PDF bytes via WeasyPrint, ReportLab, or HTML fallback
+        if WEASYPRINT_AVAILABLE and HTML is not None:
+            try:
+                pdf_bytes = io.BytesIO()
+                HTML(string=html_content).write_pdf(target=pdf_bytes)
+                return pdf_bytes.getvalue()
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"WeasyPrint render failed: {e}. Using ReportLab fallback.")
+
+        # Fallback to ReportLab PDF generator
+        return PDFGeneratorService.generate_reportlab_pdf(data)
+
+    @staticmethod
+    def generate_html_report(result_data: dict) -> str:
+        """Returns the full HTML markup for the report."""
+        # Use existing logic to generate HTML
+        filename = result_data.get("filename", "document.txt")
+        char_count = result_data.get("char_count", 0)
+        sentence_count = result_data.get("sentence_count", 0)
+        sentences = result_data.get("sentences", [])
+        
+        analysis = result_data.get("analysis", {})
+        plag_score = analysis.get("plagiarism_score", 0.0)
+        orig_score = analysis.get("originality_score", 100.0)
+        matches = analysis.get("matches", [])
+        sources = analysis.get("sources", [])
+        
+        return f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Lemma Integrity Report - {html.escape(filename)}</title>
+<style>
+body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 900px; margin: 40px auto; padding: 0 20px; background: #f8fafc; }}
+.card {{ background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }}
+.badge {{ display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 14px; }}
+.badge-danger {{ background: #fee2e2; color: #991b1b; }}
+.badge-success {{ background: #dcfce7; color: #166534; }}
+.match-item {{ border-left: 4px solid #ef4444; padding: 12px; margin-bottom: 12px; background: #fff1f2; }}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>LEMMA INTEGRITY REPORT</h1>
+  <p><strong>Document:</strong> {html.escape(filename)} | <strong>Date:</strong> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
+  <hr>
+  <h2>Plagiarism Score: <span class="badge badge-danger">{plag_score}%</span> &nbsp; Originality: <span class="badge badge-success">{orig_score}%</span></h2>
+  <p><strong>Total Sentences:</strong> {sentence_count} | <strong>Total Characters:</strong> {char_count:,} | <strong>Flagged Sentences:</strong> {len(matches)}</p>
+</div>
+<div class="card">
+  <h3>Flagged Matches</h3>
+  {''.join([f'<div class="match-item"><p><strong>Flagged Sentence:</strong> {html.escape(m.get("matched_sentence") or m.get("query_sentence", {}).get("text", ""))}</p><p><strong>Source:</strong> {html.escape(m.get("source", "Reference"))} ({round(m.get("similarity", 0)*100, 1)}% match)</p></div>' for m in matches]) if matches else '<p>No matching passages flagged.</p>'}
+</div>
+</body>
+</html>"""
+
+    @staticmethod
+    def generate_reportlab_pdf(result_data: dict) -> bytes:
+        """Generates clean standalone PDF using ReportLab."""
+        try:
+            from reportlab.lib.pagesizes import letter
+            from reportlab.lib import colors
+            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+
+            buffer = io.BytesIO()
+            doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=40)
+            story = []
+            styles = getSampleStyleSheet()
+
+            # Custom styles
+            title_style = ParagraphStyle(
+                'TitleStyle',
+                parent=styles['Heading1'],
+                fontName='Helvetica-Bold',
+                fontSize=20,
+                textColor=colors.HexColor("#4f46e5"),
+                spaceAfter=6
+            )
+            subtitle_style = ParagraphStyle(
+                'SubStyle',
+                parent=styles['Normal'],
+                fontName='Helvetica',
+                fontSize=10,
+                textColor=colors.HexColor("#64748b"),
+                spaceAfter=15
+            )
+            heading_style = ParagraphStyle(
+                'HeadingStyle',
+                parent=styles['Heading2'],
+                fontName='Helvetica-Bold',
+                fontSize=13,
+                textColor=colors.HexColor("#1e293b"),
+                spaceBefore=12,
+                spaceAfter=8
+            )
+            body_style = ParagraphStyle(
+                'BodyStyle',
+                parent=styles['Normal'],
+                fontName='Helvetica',
+                fontSize=9.5,
+                leading=14,
+                textColor=colors.HexColor("#334155")
+            )
+            flagged_style = ParagraphStyle(
+                'FlaggedStyle',
+                parent=styles['Normal'],
+                fontName='Helvetica-Oblique',
+                fontSize=9,
+                leading=13,
+                textColor=colors.HexColor("#991b1b")
+            )
+
+            filename = result_data.get("filename", "Uploaded Document")
+            analysis = result_data.get("analysis", {})
+            plag_score = analysis.get("plagiarism_score", 0.0)
+            orig_score = analysis.get("originality_score", 100.0)
+            char_count = result_data.get("char_count", len(result_data.get("text", "")))
+            sentence_count = result_data.get("sentence_count", len(result_data.get("sentences", [])))
+            matches = analysis.get("matches", [])
+            sources = analysis.get("sources", [])
+
+            # Header
+            story.append(Paragraph("LEMMA INTEGRITY REPORT", title_style))
+            story.append(Paragraph(f"Official Plagiarism & Originality Verification Document • Generated: {datetime.datetime.now().strftime('%B %d, %Y at %H:%M')}", subtitle_style))
+            story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#4f46e5"), spaceAfter=15))
+
+            # Metadata Table
+            meta_data = [
+                [Paragraph("<b>Target Document:</b>", body_style), Paragraph(str(filename), body_style),
+                 Paragraph("<b>Total Characters:</b>", body_style), Paragraph(f"{char_count:,}", body_style)],
+                [Paragraph("<b>Plagiarism Score:</b>", body_style), Paragraph(f"<b>{plag_score}%</b>", body_style),
+                 Paragraph("<b>Originality Score:</b>", body_style), Paragraph(f"<b>{orig_score}%</b>", body_style)],
+                [Paragraph("<b>Total Sentences:</b>", body_style), Paragraph(f"{sentence_count:,}", body_style),
+                 Paragraph("<b>Flagged Sentences:</b>", body_style), Paragraph(f"{len(matches)}", body_style)]
+            ]
+            t = Table(meta_data, colWidths=[110, 150, 110, 150])
+            t.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,-1), colors.HexColor("#f8fafc")),
+                ('BOX', (0,0), (-1,-1), 1, colors.HexColor("#cbd5e1")),
+                ('INNERGRID', (0,0), (-1,-1), 0.5, colors.HexColor("#e2e8f0")),
+                ('PADDING', (0,0), (-1,-1), 6),
+            ]))
+            story.append(t)
+            story.append(Spacer(1, 15))
+
+            # Top Sources
+            if sources:
+                story.append(Paragraph("Top Matched Reference Sources", heading_style))
+                src_data = [[Paragraph("<b>#</b>", body_style), Paragraph("<b>Title & Authors</b>", body_style), Paragraph("<b>Similarity</b>", body_style), Paragraph("<b>Matches</b>", body_style)]]
+                for idx, s in enumerate(sources[:5], 1):
+                    sim = f"{round(s.get('max_similarity', 0.0)*100, 1)}%" if s.get('max_similarity') else "N/A"
+                    src_data.append([
+                        Paragraph(str(idx), body_style),
+                        Paragraph(f"<b>{s.get('title', 'Unknown')}</b><br/><font color='#64748b'>{s.get('author', 'N/A')}</font>", body_style),
+                        Paragraph(sim, body_style),
+                        Paragraph(f"{s.get('match_count', 1)}", body_style)
+                    ])
+                st = Table(src_data, colWidths=[25, 345, 80, 70])
+                st.setStyle(TableStyle([
+                    ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#e0e7ff")),
+                    ('BOX', (0,0), (-1,-1), 1, colors.HexColor("#c7d2fe")),
+                    ('INNERGRID', (0,0), (-1,-1), 0.5, colors.HexColor("#e2e8f0")),
+                    ('PADDING', (0,0), (-1,-1), 5),
+                ]))
+                story.append(st)
+                story.append(Spacer(1, 15))
+
+            # Flagged matches list
+            story.append(Paragraph("Flagged Sentence Analysis", heading_style))
+            if matches:
+                for idx, m in enumerate(matches[:8], 1):
+                    q_text = m.get("matched_sentence") or m.get("query_sentence", {}).get("text", "") or m.get("query_text", "")
+                    src = m.get("source", m.get("doc_title", "Reference Source"))
+                    sim = round(m.get("similarity", 0) * 100, 1)
+                    story.append(Paragraph(f"<b>{idx}. Flagged ({sim}% similarity) — Source: {src}</b>", body_style))
+                    story.append(Paragraph(f"\"{q_text}\"", flagged_style))
+                    story.append(Spacer(1, 6))
+            else:
+                story.append(Paragraph("No sentences were flagged for plagiarism in this document.", body_style))
+
+            # Build PDF
+            doc.build(story)
+            return buffer.getvalue()
+
+        except Exception as e:
+            # Absolute fallback if ReportLab fails
+            return PDFGeneratorService.generate_html_report(result_data).encode("utf-8")
+

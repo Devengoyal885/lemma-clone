@@ -1,3 +1,4 @@
+import pytest
 from app.services.matcher import (
     load_references,
     LexicalMatcher,
@@ -8,6 +9,7 @@ from app.services.matcher import (
 from app.services.database import DatabaseService
 from app.config import settings
 
+@pytest.mark.skipif(not DatabaseService.is_available(), reason="PostgreSQL database not running")
 def test_database_and_elasticsearch_initialization():
     # Trigger loading references, which seeds database and ES if empty
     references = load_references()
@@ -28,6 +30,7 @@ def test_database_and_elasticsearch_initialization():
         assert db_item["doc_source"] == ref_item["doc_source"]
 
 
+@pytest.mark.skipif(not DatabaseService.is_available(), reason="PostgreSQL database not running")
 def test_load_references():
     references = load_references()
     assert len(references) > 0
@@ -40,6 +43,7 @@ def test_load_references():
         assert "doc_source" in ref
         assert len(ref["text"].strip()) > 0
 
+@pytest.mark.skipif(not DatabaseService.is_available(), reason="PostgreSQL database not running")
 def test_lexical_matcher_exact_copy():
     references = load_references()
     matcher = LexicalMatcher(references)
@@ -58,6 +62,7 @@ def test_lexical_matcher_exact_copy():
     no_match = matcher.find_match("We like eating pizza on Friday nights while watching movies.", threshold=0.7)
     assert no_match is None
 
+@pytest.mark.skipif(not DatabaseService.is_available(), reason="PostgreSQL database not running")
 def test_semantic_matcher_paraphrase():
     references = load_references()
     lex_matcher = LexicalMatcher(references)
@@ -99,6 +104,7 @@ def test_get_matching_slices():
     assert slices[1]["start"] == 53
     assert slices[1]["end"] == 60
 
+@pytest.mark.skipif(not DatabaseService.is_available(), reason="PostgreSQL database not running")
 def test_dual_tier_matcher_integration():
     # Setup query sentences with absolute offsets
     # Sentence 1: Exact copy from ref_history_internet
