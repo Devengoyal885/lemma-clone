@@ -1,0 +1,693 @@
+[
+  {
+    "id": "hist_1788077645302",
+    "filename": "Sample Academic Paper.txt",
+    "title": "Sample Academic Paper.txt",
+    "created_at": "2026-08-30 13:44:05",
+    "timestamp": 1788077645,
+    "char_count": 659,
+    "sentence_count": 5,
+    "metrics": {
+      "word_count": 90,
+      "char_count": 659,
+      "sentence_count": 5,
+      "paragraph_count": 1,
+      "avg_sentence_length": 18,
+      "avg_word_length": 6.24,
+      "unique_word_count": 62,
+      "lexical_diversity": 0.689,
+      "flesch_reading_ease": 10,
+      "flesch_kincaid_grade": "16.3",
+      "readability_level": "Very Difficult (Postgraduate)",
+      "reading_time_seconds": 27,
+      "reading_time_minutes": 0.5
+    },
+    "analysis": {
+      "plagiarism_score": 80,
+      "originality_score": 20,
+      "total_sentences": 5,
+      "matched_sentences_count": 4,
+      "matched_words": 65,
+      "total_words": 90,
+      "lexical_matches_count": 4,
+      "semantic_matches_count": 0,
+      "hybrid_matches_count": 0,
+      "matches": [
+        {
+          "id": "match_0_ce6728",
+          "sentence_index": 0,
+          "query_sentence": {
+            "text": "Deep learning is a subset of machine learning that is based on artificial neural networks with representation learning.",
+            "start_char": 0,
+            "end_char": 119
+          },
+          "matched_sentence": "Deep learning is a subset of machine learning that is based on artificial neural networks with representation learning.",
+          "similarity": 1,
+          "match_type": "lexical",
+          "source": "Deep Learning: Principles and Foundations",
+          "source_author": "Dr. Sarah Jenkins",
+          "source_url": "https://doi.org/10.1016/j.jair.2024.01.004",
+          "source_publication": "Journal of Artificial Intelligence Research, 2024",
+          "source_category": "Technology",
+          "start_position": 0,
+          "end_position": 119,
+          "highlights": [
+            {
+              "start_char": 0,
+              "end_char": 119,
+              "text": "Deep learning is a subset of machine learning that is based on artificial neural networks with representation learning."
+            }
+          ],
+          "phrases": [
+            {
+              "start": 0,
+              "end": 119,
+              "text": "Deep learning is a subset of machine learning that is based on artificial neural networks with representation learning."
+            }
+          ]
+        },
+        {
+          "id": "match_1_4f3859",
+          "sentence_index": 1,
+          "query_sentence": {
+            "text": "Scholarly analysis indicates that the adjective deep in deep learning refers to the utilize of multiple layers in the network.",
+            "start_char": 120,
+            "end_char": 246
+          },
+          "matched_sentence": "The adjective deep in deep learning refers to the use of multiple layers in the network.",
+          "similarity": 0.8158,
+          "match_type": "lexical",
+          "source": "Deep Learning: Principles and Foundations",
+          "source_author": "Dr. Sarah Jenkins",
+          "source_url": "https://doi.org/10.1016/j.jair.2024.01.004",
+          "source_publication": "Journal of Artificial Intelligence Research, 2024",
+          "source_category": "Technology",
+          "start_position": 120,
+          "end_position": 246,
+          "highlights": [
+            {
+              "start_char": 154,
+              "end_char": 205,
+              "text": "the adjective deep in deep learning refers to the u"
+            },
+            {
+              "start_char": 210,
+              "end_char": 246,
+              "text": "e of multiple layers in the network."
+            }
+          ],
+          "phrases": [
+            {
+              "start": 34,
+              "end": 85,
+              "text": "the adjective deep in deep learning refers to the u"
+            },
+            {
+              "start": 90,
+              "end": 126,
+              "text": "e of multiple layers in the network."
+            }
+          ]
+        },
+        {
+          "id": "match_2_803ab0",
+          "sentence_index": 2,
+          "query_sentence": {
+            "text": "Historically, neural networks were limited in depth due to computational constraints and training difficulties.",
+            "start_char": 247,
+            "end_char": 358
+          },
+          "matched_sentence": "Historically, neural networks were limited in depth due to computational constraints and training difficulties.",
+          "similarity": 1,
+          "match_type": "lexical",
+          "source": "Deep Learning: Principles and Foundations",
+          "source_author": "Dr. Sarah Jenkins",
+          "source_url": "https://doi.org/10.1016/j.jair.2024.01.004",
+          "source_publication": "Journal of Artificial Intelligence Research, 2024",
+          "source_category": "Technology",
+          "start_position": 247,
+          "end_position": 358,
+          "highlights": [
+            {
+              "start_char": 247,
+              "end_char": 358,
+              "text": "Historically, neural networks were limited in depth due to computational constraints and training difficulties."
+            }
+          ],
+          "phrases": [
+            {
+              "start": 0,
+              "end": 111,
+              "text": "Historically, neural networks were limited in depth due to computational constraints and training difficulties."
+            }
+          ]
+        },
+        {
+          "id": "match_3_bf9da6",
+          "sentence_index": 3,
+          "query_sentence": {
+            "text": "Today, modern deep learning architectures utilize convolutional neural networks and transformer architectures to process vast datasets.",
+            "start_char": 359,
+            "end_char": 494
+          },
+          "matched_sentence": "Today, modern deep learning architectures utilize convolutional neural networks and transformer architectures to process vast datasets.",
+          "similarity": 1,
+          "match_type": "lexical",
+          "source": "Deep Learning: Principles and Foundations",
+          "source_author": "Dr. Sarah Jenkins",
+          "source_url": "https://doi.org/10.1016/j.jair.2024.01.004",
+          "source_publication": "Journal of Artificial Intelligence Research, 2024",
+          "source_category": "Technology",
+          "start_position": 359,
+          "end_position": 494,
+          "highlights": [
+            {
+              "start_char": 359,
+              "end_char": 494,
+              "text": "Today, modern deep learning architectures utilize convolutional neural networks and transformer architectures to process vast datasets."
+            }
+          ],
+          "phrases": [
+            {
+              "start": 0,
+              "end": 135,
+              "text": "Today, modern deep learning architectures utilize convolutional neural networks and transformer architectures to process vast datasets."
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "id": "ref_tech_deep_learning",
+          "title": "Deep Learning: Principles and Foundations",
+          "author": "Dr. Sarah Jenkins",
+          "source": "Journal of Artificial Intelligence Research, 2024",
+          "url": "https://doi.org/10.1016/j.jair.2024.01.004",
+          "category": "Technology",
+          "match_type": "lexical",
+          "match_count": 4,
+          "max_similarity": 1
+        }
+      ],
+      "mode": "lite"
+    },
+    "text": "Deep learning is a subset of machine learning that is based on artificial neural networks with representation learning. Scholarly analysis indicates that the adjective deep in deep learning refers to the utilize of multiple layers in the network. Historically, neural networks were limited in depth due to computational constraints and training difficulties. Today, modern deep learning architectures utilize convolutional neural networks and transformer architectures to process vast datasets. In this paper, we introduce an empirical evaluation of lexical and semantic document similarity metrics to assist researchers in maintaining manuscript originality.",
+    "sentences": [
+      {
+        "text": "Deep learning is a subset of machine learning that is based on artificial neural networks with representation learning.",
+        "start_char": 0,
+        "end_char": 119
+      },
+      {
+        "text": "Scholarly analysis indicates that the adjective deep in deep learning refers to the utilize of multiple layers in the network.",
+        "start_char": 120,
+        "end_char": 246
+      },
+      {
+        "text": "Historically, neural networks were limited in depth due to computational constraints and training difficulties.",
+        "start_char": 247,
+        "end_char": 358
+      },
+      {
+        "text": "Today, modern deep learning architectures utilize convolutional neural networks and transformer architectures to process vast datasets.",
+        "start_char": 359,
+        "end_char": 494
+      },
+      {
+        "text": "In this paper, we introduce an empirical evaluation of lexical and semantic document similarity metrics to assist researchers in maintaining manuscript originality.",
+        "start_char": 495,
+        "end_char": 659
+      }
+    ],
+    "project_id": "default"
+  },
+  {
+    "id": "hist_1788076565933",
+    "filename": "Sample Academic Paper.txt",
+    "title": "Sample Academic Paper.txt",
+    "created_at": "2026-08-30 13:26:05",
+    "timestamp": 1788076565,
+    "char_count": 659,
+    "sentence_count": 5,
+    "metrics": {
+      "word_count": 90,
+      "char_count": 659,
+      "sentence_count": 5,
+      "paragraph_count": 1,
+      "avg_sentence_length": 18,
+      "avg_word_length": 6.24,
+      "unique_word_count": 62,
+      "lexical_diversity": 0.689,
+      "flesch_reading_ease": 10,
+      "flesch_kincaid_grade": "16.3",
+      "readability_level": "Very Difficult (Postgraduate)",
+      "reading_time_seconds": 27,
+      "reading_time_minutes": 0.5
+    },
+    "analysis": {
+      "plagiarism_score": 80,
+      "originality_score": 20,
+      "total_sentences": 5,
+      "matched_sentences_count": 4,
+      "matched_words": 65,
+      "total_words": 90,
+      "lexical_matches_count": 4,
+      "semantic_matches_count": 0,
+      "hybrid_matches_count": 0,
+      "matches": [
+        {
+          "id": "match_0_6ca41a",
+          "sentence_index": 0,
+          "query_sentence": {
+            "text": "Deep learning is a subset of machine learning that is based on artificial neural networks with representation learning.",
+            "start_char": 0,
+            "end_char": 119
+          },
+          "matched_sentence": "Deep learning is a subset of machine learning that is based on artificial neural networks with representation learning.",
+          "similarity": 1,
+          "match_type": "lexical",
+          "source": "Deep Learning: Principles and Foundations",
+          "source_author": "Dr. Sarah Jenkins",
+          "source_url": "https://doi.org/10.1016/j.jair.2024.01.004",
+          "source_publication": "Journal of Artificial Intelligence Research, 2024",
+          "source_category": "Technology",
+          "start_position": 0,
+          "end_position": 119,
+          "highlights": [
+            {
+              "start_char": 0,
+              "end_char": 119,
+              "text": "Deep learning is a subset of machine learning that is based on artificial neural networks with representation learning."
+            }
+          ],
+          "phrases": [
+            {
+              "start": 0,
+              "end": 119,
+              "text": "Deep learning is a subset of machine learning that is based on artificial neural networks with representation learning."
+            }
+          ]
+        },
+        {
+          "id": "match_1_cae74b",
+          "sentence_index": 1,
+          "query_sentence": {
+            "text": "Scholarly analysis indicates that the adjective deep in deep learning refers to the utilize of multiple layers in the network.",
+            "start_char": 120,
+            "end_char": 246
+          },
+          "matched_sentence": "The adjective deep in deep learning refers to the use of multiple layers in the network.",
+          "similarity": 0.8158,
+          "match_type": "lexical",
+          "source": "Deep Learning: Principles and Foundations",
+          "source_author": "Dr. Sarah Jenkins",
+          "source_url": "https://doi.org/10.1016/j.jair.2024.01.004",
+          "source_publication": "Journal of Artificial Intelligence Research, 2024",
+          "source_category": "Technology",
+          "start_position": 120,
+          "end_position": 246,
+          "highlights": [
+            {
+              "start_char": 154,
+              "end_char": 205,
+              "text": "the adjective deep in deep learning refers to the u"
+            },
+            {
+              "start_char": 210,
+              "end_char": 246,
+              "text": "e of multiple layers in the network."
+            }
+          ],
+          "phrases": [
+            {
+              "start": 34,
+              "end": 85,
+              "text": "the adjective deep in deep learning refers to the u"
+            },
+            {
+              "start": 90,
+              "end": 126,
+              "text": "e of multiple layers in the network."
+            }
+          ]
+        },
+        {
+          "id": "match_2_8a0a0c",
+          "sentence_index": 2,
+          "query_sentence": {
+            "text": "Historically, neural networks were limited in depth due to computational constraints and training difficulties.",
+            "start_char": 247,
+            "end_char": 358
+          },
+          "matched_sentence": "Historically, neural networks were limited in depth due to computational constraints and training difficulties.",
+          "similarity": 1,
+          "match_type": "lexical",
+          "source": "Deep Learning: Principles and Foundations",
+          "source_author": "Dr. Sarah Jenkins",
+          "source_url": "https://doi.org/10.1016/j.jair.2024.01.004",
+          "source_publication": "Journal of Artificial Intelligence Research, 2024",
+          "source_category": "Technology",
+          "start_position": 247,
+          "end_position": 358,
+          "highlights": [
+            {
+              "start_char": 247,
+              "end_char": 358,
+              "text": "Historically, neural networks were limited in depth due to computational constraints and training difficulties."
+            }
+          ],
+          "phrases": [
+            {
+              "start": 0,
+              "end": 111,
+              "text": "Historically, neural networks were limited in depth due to computational constraints and training difficulties."
+            }
+          ]
+        },
+        {
+          "id": "match_3_7233d3",
+          "sentence_index": 3,
+          "query_sentence": {
+            "text": "Today, modern deep learning architectures utilize convolutional neural networks and transformer architectures to process vast datasets.",
+            "start_char": 359,
+            "end_char": 494
+          },
+          "matched_sentence": "Today, modern deep learning architectures utilize convolutional neural networks and transformer architectures to process vast datasets.",
+          "similarity": 1,
+          "match_type": "lexical",
+          "source": "Deep Learning: Principles and Foundations",
+          "source_author": "Dr. Sarah Jenkins",
+          "source_url": "https://doi.org/10.1016/j.jair.2024.01.004",
+          "source_publication": "Journal of Artificial Intelligence Research, 2024",
+          "source_category": "Technology",
+          "start_position": 359,
+          "end_position": 494,
+          "highlights": [
+            {
+              "start_char": 359,
+              "end_char": 494,
+              "text": "Today, modern deep learning architectures utilize convolutional neural networks and transformer architectures to process vast datasets."
+            }
+          ],
+          "phrases": [
+            {
+              "start": 0,
+              "end": 135,
+              "text": "Today, modern deep learning architectures utilize convolutional neural networks and transformer architectures to process vast datasets."
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "id": "ref_tech_deep_learning",
+          "title": "Deep Learning: Principles and Foundations",
+          "author": "Dr. Sarah Jenkins",
+          "source": "Journal of Artificial Intelligence Research, 2024",
+          "url": "https://doi.org/10.1016/j.jair.2024.01.004",
+          "category": "Technology",
+          "match_type": "lexical",
+          "match_count": 4,
+          "max_similarity": 1
+        }
+      ],
+      "mode": "lite"
+    },
+    "text": "Deep learning is a subset of machine learning that is based on artificial neural networks with representation learning. Scholarly analysis indicates that the adjective deep in deep learning refers to the utilize of multiple layers in the network. Historically, neural networks were limited in depth due to computational constraints and training difficulties. Today, modern deep learning architectures utilize convolutional neural networks and transformer architectures to process vast datasets. In this paper, we introduce an empirical evaluation of lexical and semantic document similarity metrics to assist researchers in maintaining manuscript originality.",
+    "sentences": [
+      {
+        "text": "Deep learning is a subset of machine learning that is based on artificial neural networks with representation learning.",
+        "start_char": 0,
+        "end_char": 119
+      },
+      {
+        "text": "Scholarly analysis indicates that the adjective deep in deep learning refers to the utilize of multiple layers in the network.",
+        "start_char": 120,
+        "end_char": 246
+      },
+      {
+        "text": "Historically, neural networks were limited in depth due to computational constraints and training difficulties.",
+        "start_char": 247,
+        "end_char": 358
+      },
+      {
+        "text": "Today, modern deep learning architectures utilize convolutional neural networks and transformer architectures to process vast datasets.",
+        "start_char": 359,
+        "end_char": 494
+      },
+      {
+        "text": "In this paper, we introduce an empirical evaluation of lexical and semantic document similarity metrics to assist researchers in maintaining manuscript originality.",
+        "start_char": 495,
+        "end_char": 659
+      }
+    ],
+    "project_id": "default"
+  },
+  {
+    "id": "hist_1788075989909",
+    "filename": "SIH_2026_Full_Problem_Statements_Guide.pdf",
+    "title": "SIH_2026_Full_Problem_Statements_Guide.pdf",
+    "created_at": "2026-08-30 13:16:29",
+    "timestamp": 1788075989,
+    "char_count": 25626,
+    "sentence_count": 41,
+    "metrics": {
+      "word_count": 3643,
+      "char_count": 25626,
+      "sentence_count": 41,
+      "paragraph_count": 11,
+      "avg_sentence_length": 88.85,
+      "avg_word_length": 5.83,
+      "unique_word_count": 1381,
+      "lexical_diversity": 0.379,
+      "flesch_reading_ease": 0,
+      "flesch_kincaid_grade": "40.6",
+      "readability_level": "Very Difficult (Postgraduate)",
+      "reading_time_seconds": 1093,
+      "reading_time_minutes": 18.2
+    },
+    "analysis": {
+      "plagiarism_score": 0,
+      "originality_score": 100,
+      "total_sentences": 41,
+      "matched_sentences_count": 0,
+      "matched_words": 0,
+      "total_words": 3597,
+      "lexical_matches_count": 0,
+      "semantic_matches_count": 0,
+      "hybrid_matches_count": 0,
+      "matches": [],
+      "sources": [],
+      "mode": "lite"
+    },
+    "text": "Smart India Hackathon 2026\nComplete Problem Statement Guide — Software + Hardware\nAll problem statements captured from the SIH 2026 catalogue (226 total — 172 Software, 54\nHardware), organized by theme, with a legend distinguishing Software vs Hardware tracks, plus a\nstrategic recommendation for the strongest hardware+software project to build.\nSW\n= Software track\nHW\n= Hardware track\nSource: SIH 2026 Official Master Catalogue — compiled from a third-party mirror of sih.gov.in data. Some theme tags in the raw source\nappeared inconsistent; verify final picks on sih.gov.in/sih2026PS.\nPrepared: August 2026\n\nA Note on the Data\nThis guide is built from a third-party compiled mirror of the SIH 2026 catalogue, not scraped directly from sih.gov.in (which\nblocks automated access). Titles here are shortened for table readability — the official portal has the full problem statement\ntext, background, and expected solution for each code. Verify your shortlisted PS number's exact title, theme, and full\ndescription on sih.gov.in/sih2026PS before finalizing your choice.\nAll Problem Statements by Theme\nBoth SOFTWARE and HARDWARE tracks are included below. Rows are shaded blue (Software) or red (Hardware) for\nquick scanning.\nDisaster Management   —   25 total (20 SW / 5 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26013\nSW\nAutomated integration & harmonization of multi-source geospatial data for\nland records\nRural Development\nSIH26015\nSW\nGeospatial visualization/analysis of geo-coded images for watershed\ndevelopment\nRural Development\nSIH26025\nHW\nAI-enabled low-cost real-time mine subsidence monitoring & early warning\nMinistry of Coal\nSIH26028\nSW\nDynamic forecast of ETA for coaching trains\nMinistry of Railways\nSIH26029\nHW\nAutomated high-current short-circuit test system for MCB compliance\nConsumer Affairs, Food\n& PD\nSIH26060\nSW\nDigital platform for remote management of Indian Antarctic research stations\nMinistry of Earth\nSciences\nSIH26069\nSW\nNational weather big data analytics platform\nMinistry of Earth\nSciences\nSIH26071\nSW\nAI/ML integrated heavy rainfall early warning & inundation prediction\nMinistry of Earth\nSciences\nSIH26072\nSW\nAI/ML nowcasting of thunderstorm & lightning\nMinistry of Earth\nSciences\nSIH26073\nSW\nAI/ML anomaly detection for Automatic Weather Stations\nMinistry of Earth\nSciences\nSIH26074\nSW\nDownscaling weather forecasts from block to panchayat level\nMinistry of Earth\nSciences\nSIH26078\nSW\nAI-driven spatio-temporal tracking of extreme weather anomalies\nMinistry of Earth\nSciences\nSIH26079\nSW\nAI-based forecast-bust detection for medium-range weather forecasts\nMinistry of Earth\nSciences\nSIH26080\nSW\nRegime-aware AI post-processing of monsoon rainfall forecasts\nMinistry of Earth\nSciences\nSIH26082\nSW\nAir pollution-weather coupled forecasting system (Delhi NCR)\nMinistry of Earth\nSciences\nSIH26083\nSW\nExtreme heatwave early warning & human thermal stress index\nMinistry of Earth\nSciences\nSIH26084\nSW\nConvective-scale nowcasting for thunderstorms, hail & cloudbursts\nMinistry of Earth\nSciences\nSIH26085\nSW\nUrban flood nowcasting system (drainage & rainfall coupling)\nMinistry of Earth\nSciences\nSIH26161\nSW\nDam break inundation modelling using hydrodynamic modelling\nNTRO\nSIH26177\nHW\nDeployable AI-powered autonomous drone for search-and-rescue\nQualcomm Inc\n\nCode\nTrack\nTitle\nMinistry\nSIH26180\nHW\nField-deployable AI Smart Farming Assistant\nQualcomm Inc\nSIH26191\nSW\nIntelligent identification of hazard-based red zones & relocation needs\nMinistry of Home Affairs\nSIH26192\nSW\nFlash flood prediction system for hilly regions (multi-source data)\nMinistry of Home Affairs\nSIH26206\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26223\nHW\nStudent Innovation (open theme)\nAICTE\nSmart Automation   —   74 total (54 SW / 20 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26002\nSW\nAI-based smart logistics and accessibility intelligence platform for NER\nMDoNER\nSIH26006\nSW\nIntelligent freight forecasting model for vessel chartering & bulk cargo\nprocurement\nMinistry of Steel\nSIH26007\nHW\nSafe & efficient operation of mine vehicles in fog/low-visibility conditions\nMinistry of Steel\nSIH26008\nHW\nBelt joint rupture & conveyor belt damage: intelligent monitoring & prediction\nMinistry of Steel\nSIH26021\nSW\nHoney Chain: blockchain-based honey traceability & beekeeping\nmanagement\nMinistry of MSME\nSIH26023\nSW\nAI-powered geological & mining reporting solution for CMPDI/CIL\nMinistry of Coal\nSIH26024\nSW\nAI-based smart governance & compliance monitoring for coal mines\nMinistry of Coal\nSIH26027\nSW\nAI-powered automatic block planning to maximize train asset availability\nMinistry of Railways\nSIH26030\nHW\nAutomated cable specimen preparation system (IS 10810/7098 compliance)\nConsumer Affairs, Food\n& PD\nSIH26032\nSW\nFarmer procurement schedule & status transparency platform\nConsumer Affairs, Food\n& PD\nSIH26036\nSW\nOnline verification system for weighing & measuring instruments\nConsumer Affairs, Food\n& PD\nSIH26040\nHW\nSmart water purification & quality monitoring (rural/mining areas)\nGovt. of Jharkhand\nSIH26044\nSW\nPortal for academia-industry collaboration on skilling, internships &\nplacement\nMinistry of Ayush\nSIH26047\nSW\nPatient case-taking software\nMinistry of Ayush\nSIH26049\nHW\nImproving reliability of electrical/electronic equipment in Ladakh's\nHAA/SHAA conditions\nDRDO\nSIH26053\nSW\nAdaptive variable resolution 2.5D lidar mapping for dynamic environment\nperception\nDRDO\nSIH26057\nSW\nAI-powered underwater marine debris & anomaly detection (side-scan\nsonar)\nMinistry of Earth\nSciences\nSIH26064\nHW\nLow-cost deployable seafloor metal detection sensor\nMinistry of Earth\nSciences\nSIH26065\nHW\nAutonomous low-cost ocean observation platform (polar/southern oceans)\nMinistry of Earth\nSciences\nSIH26067\nSW\nWeb-based interactive 3D visualization of ocean model outputs\nMinistry of Earth\nSciences\nSIH26081\nSW\nHybrid AI/NWP multi-model forecast blending system\nMinistry of Earth\nSciences\nSIH26088\nHW\nMultilingual cooperative governance & legal assistance chatbot\nMinistry of Cooperation\nSIH26089\nSW\nCooperative gig services platform for household & community services\nMinistry of Cooperation\n\nCode\nTrack\nTitle\nMinistry\nSIH26090\nSW\nAI-driven market linkage & smart cataloging app for marginalized artisans\nMinistry of Social\nJustice &\nEmpowerment\nSIH26092\nSW\nAI-driven scheme matching for marginalized entrepreneurs\nMinistry of Social\nJustice &\nEmpowerment\nSIH26093\nSW\nAI real-time stress & trauma assessment for victims accessing NHAA\n(14566)\nMinistry of Social\nJustice &\nEmpowerment\nSIH26095\nSW\nSmart real-time monitoring & inspection mobile app\nMinistry of Social\nJustice &\nEmpowerment\nSIH26096\nHW\nDigital heritage archive for memorials, manuscripts & Ambedkar (AI\narchive/AV platform)\nMinistry of Social\nJustice &\nEmpowerment\nSIH26098\nHW\nLow-cost precision guidance & smart electronic fuze for 155mm artillery shell\nMinistry of Defence\nSIH26099\nSW\nAI-driven standardization & harmonization of material codes across CPSEs\nPetroleum & Natural\nGas\nSIH26100\nSW\nAI-powered bid compliance verification platform for GeM procurement\nPetroleum & Natural\nGas\nSIH26103\nSW\nWeb-based integrated project-monitoring platform\nMoSPI\nSIH26107\nSW\nAI intelligent assistant for Indian Standards & BIS services\nConsumer Affairs, Food\n& PD\nSIH26108\nSW\nAI recommendation engine for applicable Indian Standards in procurement\nConsumer Affairs, Food\n& PD\nSIH26114\nSW\nSmart city site planning using Autodesk Forma\nAutodesk\nSIH26117\nSW\nSovereign on-premise agentic AI workbench (open-weight multimodal LLMs)\nMRPL\nSIH26118\nHW\nPassive colorimetric H2S exposure-dosimeter wristband with AI reading\nMRPL\nSIH26119\nSW\nIndigenous GPU-accelerated optimization solver\nMRPL\nSIH26120\nSW\nDigital twin for well-to-surface optimization (CSS/SRP heavy oil wells)\nOil India Limited\nSIH26121\nSW\neRTMAC-NWIS: AI offset-well knowledge & decision support for drilling\nOil India Limited\nSIH26122\nSW\nIntelligent data capture & schedule-linking for infrastructure project\nmanagement\nOil India Limited\nSIH26127\nSW\nCity-wide AI engine for multi-camera ANPR trajectory tracking & traffic\nanalytics\nBharat Electronics Ltd\nSIH26129\nSW\nSystem integration/interoperability among government digital platforms\nGovt. of Maharashtra\nSIH26130\nSW\nStreamlining industrial approvals & compliance processes\nGovt. of Maharashtra\nSIH26134\nSW\nAligning skill development programs with industry requirements\nGovt. of Maharashtra\nSIH26144\nHW\nHigh-sensitivity micro-barometer infrasound sensor\nNTRO\nSIH26146\nSW\nAI-powered monitoring & analysis of Bitcoin transaction traffic\nNTRO\nSIH26147\nSW\nAutomated model for .IQ/.wav file & signal parameter analysis\nNTRO\nSIH26152\nSW\nSocial media analytics\nNTRO\nSIH26154\nSW\nGen AI platform for automated content transformation\nNTRO\nSIH26157\nSW\nSupervisory analytics tool for SOC assessment\nNTRO\nSIH26163\nSW\nSecurity assessment of the World Monitor application\nNTRO\nSIH26165\nSW\nAI/NLP engine to detect SIF precursors in unsafe-act/near-miss reports\nOil India Limited\nSIH26168\nSW\nAI/ML intelligent dead-reckoning system for seamless navigation\nISRO\n\nCode\nTrack\nTitle\nMinistry\nSIH26170\nSW\nAI-driven anomaly detection in component burn-in & screening\nISRO\nSIH26171\nSW\nOn-device visual perception for lightweight browser agents\nISRO\nSIH26172\nHW\nLow-latency & efficient voice activator for edge devices\nISRO\nSIH26173\nSW\niTantra: Indian multilingual TTS/STT neural transceiver radio access\nISRO\nSIH26174\nSW\nAI human activity recognition for on-board BAS experiments\nISRO\nSIH26179\nHW\nAI-powered retail intelligence platform (on-device shopper analytics)\nQualcomm Inc\nSIH26185\nHW\nHelmet-mounted conformal antenna for tactical communications\nMinistry of Home Affairs\nSIH26187\nSW\nAI intelligent video analytics for border surveillance using existing CCTV\nMinistry of Home Affairs\nSIH26188\nSW\nAI-based fake identity & document screening system\nMinistry of Home Affairs\nSIH26190\nSW\nSecure digital document management system for legal/investigation\ndocuments\nMinistry of Home Affairs\nSIH26193\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26195\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26198\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26201\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26203\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26210\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26212\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26215\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26218\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26220\nHW\nStudent Innovation (open theme)\nAICTE\nBlockchain & Cybersecurity   —   26 total (24 SW / 2 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26019\nSW\nNational digital platform for research, policy innovation & land governance\nRural Development\nSIH26020\nHW\nInnovative hand-spinning equipment for Khadi artisan productivity & income\nMinistry of MSME\nSIH26041\nSW\nAR-based vocational training simulator for industrial safety\n(mining/manufacturing)\nGovt. of Jharkhand\nSIH26058\nHW\nLow-power real-time adaptive software-defined sonar transmitter payload for\nAUVs\nMinistry of Earth\nSciences\nSIH26101\nSW\nAI learning platform integrated with iGOT Karmayogi (competency gaps,\nMCQ generation)\nMoSPI\nSIH26102\nSW\nAI system to detect anomalies/fraud/inefficiencies in MPLAD scheme\nMoSPI\nSIH26104\nSW\nAI real-time detection/prevention of voice-cloning impersonation attacks\nAICTE\nSIH26105\nSW\nAI continuous cyber risk quantification & investment optimization platform\nAICTE\nSIH26106\nSW\nAI email threat detection, geolocation & forensic intelligence platform\nAICTE\nSIH26125\nSW\nBlockchain-based secure platform for identity, access control & digital assets\nBharat Electronics Ltd\nSIH26136\nSW\nStartup-friendly public procurement mechanism for govt departments\nGovt. of Maharashtra\nSIH26141\nSW\nQuantum-inspired cyber threat detection for digital signature security\nEgreen Quanta\nSIH26145\nSW\nAI-based detection of cyber threats in unidirectional IP traffic\nNTRO\nSIH26148\nSW\nNew programming language/scripts for stealth network forensic analysis\nNTRO\n\nCode\nTrack\nTitle\nMinistry\nSIH26149\nSW\nIntegrated secure data erasure & advanced file recovery tool\nNTRO\nSIH26150\nSW\nMulti-vendor DVR/NVR forensic analysis tool for surveillance evidence\nNTRO\nSIH26151\nSW\nDark web threat actor de-anonymization\nNTRO\nSIH26155\nSW\nAI-driven multi-vendor network security compliance auditor\nNTRO\nSIH26156\nSW\nUniversal log pre-processing framework\nNTRO\nSIH26159\nSW\nSecureMailScope: AI cryptographic security posture assessment for email\nNTRO\nSIH26160\nSW\nAI-powered IPsec VPN protocol analyzer & security assessment\nNTRO\nSIH26164\nSW\nEnterprise cryptographic discovery & analysis tool\nNTRO\nSIH26182\nSW\nAutomated attribution of unknown crypto wallets to nearest VASPs\nMinistry of Home Affairs\nSIH26183\nSW\nReal-time identification of fraud-linked crypto exchanges\nMinistry of Home Affairs\nSIH26184\nSW\nPredictive analytics for cybercrime complaints (forecast cash withdrawal\nlocations)\nMinistry of Home Affairs\nSIH26189\nSW\nAI-powered criminal network analysis system\nMinistry of Home Affairs\nMedTech / BioTech / HealthTech   —   18 total (13 SW / 5 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26018\nSW\nIntelligent land record digitization & validation system\nRural Development\nSIH26033\nSW\nReducing intermediaries to improve farmer earnings & consumer prices\nConsumer Affairs, Food\n& PD\nSIH26035\nSW\nApp for generating NAWI test reports per OIML R-76\nConsumer Affairs, Food\n& PD\nSIH26043\nSW\nDigital platform to crowdsource societal challenges via university-industry\npartnerships\nGovt. of Jharkhand\nSIH26050\nHW\nHigh altitude performance optimization & robust design of anti-drone system\nDRDO\nSIH26076\nSW\nPersonalized homepage for the 'Mausam' mobile application\nMinistry of Earth\nSciences\nSIH26094\nSW\nAI dynamic mental health monitoring & distress prediction for victims of\natrocities\nMinistry of Social\nJustice &\nEmpowerment\nSIH26113\nHW\nHuman augmentation tech for healthcare, rehab, ergonomics, assistive\nliving, sports\nAutodesk\nSIH26115\nSW\nSmart mobile medical-waste collection & segregation system\nAutodesk\nSIH26131\nSW\nEarly detection & management of crop diseases/pest infestations\nGovt. of Maharashtra\nSIH26133\nSW\nAccessibility & quality of public healthcare in rural/underserved areas\nGovt. of Maharashtra\nSIH26139\nSW\nHybrid quantum machine learning platform for early disease detection\nEgreen Quanta\nSIH26181\nHW\nSecure AI-powered Personal Health Companion (on-device)\nQualcomm Inc\nSIH26186\nSW\nAI predictive personnel stress & welfare monitoring for uniformed forces\nMinistry of Home Affairs\nSIH26196\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26200\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26213\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26217\nHW\nStudent Innovation (open theme)\nAICTE\n\nSmart Education   —   17 total (12 SW / 5 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26042\nSW\nAI vernacular pedagogy & real-time translation for mother-tongue education\nGovt. of Jharkhand\nSIH26059\nSW\nAI-enabled Antarctic sea-ice & iceberg trajectory navigation decision support\nMinistry of Earth\nSciences\nSIH26070\nSW\nAI/ML system for tropical cyclone pattern classification & prediction\nMinistry of Earth\nSciences\nSIH26075\nSW\nCAPACITY CONNECT: digital capacity-building & learning management\nportal\nMinistry of Earth\nSciences\nSIH26087\nHW\nAI-enabled cooperative capacity building, ERP & employment ecosystem\nMinistry of Cooperation\nSIH26097\nSW\nAI voice assistant for livelihood mapping & NSQF skilling (SC communities,\nPM-AJAY)\nMinistry of Social\nJustice &\nEmpowerment\nSIH26116\nSW\nUrban mixed-use design challenge in Autodesk Revit\nAutodesk\nSIH26135\nSW\nTracking employment outcomes & skill gaps from skilling initiatives\nGovt. of Maharashtra\nSIH26140\nSW\nAI-based interactive quantum algorithm learning platform\nEgreen Quanta\nSIH26202\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26204\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26205\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26208\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26219\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26221\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26222\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26225\nHW\nStudent Innovation (open theme)\nAICTE\nAgriculture, FoodTech & Rural Development   —   15 total (11 SW / 4 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26016\nSW\nReal-time national land acquisition & management system\nRural Development\nSIH26017\nSW\nPredictive analytics for early detection of land acquisition delays\nRural Development\nSIH26022\nHW\nSolar-powered drying & packaging system for home-based agarbatti\nmanufacturing\nMinistry of MSME\nSIH26034\nSW\nCompliance checker for packaged commodities (Legal Metrology Rules\n2011)\nConsumer Affairs, Food\n& PD\nSIH26051\nSW\nSoftware model for design of area-specific shelter for thermal comfort\nDRDO\nSIH26086\nSW\nHyperlocal monsoon onset & break prediction (block/village scale)\nMinistry of Earth\nSciences\nSIH26091\nSW\nAI hyper-local business advisory & financial structuring for rural\nmicro-entrepreneurs\nMinistry of Social\nJustice &\nEmpowerment\nSIH26109\nHW\nAI predictive modelling for early forecasting of bovine mastitis\nFisheries, Animal\nHusbandry & Dairying\nSIH26110\nHW\nLow-cost lightweight milk chilling can for small-scale dairy farmers\nFisheries, Animal\nHusbandry & Dairying\nSIH26111\nSW\nSmart AI-enabled rapid feed & silage quality testing for dairy farmers\nFisheries, Animal\nHusbandry & Dairying\n\nCode\nTrack\nTitle\nMinistry\nSIH26126\nSW\nVision-based autonomous navigation for unmanned ground vehicle\n(outdoor)\nBharat Electronics Ltd\nSIH26128\nSW\nEarly detection & management of livestock diseases\nGovt. of Maharashtra\nSIH26132\nSW\nStrengthening market linkages & price discovery for farmers\nGovt. of Maharashtra\nSIH26197\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26214\nHW\nStudent Innovation (open theme)\nAICTE\nSpace Technology   —   23 total (19 SW / 4 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26001\nSW\nAI-Based early warning and landslide risk monitoring system in NER\nMDoNER\nSIH26003\nSW\nAI-based cognitive gaming and memory assistance platform for elderly\ndementia patients (NER)\nMDoNER\nSIH26004\nHW\nAI-assisted early detection system for osteoarthritis (OA) risk markers (NER)\nMDoNER\nSIH26009\nSW\nAI/ML & space tech to identify manganese reserves\nMinistry of Steel\nSIH26010\nHW\nSurvey/resurvey of rural agricultural land in India\nRural Development\nSIH26011\nSW\n3D ULPIN generation and vertical property mapping system\nRural Development\nSIH26046\nSW\nAIIA clinical trials dashboard (GCP-compliant CTMS for Ayurveda research)\nMinistry of Ayush\nSIH26063\nSW\nIntegrated polar science outreach, knowledge repository & media portal\nMinistry of Earth\nSciences\nSIH26066\nSW\nOceanEmbed: satellite embedding deep-learning framework for subsurface\nocean temperature\nMinistry of Earth\nSciences\nSIH26068\nSW\nWeatherGPT: conversational AI for weather forecasting & alerts\nMinistry of Earth\nSciences\nSIH26077\nSW\nAI-driven hyper-local early warning for severe weather nowcasting\nMinistry of Earth\nSciences\nSIH26142\nSW\nDeep-learning super-resolution mapping from medium-resolution satellite\nimagery\nNTRO\nSIH26143\nSW\nSatellite imagery for oil spill detection with AIS vessel correlation\nNTRO\nSIH26153\nSW\nAI-based network attack forecasting from network traffic data\nNTRO\nSIH26162\nSW\nAI detection/classification of industrial fires using NASA FIRMS & satellite\ndata\nNTRO\nSIH26166\nSW\nMulti-modal, sun-angle invariant image correspondence (Chandrayaan-2\nimagery)\nISRO\nSIH26167\nSW\nSatQuery AI: vision-language assistant for remote sensing image analysis\nISRO\nSIH26169\nSW\nAI virtual camera tracking for coarse alignment of mobile FSOC terminals\nISRO\nSIH26175\nSW\nDepthWizard: single-view height estimation & 3D flythrough\nISRO\nSIH26176\nSW\nORCA: marine ecosystem reasoning with collaborative agents\nISRO\nSIH26178\nHW\nResilient AI environmental monitoring network (floods, fires, pollution)\nQualcomm Inc\nSIH26209\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26226\nHW\nStudent Innovation (open theme)\nAICTE\nRobotics & Drones   —   8 total (6 SW / 2 HW)\n\nCode\nTrack\nTitle\nMinistry\nSIH26012\nSW\nAI-based automated urban parcel mapping & cadastral feature extraction\n(drone imagery)\nRural Development\nSIH26014\nSW\nIntegrated GIS-based digital public infrastructure for land governance\nRural Development\nSIH26026\nHW\nMobile (quadruped)/handheld device for narcotics & explosives detection\n(Railways)\nMinistry of Railways\nSIH26037\nSW\nAdaptive path planning & collision avoidance for autonomous vehicles on\nIndian roads\nMathWorks\nSIH26054\nSW\nAI real-time digital twin for aero piston engines (MALE UAVs)\nDRDO\nSIH26112\nHW\nModular Autonomous Mobile Robot (AMR) platform for smart warehouse\nautomation\nAutodesk\nSIH26123\nSW\nEdge-AI distributed fleet coordination for AMRs in smart warehouses\nBharat Electronics Ltd\nSIH26158\nSW\nSingle-pass drone video to accurate 3D model generation\nNTRO\nFitness & Sports   —   8 total (5 SW / 3 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26031\nSW\nQuality assessment & grading of onions (subjective grading disputes)\nConsumer Affairs, Food\n& PD\nSIH26048\nHW\niKwath: pod-based smart Kwatha (Kadha) maker\nMinistry of Ayush\nSIH26124\nSW\nAI mobile urban intelligence platform using public transport fleet\nBharat Electronics Ltd\nSIH26137\nSW\nQuantum-inspired intelligent traffic route optimization\nEgreen Quanta\nSIH26194\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26199\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26211\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26216\nHW\nStudent Innovation (open theme)\nAICTE\nTravel & Tourism   —   4 total (2 SW / 2 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26039\nHW\nAI-powered underground mine safety, monitoring & rescue system\nGovt. of Jharkhand\nSIH26056\nSW\nReal-time airfare price index via automated web scraping\nMoSPI\nSIH26207\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26224\nHW\nStudent Innovation (open theme)\nAICTE\nSmart Vehicles   —   3 total (1 SW / 2 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26005\nHW\nSolar-powered smart mini cold storage system for fresh vegetables (NER)\nMDoNER\nSIH26052\nHW\nAI/ML-enabled adaptive noise cancellation for defence environments\nDRDO\nSIH26138\nSW\nQuantum-inspired fuel consumption prediction & green fleet optimization\nEgreen Quanta\nRenewable / Sustainable Energy   —   1 total (1 SW / 0 HW)\n\nCode\nTrack\nTitle\nMinistry\nSIH26061\nSW\nAI-driven smart energy management for polar research stations\nMinistry of Earth\nSciences\nClean & Green Technology   —   2 total (2 SW / 0 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26038\nSW\nExplainable AI for diabetic retinopathy screening in rural India\nMathWorks\nSIH26055\nSW\nSmart scan strategy for electronic warfare\nDRDO\nToys & Games   —   2 total (2 SW / 0 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26045\nSW\nIP-SAKTI Sahayak: multilingual RAG AI assistant for Ayurveda IP guidance\nMinistry of Ayush\nSIH26062\nSW\nIntegrated polar expedition logistics & asset management system\nMinistry of Earth\nSciences\n\nRecommendation: Best Bets for a Hardware + Software Build\nRanked for a 6-member student team building a genuine hardware + software solution, weighing feasibility in the\nhackathon timeframe, demo strength, and alignment with what SIH judging panels tend to reward.\n■ 1st Choice — SIH26025: Mine Subsidence Monitoring & Early Warning System\nTheme: Disaster Management  |  Ministry of Coal  |  Track: Hardware\nThe strongest overall pick. Disaster Management is the largest theme in the catalogue, which typically means\nministries and evaluators invest heavily in that track. The hardware is realistically buildable in a hackathon: tilt/vibration\nsensors and strain gauges wired to an ESP32 or Arduino, transmitting over LoRa or GSM from a small test rig\nsimulating a mine wall. The software layer — a predictive ML model over the sensor time-series, a live dashboard, and\nautomated SMS/app alerts — is exactly the AI + IoT combination judges reward. It's demonstrable live on stage: shake\nthe rig, watch the alert fire in real time.\n■ 2nd Choice — SIH26177: AI-Powered Search-and-Rescue Drone\nTheme: Disaster Management  |  Sponsor: Qualcomm Inc  |  Track: Hardware\nHighest \"wow factor\" of the shortlist. You don't need a fully flying drone to prove the concept — a tethered quadcopter\nor a small ground rover with a camera running person/hazard detection (YOLO on a Jetson Nano or Raspberry Pi)\nmakes for a compelling demo. Qualcomm-sponsored problem statements often come with access to dev kits and\ntechnical support, a practical edge during the build phase.\n■ 3rd Choice — SIH26109: Bovine Mastitis Early Forecasting\nTheme: Agriculture, FoodTech & Rural Development  |  Fisheries, Animal Husbandry & Dairying  |  Track: Hardware\nLess crowded — far fewer teams gravitate toward a dairy-sensor problem compared to AI chatbots or vision systems,\nwhich can work in your favor for differentiation and evaluator attention. The hardware is simple (a milk\nconductivity/temperature sensor) paired with an ML classification model, and the rural impact story is strong for the\npitch.\nWhy the top pick wins\nWinning SIH is less about picking the flashiest idea and more about picking a problem your team can fully close the\nloop on — working hardware, working software, and a live, convincing demo — within the time you have. SIH26025\nlets a 6-person team split cleanly: 2 on embedded/sensors, 2 on backend/ML, 2 on dashboard/frontend + pitch, with no\nsingle point of failure (no drone-flight risk, no exotic hardware to source).\nNext Steps\n1\nVerify your shortlisted PS number, exact title, and full description on sih.gov.in/sih2026PS before committing.\n2\nConfirm team composition against SIH rules: exactly 6 students, same college, minimum 1 female member.\n3\nDraft a system architecture (sensor stack → data pipeline → ML model → dashboard/alerting) for your chosen PS.\n4\nBuild a rough 36-hour execution timeline splitting hardware, backend, and frontend/pitch work across the team.",
+    "sentences": [
+      {
+        "text": "Smart India Hackathon 2026\nComplete Problem Statement Guide — Software + Hardware\nAll problem statements captured from the SIH 2026 catalogue (226 total — 172 Software, 54\nHardware), organized by theme, with a legend distinguishing Software vs Hardware tracks, plus a\nstrategic recommendation for the strongest hardware+software project to build.",
+        "start_char": 0,
+        "end_char": 346
+      },
+      {
+        "text": "SW\n= Software track\nHW\n= Hardware track\nSource: SIH 2026 Official Master Catalogue — compiled from a third-party mirror of sih.gov.in data.",
+        "start_char": 347,
+        "end_char": 486
+      },
+      {
+        "text": "Some theme tags in the raw source\nappeared inconsistent; verify final picks on sih.gov.in/sih2026PS.",
+        "start_char": 487,
+        "end_char": 587
+      },
+      {
+        "text": "Prepared: August 2026\n\nA Note on the Data\nThis guide is built from a third-party compiled mirror of the SIH 2026 catalogue, not scraped directly from sih.gov.in (which\nblocks automated access).",
+        "start_char": 588,
+        "end_char": 781
+      },
+      {
+        "text": "Titles here are shortened for table readability — the official portal has the full problem statement\ntext, background, and expected solution for each code.",
+        "start_char": 782,
+        "end_char": 937
+      },
+      {
+        "text": "Verify your shortlisted PS number's exact title, theme, and full\ndescription on sih.gov.in/sih2026PS before finalizing your choice.",
+        "start_char": 938,
+        "end_char": 1069
+      },
+      {
+        "text": "All Problem Statements by Theme\nBoth SOFTWARE and HARDWARE tracks are included below.",
+        "start_char": 1070,
+        "end_char": 1155
+      },
+      {
+        "text": "Rows are shaded blue (Software) or red (Hardware) for\nquick scanning.",
+        "start_char": 1156,
+        "end_char": 1225
+      },
+      {
+        "text": "Disaster Management   —   25 total (20 SW / 5 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26013\nSW\nAutomated integration & harmonization of multi-source geospatial data for\nland records\nRural Development\nSIH26015\nSW\nGeospatial visualization/analysis of geo-coded images for watershed\ndevelopment\nRural Development\nSIH26025\nHW\nAI-enabled low-cost real-time mine subsidence monitoring & early warning\nMinistry of Coal\nSIH26028\nSW\nDynamic forecast of ETA for coaching trains\nMinistry of Railways\nSIH26029\nHW\nAutomated high-current short-circuit test system for MCB compliance\nConsumer Affairs, Food\n& PD\nSIH26060\nSW\nDigital platform for remote management of Indian Antarctic research stations\nMinistry of Earth\nSciences\nSIH26069\nSW\nNational weather big data analytics platform\nMinistry of Earth\nSciences\nSIH26071\nSW\nAI/ML integrated heavy rainfall early warning & inundation prediction\nMinistry of Earth\nSciences\nSIH26072\nSW\nAI/ML nowcasting of thunderstorm & lightning\nMinistry of Earth\nSciences\nSIH26073\nSW\nAI/ML anomaly detection for Automatic Weather Stations\nMinistry of Earth\nSciences\nSIH26074\nSW\nDownscaling weather forecasts from block to panchayat level\nMinistry of Earth\nSciences\nSIH26078\nSW\nAI-driven spatio-temporal tracking of extreme weather anomalies\nMinistry of Earth\nSciences\nSIH26079\nSW\nAI-based forecast-bust detection for medium-range weather forecasts\nMinistry of Earth\nSciences\nSIH26080\nSW\nRegime-aware AI post-processing of monsoon rainfall forecasts\nMinistry of Earth\nSciences\nSIH26082\nSW\nAir pollution-weather coupled forecasting system (Delhi NCR)\nMinistry of Earth\nSciences\nSIH26083\nSW\nExtreme heatwave early warning & human thermal stress index\nMinistry of Earth\nSciences\nSIH26084\nSW\nConvective-scale nowcasting for thunderstorms, hail & cloudbursts\nMinistry of Earth\nSciences\nSIH26085\nSW\nUrban flood nowcasting system (drainage & rainfall coupling)\nMinistry of Earth\nSciences\nSIH26161\nSW\nDam break inundation modelling using hydrodynamic modelling\nNTRO\nSIH26177\nHW\nDeployable AI-powered autonomous drone for search-and-rescue\nQualcomm Inc\n\nCode\nTrack\nTitle\nMinistry\nSIH26180\nHW\nField-deployable AI Smart Farming Assistant\nQualcomm Inc\nSIH26191\nSW\nIntelligent identification of hazard-based red zones & relocation needs\nMinistry of Home Affairs\nSIH26192\nSW\nFlash flood prediction system for hilly regions (multi-source data)",
+        "start_char": 1226,
+        "end_char": 3564
+      },
+      {
+        "text": "Ministry of Home Affairs\nSIH26206\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26223\nHW\nStudent Innovation (open theme)\nAICTE\nSmart Automation   —   74 total (54 SW / 20 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26002\nSW\nAI-based smart logistics and accessibility intelligence platform for NER\nMDoNER\nSIH26006\nSW\nIntelligent freight forecasting model for vessel chartering & bulk cargo\nprocurement\nMinistry of Steel\nSIH26007\nHW\nSafe & efficient operation of mine vehicles in fog/low-visibility conditions\nMinistry of Steel\nSIH26008\nHW\nBelt joint rupture & conveyor belt damage: intelligent monitoring & prediction\nMinistry of Steel\nSIH26021\nSW\nHoney Chain: blockchain-based honey traceability & beekeeping\nmanagement\nMinistry of MSME\nSIH26023\nSW\nAI-powered geological & mining reporting solution for CMPDI/CIL\nMinistry of Coal\nSIH26024\nSW\nAI-based smart governance & compliance monitoring for coal mines\nMinistry of Coal\nSIH26027\nSW\nAI-powered automatic block planning to maximize train asset availability\nMinistry of Railways\nSIH26030\nHW\nAutomated cable specimen preparation system (IS 10810/7098 compliance)\nConsumer Affairs, Food\n& PD\nSIH26032\nSW\nFarmer procurement schedule & status transparency platform\nConsumer Affairs, Food\n& PD\nSIH26036\nSW\nOnline verification system for weighing & measuring instruments\nConsumer Affairs, Food\n& PD\nSIH26040\nHW\nSmart water purification & quality monitoring (rural/mining areas)\nGovt. of Jharkhand\nSIH26044\nSW\nPortal for academia-industry collaboration on skilling, internships &\nplacement\nMinistry of Ayush\nSIH26047\nSW\nPatient case-taking software\nMinistry of Ayush\nSIH26049\nHW\nImproving reliability of electrical/electronic equipment in Ladakh's\nHAA/SHAA conditions\nDRDO\nSIH26053\nSW\nAdaptive variable resolution 2.5D lidar mapping for dynamic environment\nperception\nDRDO\nSIH26057\nSW\nAI-powered underwater marine debris & anomaly detection (side-scan\nsonar)\nMinistry of Earth\nSciences\nSIH26064\nHW\nLow-cost deployable seafloor metal detection sensor\nMinistry of Earth\nSciences\nSIH26065\nHW\nAutonomous low-cost ocean observation platform (polar/southern oceans)\nMinistry of Earth\nSciences\nSIH26067\nSW\nWeb-based interactive 3D visualization of ocean model outputs\nMinistry of Earth\nSciences\nSIH26081\nSW\nHybrid AI/NWP multi-model forecast blending system\nMinistry of Earth\nSciences\nSIH26088\nHW\nMultilingual cooperative governance & legal assistance chatbot\nMinistry of Cooperation\nSIH26089\nSW\nCooperative gig services platform for household & community services\nMinistry of Cooperation\n\nCode\nTrack\nTitle\nMinistry\nSIH26090\nSW\nAI-driven market linkage & smart cataloging app for marginalized artisans\nMinistry of Social\nJustice &\nEmpowerment\nSIH26092\nSW\nAI-driven scheme matching for marginalized entrepreneurs\nMinistry of Social\nJustice &\nEmpowerment\nSIH26093\nSW\nAI real-time stress & trauma assessment for victims accessing NHAA\n(14566)\nMinistry of Social\nJustice &\nEmpowerment\nSIH26095\nSW\nSmart real-time monitoring & inspection mobile app\nMinistry of Social\nJustice &\nEmpowerment\nSIH26096\nHW\nDigital heritage archive for memorials, manuscripts & Ambedkar (AI\narchive/AV platform)\nMinistry of Social\nJustice &\nEmpowerment\nSIH26098\nHW\nLow-cost precision guidance & smart electronic fuze for 155mm artillery shell\nMinistry of Defence\nSIH26099\nSW\nAI-driven standardization & harmonization of material codes across CPSEs\nPetroleum & Natural\nGas\nSIH26100\nSW\nAI-powered bid compliance verification platform for GeM procurement\nPetroleum & Natural\nGas\nSIH26103\nSW\nWeb-based integrated project-monitoring platform\nMoSPI\nSIH26107\nSW\nAI intelligent assistant for Indian Standards & BIS services\nConsumer Affairs, Food\n& PD\nSIH26108\nSW\nAI recommendation engine for applicable Indian Standards in procurement\nConsumer Affairs, Food\n& PD\nSIH26114\nSW\nSmart city site planning using Autodesk Forma\nAutodesk\nSIH26117\nSW\nSovereign on-premise agentic AI workbench (open-weight multimodal LLMs)\nMRPL\nSIH26118\nHW\nPassive colorimetric H2S exposure-dosimeter wristband with AI reading\nMRPL\nSIH26119\nSW\nIndigenous GPU-accelerated optimization solver\nMRPL\nSIH26120\nSW\nDigital twin for well-to-surface optimization (CSS/SRP heavy oil wells)",
+        "start_char": 3565,
+        "end_char": 7708
+      },
+      {
+        "text": "Oil India Limited\nSIH26121\nSW\neRTMAC-NWIS:",
+        "start_char": 7709,
+        "end_char": 7751
+      },
+      {
+        "text": "AI offset-well knowledge & decision support for drilling\nOil India Limited\nSIH26122\nSW\nIntelligent data capture & schedule-linking for infrastructure project\nmanagement\nOil India Limited\nSIH26127\nSW\nCity-wide AI engine for multi-camera ANPR trajectory tracking & traffic\nanalytics\nBharat Electronics Ltd\nSIH26129\nSW\nSystem integration/interoperability among government digital platforms\nGovt. of Maharashtra\nSIH26130\nSW\nStreamlining industrial approvals & compliance processes\nGovt. of Maharashtra\nSIH26134\nSW\nAligning skill development programs with industry requirements\nGovt. of Maharashtra\nSIH26144\nHW\nHigh-sensitivity micro-barometer infrasound sensor\nNTRO\nSIH26146\nSW\nAI-powered monitoring & analysis of Bitcoin transaction traffic\nNTRO\nSIH26147\nSW\nAutomated model for .IQ/.wav file & signal parameter analysis\nNTRO\nSIH26152\nSW\nSocial media analytics\nNTRO\nSIH26154\nSW\nGen AI platform for automated content transformation\nNTRO\nSIH26157\nSW\nSupervisory analytics tool for SOC assessment\nNTRO\nSIH26163\nSW\nSecurity assessment of the World Monitor application\nNTRO\nSIH26165\nSW\nAI/NLP engine to detect SIF precursors in unsafe-act/near-miss reports\nOil India Limited\nSIH26168\nSW\nAI/ML intelligent dead-reckoning system for seamless navigation\nISRO\n\nCode\nTrack\nTitle\nMinistry\nSIH26170\nSW\nAI-driven anomaly detection in component burn-in & screening\nISRO\nSIH26171\nSW\nOn-device visual perception for lightweight browser agents\nISRO\nSIH26172\nHW\nLow-latency & efficient voice activator for edge devices\nISRO\nSIH26173\nSW\niTantra: Indian multilingual TTS/STT neural transceiver radio access\nISRO\nSIH26174\nSW\nAI human activity recognition for on-board BAS experiments\nISRO\nSIH26179\nHW\nAI-powered retail intelligence platform (on-device shopper analytics)",
+        "start_char": 7752,
+        "end_char": 9497
+      },
+      {
+        "text": "Qualcomm Inc\nSIH26185\nHW\nHelmet-mounted conformal antenna for tactical communications\nMinistry of Home Affairs\nSIH26187\nSW\nAI intelligent video analytics for border surveillance using existing CCTV\nMinistry of Home Affairs\nSIH26188\nSW\nAI-based fake identity & document screening system\nMinistry of Home Affairs\nSIH26190\nSW\nSecure digital document management system for legal/investigation\ndocuments\nMinistry of Home Affairs\nSIH26193\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26195\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26198\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26201\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26203\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26210\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26212\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26215\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26218\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26220\nHW\nStudent Innovation (open theme)\nAICTE\nBlockchain & Cybersecurity   —   26 total (24 SW / 2 HW)",
+        "start_char": 9498,
+        "end_char": 10478
+      },
+      {
+        "text": "Code\nTrack\nTitle\nMinistry\nSIH26019\nSW\nNational digital platform for research, policy innovation & land governance\nRural Development\nSIH26020\nHW\nInnovative hand-spinning equipment for Khadi artisan productivity & income\nMinistry of MSME\nSIH26041\nSW\nAR-based vocational training simulator for industrial safety\n(mining/manufacturing)\nGovt. of Jharkhand\nSIH26058\nHW\nLow-power real-time adaptive software-defined sonar transmitter payload for\nAUVs\nMinistry of Earth\nSciences\nSIH26101\nSW\nAI learning platform integrated with iGOT Karmayogi (competency gaps,\nMCQ generation)\nMoSPI\nSIH26102\nSW\nAI system to detect anomalies/fraud/inefficiencies in MPLAD scheme\nMoSPI\nSIH26104\nSW\nAI real-time detection/prevention of voice-cloning impersonation attacks\nAICTE\nSIH26105\nSW\nAI continuous cyber risk quantification & investment optimization platform\nAICTE\nSIH26106\nSW\nAI email threat detection, geolocation & forensic intelligence platform\nAICTE\nSIH26125\nSW\nBlockchain-based secure platform for identity, access control & digital assets\nBharat Electronics Ltd\nSIH26136\nSW\nStartup-friendly public procurement mechanism for govt departments\nGovt. of Maharashtra\nSIH26141\nSW\nQuantum-inspired cyber threat detection for digital signature security\nEgreen Quanta\nSIH26145\nSW\nAI-based detection of cyber threats in unidirectional IP traffic\nNTRO\nSIH26148\nSW\nNew programming language/scripts for stealth network forensic analysis\nNTRO\n\nCode\nTrack\nTitle\nMinistry\nSIH26149\nSW\nIntegrated secure data erasure & advanced file recovery tool\nNTRO\nSIH26150\nSW\nMulti-vendor DVR/NVR forensic analysis tool for surveillance evidence\nNTRO\nSIH26151\nSW\nDark web threat actor de-anonymization\nNTRO\nSIH26155\nSW\nAI-driven multi-vendor network security compliance auditor\nNTRO\nSIH26156\nSW\nUniversal log pre-processing framework\nNTRO\nSIH26159\nSW\nSecureMailScope: AI cryptographic security posture assessment for email\nNTRO\nSIH26160\nSW\nAI-powered IPsec VPN protocol analyzer & security assessment\nNTRO\nSIH26164\nSW\nEnterprise cryptographic discovery & analysis tool\nNTRO\nSIH26182\nSW\nAutomated attribution of unknown crypto wallets to nearest VASPs\nMinistry of Home Affairs\nSIH26183\nSW\nReal-time identification of fraud-linked crypto exchanges\nMinistry of Home Affairs\nSIH26184\nSW\nPredictive analytics for cybercrime complaints (forecast cash withdrawal\nlocations)\nMinistry of Home Affairs\nSIH26189\nSW\nAI-powered criminal network analysis system\nMinistry of Home Affairs\nMedTech / BioTech / HealthTech   —   18 total (13 SW / 5 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26018\nSW\nIntelligent land record digitization & validation system\nRural Development\nSIH26033\nSW\nReducing intermediaries to improve farmer earnings & consumer prices\nConsumer Affairs, Food\n& PD\nSIH26035\nSW\nApp for generating NAWI test reports per OIML R-76\nConsumer Affairs, Food\n& PD\nSIH26043\nSW\nDigital platform to crowdsource societal challenges via university-industry\npartnerships\nGovt. of Jharkhand\nSIH26050\nHW\nHigh altitude performance optimization & robust design of anti-drone system\nDRDO\nSIH26076\nSW\nPersonalized homepage for the 'Mausam' mobile application\nMinistry of Earth\nSciences\nSIH26094\nSW\nAI dynamic mental health monitoring & distress prediction for victims of\natrocities\nMinistry of Social\nJustice &\nEmpowerment\nSIH26113\nHW\nHuman augmentation tech for healthcare, rehab, ergonomics, assistive\nliving, sports\nAutodesk\nSIH26115\nSW\nSmart mobile medical-waste collection & segregation system\nAutodesk\nSIH26131\nSW\nEarly detection & management of crop diseases/pest infestations\nGovt.",
+        "start_char": 10479,
+        "end_char": 13995
+      },
+      {
+        "text": "of Maharashtra\nSIH26133\nSW\nAccessibility & quality of public healthcare in rural/underserved areas\nGovt. of Maharashtra\nSIH26139\nSW\nHybrid quantum machine learning platform for early disease detection\nEgreen Quanta\nSIH26181\nHW\nSecure AI-powered Personal Health Companion (on-device)",
+        "start_char": 13996,
+        "end_char": 14278
+      },
+      {
+        "text": "Qualcomm Inc\nSIH26186\nSW\nAI predictive personnel stress & welfare monitoring for uniformed forces\nMinistry of Home Affairs\nSIH26196\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26200\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26213\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26217\nHW\nStudent Innovation (open theme)\nAICTE\n\nSmart Education   —   17 total (12 SW / 5 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26042\nSW\nAI vernacular pedagogy & real-time translation for mother-tongue education\nGovt. of Jharkhand\nSIH26059\nSW\nAI-enabled Antarctic sea-ice & iceberg trajectory navigation decision support\nMinistry of Earth\nSciences\nSIH26070\nSW\nAI/ML system for tropical cyclone pattern classification & prediction\nMinistry of Earth\nSciences\nSIH26075\nSW\nCAPACITY CONNECT:",
+        "start_char": 14279,
+        "end_char": 15036
+      },
+      {
+        "text": "digital capacity-building & learning management\nportal\nMinistry of Earth\nSciences\nSIH26087\nHW\nAI-enabled cooperative capacity building, ERP & employment ecosystem\nMinistry of Cooperation\nSIH26097\nSW\nAI voice assistant for livelihood mapping & NSQF skilling (SC communities,\nPM-AJAY)\nMinistry of Social\nJustice &\nEmpowerment\nSIH26116\nSW\nUrban mixed-use design challenge in Autodesk Revit\nAutodesk\nSIH26135\nSW\nTracking employment outcomes & skill gaps from skilling initiatives\nGovt. of Maharashtra\nSIH26140\nSW\nAI-based interactive quantum algorithm learning platform\nEgreen Quanta\nSIH26202\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26204\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26205\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26208\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26219\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26221\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26222\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26225\nHW\nStudent Innovation (open theme)\nAICTE\nAgriculture, FoodTech & Rural Development   —   15 total (11 SW / 4 HW)",
+        "start_char": 15037,
+        "end_char": 16088
+      },
+      {
+        "text": "Code\nTrack\nTitle\nMinistry\nSIH26016\nSW\nReal-time national land acquisition & management system\nRural Development\nSIH26017\nSW\nPredictive analytics for early detection of land acquisition delays\nRural Development\nSIH26022\nHW\nSolar-powered drying & packaging system for home-based agarbatti\nmanufacturing\nMinistry of MSME\nSIH26034\nSW\nCompliance checker for packaged commodities (Legal Metrology Rules\n2011)\nConsumer Affairs, Food\n& PD\nSIH26051\nSW\nSoftware model for design of area-specific shelter for thermal comfort\nDRDO\nSIH26086\nSW\nHyperlocal monsoon onset & break prediction (block/village scale)\nMinistry of Earth\nSciences\nSIH26091\nSW\nAI hyper-local business advisory & financial structuring for rural\nmicro-entrepreneurs\nMinistry of Social\nJustice &\nEmpowerment\nSIH26109\nHW\nAI predictive modelling for early forecasting of bovine mastitis\nFisheries, Animal\nHusbandry & Dairying\nSIH26110\nHW\nLow-cost lightweight milk chilling can for small-scale dairy farmers\nFisheries, Animal\nHusbandry & Dairying\nSIH26111\nSW\nSmart AI-enabled rapid feed & silage quality testing for dairy farmers\nFisheries, Animal\nHusbandry & Dairying\n\nCode\nTrack\nTitle\nMinistry\nSIH26126\nSW\nVision-based autonomous navigation for unmanned ground vehicle\n(outdoor)\nBharat Electronics Ltd\nSIH26128\nSW\nEarly detection & management of livestock diseases\nGovt. of Maharashtra\nSIH26132\nSW\nStrengthening market linkages & price discovery for farmers\nGovt. of Maharashtra\nSIH26197\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26214\nHW\nStudent Innovation (open theme)\nAICTE\nSpace Technology   —   23 total (19 SW / 4 HW)",
+        "start_char": 16089,
+        "end_char": 17669
+      },
+      {
+        "text": "Code\nTrack\nTitle\nMinistry\nSIH26001\nSW\nAI-Based early warning and landslide risk monitoring system in NER\nMDoNER\nSIH26003\nSW\nAI-based cognitive gaming and memory assistance platform for elderly\ndementia patients (NER)\nMDoNER\nSIH26004\nHW\nAI-assisted early detection system for osteoarthritis (OA) risk markers (NER)\nMDoNER\nSIH26009\nSW\nAI/ML & space tech to identify manganese reserves\nMinistry of Steel\nSIH26010\nHW\nSurvey/resurvey of rural agricultural land in India\nRural Development\nSIH26011\nSW\n3D ULPIN generation and vertical property mapping system\nRural Development\nSIH26046\nSW\nAIIA clinical trials dashboard (GCP-compliant CTMS for Ayurveda research)\nMinistry of Ayush\nSIH26063\nSW\nIntegrated polar science outreach, knowledge repository & media portal\nMinistry of Earth\nSciences\nSIH26066\nSW\nOceanEmbed: satellite embedding deep-learning framework for subsurface\nocean temperature\nMinistry of Earth\nSciences\nSIH26068\nSW\nWeatherGPT: conversational AI for weather forecasting & alerts\nMinistry of Earth\nSciences\nSIH26077\nSW\nAI-driven hyper-local early warning for severe weather nowcasting\nMinistry of Earth\nSciences\nSIH26142\nSW\nDeep-learning super-resolution mapping from medium-resolution satellite\nimagery\nNTRO\nSIH26143\nSW\nSatellite imagery for oil spill detection with AIS vessel correlation\nNTRO\nSIH26153\nSW\nAI-based network attack forecasting from network traffic data\nNTRO\nSIH26162\nSW\nAI detection/classification of industrial fires using NASA FIRMS & satellite\ndata\nNTRO\nSIH26166\nSW\nMulti-modal, sun-angle invariant image correspondence (Chandrayaan-2\nimagery)",
+        "start_char": 17670,
+        "end_char": 19240
+      },
+      {
+        "text": "ISRO\nSIH26167\nSW\nSatQuery AI: vision-language assistant for remote sensing image analysis\nISRO\nSIH26169\nSW\nAI virtual camera tracking for coarse alignment of mobile FSOC terminals\nISRO\nSIH26175\nSW\nDepthWizard: single-view height estimation & 3D flythrough\nISRO\nSIH26176\nSW\nORCA: marine ecosystem reasoning with collaborative agents\nISRO\nSIH26178\nHW\nResilient AI environmental monitoring network (floods, fires, pollution)",
+        "start_char": 19241,
+        "end_char": 19662
+      },
+      {
+        "text": "Qualcomm Inc\nSIH26209\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26226\nHW\nStudent Innovation (open theme)\nAICTE\nRobotics & Drones   —   8 total (6 SW / 2 HW)\n\nCode\nTrack\nTitle\nMinistry\nSIH26012\nSW\nAI-based automated urban parcel mapping & cadastral feature extraction\n(drone imagery)\nRural Development\nSIH26014\nSW\nIntegrated GIS-based digital public infrastructure for land governance\nRural Development\nSIH26026\nHW\nMobile (quadruped)/handheld device for narcotics & explosives detection\n(Railways)\nMinistry of Railways\nSIH26037\nSW\nAdaptive path planning & collision avoidance for autonomous vehicles on\nIndian roads\nMathWorks\nSIH26054\nSW\nAI real-time digital twin for aero piston engines (MALE UAVs)\nDRDO\nSIH26112\nHW\nModular Autonomous Mobile Robot (AMR) platform for smart warehouse\nautomation\nAutodesk\nSIH26123\nSW\nEdge-AI distributed fleet coordination for AMRs in smart warehouses\nBharat Electronics Ltd\nSIH26158\nSW\nSingle-pass drone video to accurate 3D model generation\nNTRO\nFitness & Sports   —   8 total (5 SW / 3 HW)",
+        "start_char": 19663,
+        "end_char": 20688
+      },
+      {
+        "text": "Code\nTrack\nTitle\nMinistry\nSIH26031\nSW\nQuality assessment & grading of onions (subjective grading disputes)\nConsumer Affairs, Food\n& PD\nSIH26048\nHW\niKwath: pod-based smart Kwatha (Kadha) maker\nMinistry of Ayush\nSIH26124\nSW\nAI mobile urban intelligence platform using public transport fleet\nBharat Electronics Ltd\nSIH26137\nSW\nQuantum-inspired intelligent traffic route optimization\nEgreen Quanta\nSIH26194\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26199\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26211\nHW\nStudent Innovation (open theme)\nAICTE\nSIH26216\nHW\nStudent Innovation (open theme)\nAICTE\nTravel & Tourism   —   4 total (2 SW / 2 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26039\nHW\nAI-powered underground mine safety, monitoring & rescue system\nGovt. of Jharkhand\nSIH26056\nSW\nReal-time airfare price index via automated web scraping\nMoSPI\nSIH26207\nSW\nStudent Innovation (open theme)\nAICTE\nSIH26224\nHW\nStudent Innovation (open theme)\nAICTE\nSmart Vehicles   —   3 total (1 SW / 2 HW)",
+        "start_char": 20689,
+        "end_char": 21665
+      },
+      {
+        "text": "Code\nTrack\nTitle\nMinistry\nSIH26005\nHW\nSolar-powered smart mini cold storage system for fresh vegetables (NER)\nMDoNER\nSIH26052\nHW\nAI/ML-enabled adaptive noise cancellation for defence environments\nDRDO\nSIH26138\nSW\nQuantum-inspired fuel consumption prediction & green fleet optimization\nEgreen Quanta\nRenewable / Sustainable Energy   —   1 total (1 SW / 0 HW)\n\nCode\nTrack\nTitle\nMinistry\nSIH26061\nSW\nAI-driven smart energy management for polar research stations\nMinistry of Earth\nSciences\nClean & Green Technology   —   2 total (2 SW / 0 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26038\nSW\nExplainable AI for diabetic retinopathy screening in rural India\nMathWorks\nSIH26055\nSW\nSmart scan strategy for electronic warfare\nDRDO\nToys & Games   —   2 total (2 SW / 0 HW)\nCode\nTrack\nTitle\nMinistry\nSIH26045\nSW\nIP-SAKTI Sahayak: multilingual RAG AI assistant for Ayurveda IP guidance\nMinistry of Ayush\nSIH26062\nSW\nIntegrated polar expedition logistics & asset management system\nMinistry of Earth\nSciences\n\nRecommendation: Best Bets for a Hardware + Software Build\nRanked for a 6-member student team building a genuine hardware + software solution, weighing feasibility in the\nhackathon timeframe, demo strength, and alignment with what SIH judging panels tend to reward.",
+        "start_char": 21666,
+        "end_char": 22916
+      },
+      {
+        "text": "■ 1st Choice — SIH26025: Mine Subsidence Monitoring & Early Warning System\nTheme: Disaster Management  |  Ministry of Coal  |  Track:",
+        "start_char": 22917,
+        "end_char": 23050
+      },
+      {
+        "text": "Hardware\nThe strongest overall pick.",
+        "start_char": 23051,
+        "end_char": 23087
+      },
+      {
+        "text": "Disaster Management is the largest theme in the catalogue, which typically means\nministries and evaluators invest heavily in that track.",
+        "start_char": 23088,
+        "end_char": 23224
+      },
+      {
+        "text": "The hardware is realistically buildable in a hackathon: tilt/vibration\nsensors and strain gauges wired to an ESP32 or Arduino, transmitting over LoRa or GSM from a small test rig\nsimulating a mine wall.",
+        "start_char": 23225,
+        "end_char": 23427
+      },
+      {
+        "text": "The software layer — a predictive ML model over the sensor time-series, a live dashboard, and\nautomated SMS/app alerts — is exactly the AI + IoT combination judges reward.",
+        "start_char": 23428,
+        "end_char": 23599
+      },
+      {
+        "text": "It's demonstrable live on stage: shake\nthe rig, watch the alert fire in real time.",
+        "start_char": 23600,
+        "end_char": 23682
+      },
+      {
+        "text": "■ 2nd Choice — SIH26177: AI-Powered Search-and-Rescue Drone\nTheme: Disaster Management  |  Sponsor: Qualcomm Inc  |",
+        "start_char": 23683,
+        "end_char": 23798
+      },
+      {
+        "text": "Track: Hardware\nHighest \"wow factor\" of the shortlist.",
+        "start_char": 23800,
+        "end_char": 23854
+      },
+      {
+        "text": "You don't need a fully flying drone to prove the concept — a tethered quadcopter\nor a small ground rover with a camera running person/hazard detection (YOLO on a Jetson Nano or Raspberry Pi)\nmakes for a compelling demo.",
+        "start_char": 23855,
+        "end_char": 24074
+      },
+      {
+        "text": "Qualcomm-sponsored problem statements often come with access to dev kits and\ntechnical support, a practical edge during the build phase.",
+        "start_char": 24075,
+        "end_char": 24211
+      },
+      {
+        "text": "■ 3rd Choice — SIH26109: Bovine Mastitis Early Forecasting\nTheme: Agriculture, FoodTech & Rural Development  |  Fisheries, Animal Husbandry & Dairying",
+        "start_char": 24212,
+        "end_char": 24362
+      },
+      {
+        "text": "|  Track: Hardware\nLess crowded — far fewer teams gravitate toward a dairy-sensor problem compared to AI chatbots or vision systems,\nwhich can work in your favor for differentiation and evaluator attention.",
+        "start_char": 24364,
+        "end_char": 24570
+      },
+      {
+        "text": "The hardware is simple (a milk\nconductivity/temperature sensor) paired with an ML classification model, and the rural impact story is strong for the\npitch.",
+        "start_char": 24571,
+        "end_char": 24726
+      },
+      {
+        "text": "Why the top pick wins\nWinning SIH is less about picking the flashiest idea and more about picking a problem your team can fully close the\nloop on — working hardware, working software, and a live, convincing demo — within the time you have.",
+        "start_char": 24727,
+        "end_char": 24966
+      },
+      {
+        "text": "SIH26025\nlets a 6-person team split cleanly: 2 on embedded/sensors, 2 on backend/ML, 2 on dashboard/frontend + pitch, with no\nsingle point of failure (no drone-flight risk, no exotic hardware to source).",
+        "start_char": 24967,
+        "end_char": 25170
+      },
+      {
+        "text": "Next Steps\n1\nVerify your shortlisted PS number, exact title, and full description on sih.gov.in/sih2026PS before committing.",
+        "start_char": 25171,
+        "end_char": 25295
+      },
+      {
+        "text": "2\nConfirm team composition against SIH rules: exactly 6 students, same college, minimum 1 female member.",
+        "start_char": 25296,
+        "end_char": 25400
+      },
+      {
+        "text": "3\nDraft a system architecture (sensor stack → data pipeline → ML model → dashboard/alerting) for your chosen PS.\n4\nBuild a rough 36-hour execution timeline splitting hardware, backend, and frontend/pitch work across the team.",
+        "start_char": 25401,
+        "end_char": 25626
+      }
+    ],
+    "project_id": "default"
+  }
+]

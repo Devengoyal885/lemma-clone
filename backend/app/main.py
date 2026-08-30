@@ -671,7 +671,108 @@ async def pandaz_send_to_lemma(file: UploadFile = File(...)):
     }
 
 
-# --- 8. STATIC FRONTEND MOUNT ---
+
+# --- 8. PERSISTENT HISTORY & WORKSPACE PROJECTS ---
+
+from app.services.storage_service import StorageService
+
+class HistorySaveRequest(BaseModel):
+    id: Optional[str] = None
+    filename: Optional[str] = "Untitled Document"
+    title: Optional[str] = None
+    char_count: Optional[int] = 0
+    sentence_count: Optional[int] = 0
+    metrics: Optional[Dict[str, Any]] = Field(default_factory=dict)
+    analysis: Optional[Dict[str, Any]] = Field(default_factory=dict)
+    text: Optional[str] = ""
+    sentences: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
+    project_id: Optional[str] = "default"
+
+class ProjectCreateRequest(BaseModel):
+    name: str = Field(..., min_length=1, description="Project name")
+    description: Optional[str] = ""
+    tags: Optional[List[str]] = Field(default_factory=list)
+
+@app.get(f"{settings.API_V1_STR}/history")
+@app.get("/api/history", include_in_schema=False)
+async def list_history_records(limit: int = 50):
+    """Lists saved analysis runs in persistent local storage."""
+    records = StorageService.list_history(limit=limit)
+    return {"status": "success", "count": len(records), "history": records}
+
+@app.post(f"{settings.API_V1_STR}/history")
+@app.post("/api/history", include_in_schema=False)
+async def save_history_record(payload: HistorySaveRequest):
+    """Saves or updates an analysis run in history."""
+    saved = StorageService.save_analysis(payload.model_dump())
+    return {"status": "success", "record": saved}
+
+@app.get(f"{settings.API_V1_STR}/history/{{record_id}}")
+@app.get("/api/history/{record_id}", include_in_schema=False)
+async def get_history_record(record_id: str):
+    """Retrieves a single historical analysis run."""
+    record = StorageService.get_analysis(record_id)
+    if not record:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="History record not found")
+    return {"status": "success", "record": record}
+
+@app.delete(f"{settings.API_V1_STR}/history/{{record_id}}")
+@app.delete("/api/history/{record_id}", include_in_schema=False)
+async def delete_history_record(record_id: str):
+    """Deletes an analysis run from history."""
+    deleted = StorageService.delete_analysis(record_id)
+    if not deleted:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="History record not found")
+    return {"status": "success", "message": "Record deleted"}
+
+@app.get(f"{settings.API_V1_STR}/projects")
+@app.get("/api/projects", include_in_schema=False)
+async def list_workspace_projects():
+    """Lists all workspace projects."""
+    projects = StorageService.list_projects()
+    return {"status": "success", "count": len(projects), "projects": projects}
+
+@app.post(f"{settings.API_V1_STR}/projects")
+@app.post("/api/projects", include_in_schema=False)
+async def create_workspace_project(payload: ProjectCreateRequest):
+    """Creates a new workspace project."""
+    proj = StorageService.create_project(payload.name, payload.description or "", payload.tags or [])
+    return {"status": "success", "project": proj}
+
+@app.get(f"{settings.API_V1_STR}/projects/{{project_id}}")
+@app.get("/api/projects/{project_id}", include_in_schema=False)
+async def get_workspace_project(project_id: str):
+    """Gets project details with linked documents and chats."""
+    proj = StorageService.get_project(project_id)
+    if not proj:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+    return {"status": "success", "project": proj}
+
+@app.delete(f"{settings.API_V1_STR}/projects/{{project_id}}")
+@app.delete("/api/projects/{project_id}", include_in_schema=False)
+async def delete_workspace_project(project_id: str):
+    """Deletes a workspace project."""
+    if project_id == "default":
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot delete default project")
+    deleted = StorageService.delete_project(project_id)
+    if not deleted:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+    return {"status": "success", "message": "Project deleted"}
+
+@app.get(f"{settings.API_V1_STR}/search")
+@app.get("/api/search", include_in_schema=False)
+async def global_cross_entity_search(q: str = ""):
+    """
+    Real cross-entity global search querying:
+    - Analyzed documents in history
+    - Workspace projects
+    - Scholarly reference corpus
+    """
+    results = StorageService.global_search(q, limit=15)
+    return results
+
+
+# --- 9. STATIC FRONTEND MOUNT ---
 FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "frontend"
 try:
     FRONTEND_DIR.mkdir(parents=True, exist_ok=True)
@@ -679,3 +780,4 @@ try:
     app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
 except Exception as e:
     logger.warning(f"Could not mount frontend static files: {e}")
+

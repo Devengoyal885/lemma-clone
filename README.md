@@ -1,6 +1,6 @@
-# Lemma 🎓
+# Lemma 2.0 🎓
 
-> **Local-First Plagiarism Detection, Document Intelligence & AI Rewriting Platform**
+> **Local-First Academic Plagiarism Detection, Document Intelligence & Pandaz PDF Toolkit**
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776ab?style=flat-square&logo=python)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
@@ -8,52 +8,53 @@
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 [![Lemma](https://img.shields.io/badge/Lemma-2.0-blueviolet?style=flat-square)](https://github.com/Devengoyal885/lemma-clone)
 
-Lemma is a high-performance, **privacy-first** plagiarism detection engine that works completely locally on your machine. No cloud uploads. No API keys. No subscriptions. Analyze documents for plagiarism, receive detailed originality reports, get AI rewriting suggestions—all without leaving your device.
-
-Perfect for:
-- ✍️ Students writing essays and thesis papers
-- 🏫 Educators checking student submissions
-- 🔬 Researchers ensuring original contributions
-- 💼 Content creators verifying text authenticity
-- ⚖️ Legal professionals confirming document originality
-
+Lemma 2.0 is a state-of-the-art, **privacy-first** academic document intelligence platform designed as a **Scholarly Instrument** (manuscript-and-margin-notes layout, leader lines, paper/ink themes, high data density). Everything runs completely locally in zero-dependency Lite Mode with standard Python.
 
 ---
 
-## ✨ Key Features
+## ✨ Key Features & Navigation
 
-### 🔍 Dual-Tier Plagiarism Detection
+### 1. 🔍 Dual-Tier Plagiarism & Originality Engine
 - **Lexical Matching**: TF-IDF + Cosine Similarity for exact/near-exact copy detection
 - **Semantic Matching**: SentenceTransformer embeddings for paraphrased content detection
-- **Hybrid Scoring**: Combined confidence scores for accuracy
-- **Character-Level Precision**: Exact coordinate mapping (`start_char`, `end_char`) for highlighting
+- **Hybrid Scoring**: Combined confidence scores with multi-type breakdown
+- **Character Coordinate Inspector**: SpaCy sentence segmentation with absolute `start_char` and `end_char` offsets linked to interactive margin notes
 
-### 📊 Rich Document Analytics
-- Word count, character count, sentence count
-- Flesch Reading Ease score (0-100)
-- Grade-level complexity assessment
-- Estimated reading time
-- Lexical diversity metrics
+### 2. 📝 Scholarly Paraphraser Workbench
+- **6 Target Tones**: Academic, Professional, Simple, Concise, Detailed, Creative
+- **Batch Paraphrasing**: "Rewrite All Flagged Sentences" with real-time progress
+- **Live Re-Analyze**: Verified before→after score recalculation
+- **Word Count & Diff Metrics**: Instant comparative word and character statistics
 
-### 🤖 AI-Powered Text Rewriting
-- Local LLM support via **Ollama** (no cloud calls)
-- Multiple tone options: Academic, Professional, Standard, Creative
-- Graceful fallback when Ollama unavailable
-- Preserves meaning while eliminating plagiarism
+### 3. 🤖 Ask Lemma (Context-Aware Document RAG Assistant)
+- Real-time retrieval across document chunks, similarity matches, and readability metrics
+- Deterministic local answers for factual queries ("What is my plagiarism score?", "Highest similarity match?")
+- Local LLM support via Ollama with streaming tokens and graceful offline fallback
 
-### 📄 Professional PDF Reports
-- Publication-ready PDF generation
-- Color-coded plagiarism highlighting
-- Detailed match breakdown
-- Source attribution
-- Statistical summaries
+### 4. 📚 Scholarly Sources Discovery
+- Filterable match provenance (All, Lexical, Semantic, Hybrid)
+- Live multi-provider academic discovery (Wikipedia, OpenAlex, Crossref, arXiv, local corpus) with timeout resilience
 
-### 🌐 Web-Based UI
-- Dark/Light theme toggle
-- Responsive design (mobile, tablet, desktop)
-- Real-time progress indicators
-- Analysis history with localStorage
-- Drag-and-drop file upload
+### 5. 📄 Publication-Ready Integrity Reports
+- Direct WeasyPrint/ReportLab PDF report downloads with color-coded highlighting
+- Complete score breakdown, matched sentence tables, and recommendations
+
+### 6. 🐼 Pandaz PDF Intelligence Suite
+- **Merge PDFs**: Combine multiple documents into one publication
+- **Split PDF**: Extract specific page ranges
+- **Compress PDF**: Binary stream optimization with real before/after size stats
+- **PDF → CSV**: Extract tabular data
+- **Rename & Sanitize**: Clean filename metadata formatting
+- **Sign & Annotate**: Draw digital signatures or place annotations
+- **OCR Scanned PDF**: Extract text from scanned paper PDFs
+- **AI PDF Summarizer**: Executive TL;DR, core insights, and keyword taxonomy
+- **1-Click "Analyze with Lemma"**: Direct analysis handoff from any Pandaz output into the manuscript desk!
+
+### 7. 🗂️ History, Workspace Projects & Command Palette (Ctrl+K)
+- Structured persistence for historical analysis runs
+- Workspace project grouping for documents, chats, and sources
+- Instant fuzzy global search across all entities via `Ctrl+K`
+
 
 ### ⚡ Two Execution Modes
 

@@ -1,920 +1,640 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="description" content="Lemma 2.0 - AI-Powered Document Intelligence, Plagiarism Detection, Originality Analysis, and Pandaz PDF Tools.">
-    <title>Lemma 2.0 - Document Intelligence & Originality Workspace</title>
-    <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
-    <!-- Google Fonts: Inter & Outfit -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/mobile.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Lemma 2.0 — Local-First AI Document Intelligence, Scholarly Plagiarism Detection & Pandaz PDF Toolkit.">
+  <title>Lemma 2.0 — Scholarly Document Intelligence & Originality Workspace</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Scholarly Instrument Design System -->
+  <link rel="stylesheet" href="assets/css/scholarly.css">
 </head>
-
 <body>
-    <!-- Background Atmospheric Fog Overlays -->
-    <div class="fog-overlay fog-1"></div>
-    <div class="fog-overlay fog-2"></div>
 
-    <div class="app-container" id="app-container-el">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar" id="sidebar-panel">
-            <div class="sidebar-brand" id="brand-logo-btn">
-                <svg class="brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-purple); flex-shrink: 0;">
-                    <path d="M7 3v11c0 2.2 1.8 4 4 4h6"></path>
-                    <circle cx="15" cy="9" r="4"></circle>
-                    <line x1="18" y1="12" x2="21" y2="15"></line>
-                    <path d="M13.5 9l1 1 1.5-1.5"></path>
-                </svg>
-                <div class="brand-text">
-                    <h1>Lemma <span class="badge-version">2.0</span></h1>
-                    <span>Document Intelligence</span>
-                </div>
-            </div>
-
-            <nav class="sidebar-nav">
-                <div class="nav-section-title">LEMMA WORKSPACE</div>
-                <ul>
-                    <li class="nav-item active" id="nav-dashboard" data-target="view-dashboard">
-                        <a href="#dashboard">
-                            <i class="fa-solid fa-gauge-high"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" id="nav-analyze" data-target="view-analyze">
-                        <a href="#analyze">
-                            <i class="fa-solid fa-magnifying-glass-chart"></i>
-                            <span>Analyze</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" id="nav-asklemma" data-target="view-asklemma">
-                        <a href="#asklemma">
-                            <i class="fa-solid fa-robot"></i>
-                            <span>Ask Lemma</span>
-                            <span class="nav-badge">AI</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" id="nav-paraphrase" data-target="view-paraphrase">
-                        <a href="#paraphrase">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                            <span>Paraphraser</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" id="nav-sources" data-target="view-sources">
-                        <a href="#sources">
-                            <i class="fa-solid fa-book-bookmark"></i>
-                            <span>Sources</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" id="nav-reports" data-target="view-reports">
-                        <a href="#reports">
-                            <i class="fa-solid fa-file-invoice"></i>
-                            <span>Reports</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" id="nav-history" data-target="view-history">
-                        <a href="#history">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-                            <span>History</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" id="nav-workspace" data-target="view-workspace">
-                        <a href="#workspace">
-                            <i class="fa-solid fa-folder-tree"></i>
-                            <span>Workspace</span>
-                        </a>
-                    </li>
-                </ul>
-
-                <div class="nav-section-title">TOOLS & SUITE</div>
-                <ul>
-                    <li class="nav-item pandaz-nav-item" id="nav-pandaz" data-target="view-pandaz">
-                        <a href="#pandaz">
-                            <span class="pandaz-icon">🐼</span>
-                            <span class="pandaz-text">Pandaz PDF Tools</span>
-                            <span class="pandaz-badge">PRO</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" id="nav-settings" data-target="view-settings">
-                        <a href="#settings">
-                            <i class="fa-solid fa-sliders"></i>
-                            <span>Settings & Status</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="system-status-indicator" id="system-status-indicator">
-                    <span class="status-dot online"></span>
-                    <span class="status-label">Lemma Lite Ready</span>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <!-- Top App Bar -->
-            <header class="app-header">
-                <div class="header-left">
-                    <button class="mobile-toggle-btn" id="mobile-menu-toggle" aria-label="Toggle Menu">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                    <div class="breadcrumb" id="header-breadcrumb">
-                        <span class="breadcrumb-item active" id="current-page-title">Dashboard</span>
-                    </div>
-                </div>
-
-                <div class="header-center">
-                    <button class="command-search-btn" id="command-palette-trigger">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <span>Search tools, documents, chats...</span>
-                        <kbd>Ctrl + K</kbd>
-                    </button>
-                </div>
-
-                <div class="header-right">
-                    <button class="btn btn-outline btn-sm" id="header-quick-pandaz-btn">
-                        <span>🐼 Pandaz PDF</span>
-                    </button>
-                    <button class="btn btn-primary btn-sm" id="header-quick-analyze-btn">
-                        <i class="fa-solid fa-plus"></i>
-                        <span>Analyze New</span>
-                    </button>
-                    <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle Theme">
-                        <i class="fa-solid fa-moon"></i>
-                    </button>
-                </div>
-            </header>
-
-            <!-- Content Views Container -->
-            <div class="view-viewport">
-
-                <!-- 1. DASHBOARD VIEW -->
-                <section class="view-section active" id="view-dashboard">
-                    <div class="dashboard-hero">
-                        <div class="hero-content">
-                            <h2>Welcome to <span class="gradient-text">Lemma 2.0</span></h2>
-                            <p>AI-Powered Document Intelligence, Plagiarism Analysis, and Complete Pandaz PDF Toolkit.</p>
-                            
-                            <div class="hero-actions">
-                                <button class="btn btn-primary btn-lg" id="dash-btn-analyze">
-                                    <i class="fa-solid fa-file-arrow-up"></i>
-                                    <span>Analyze Document</span>
-                                </button>
-                                <button class="btn btn-secondary btn-lg" id="dash-btn-paste">
-                                    <i class="fa-solid fa-paste"></i>
-                                    <span>Paste Text</span>
-                                </button>
-                                <button class="btn btn-pandaz btn-lg" id="dash-btn-pandaz">
-                                    <span>🐼 Open Pandaz PDF</span>
-                                </button>
-                                <button class="btn btn-outline btn-lg" id="dash-btn-sample">
-                                    <i class="fa-solid fa-flask"></i>
-                                    <span>Try Sample Analysis</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="hero-stat-card">
-                            <div class="stat-pill-header">
-                                <i class="fa-solid fa-shield-halved"></i>
-                                <span>Integrity Overview</span>
-                            </div>
-                            <div class="stat-big-score" id="dash-overall-score">94%</div>
-                            <div class="stat-subtext">Average Document Originality</div>
-                            <div class="stat-mini-metrics">
-                                <div class="mini-stat">
-                                    <span class="mini-val" id="dash-stat-docs">0</span>
-                                    <span class="mini-lbl">Documents</span>
-                                </div>
-                                <div class="mini-stat">
-                                    <span class="mini-val" id="dash-stat-matches">0</span>
-                                    <span class="mini-lbl">Matches Flagged</span>
-                                </div>
-                                <div class="mini-stat">
-                                    <span class="mini-val" id="dash-stat-words">0</span>
-                                    <span class="mini-lbl">Words Analyzed</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Tools Grid -->
-                    <div class="section-block">
-                        <div class="section-header">
-                            <h3><i class="fa-solid fa-bolt"></i> Quick Actions & Workspaces</h3>
-                        </div>
-                        <div class="quick-cards-grid">
-                            <div class="feature-card" data-action="goto-analyze">
-                                <div class="card-icon" style="background: rgba(99, 102, 241, 0.15); color: #6366f1;">
-                                    <i class="fa-solid fa-magnifying-glass-chart"></i>
-                                </div>
-                                <h4>Plagiarism Engine</h4>
-                                <p>Hybrid TF-IDF & N-gram coordinate detection across academic and online sources.</p>
-                            </div>
-
-                            <div class="feature-card" data-action="goto-asklemma">
-                                <div class="card-icon" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
-                                    <i class="fa-solid fa-robot"></i>
-                                </div>
-                                <h4>Ask Lemma AI</h4>
-                                <p>Context-aware assistant that answers questions directly about your active document.</p>
-                            </div>
-
-                            <div class="feature-card" data-action="goto-paraphrase">
-                                <div class="card-icon" style="background: rgba(236, 72, 153, 0.15); color: #ec4899;">
-                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                                </div>
-                                <h4>Paraphraser</h4>
-                                <p>Academic, Professional, and Concise rewriting with single-click batch replace.</p>
-                            </div>
-
-                            <div class="feature-card" data-action="goto-pandaz">
-                                <div class="card-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
-                                    <span style="font-size: 20px;">🐼</span>
-                                </div>
-                                <h4>Pandaz PDF Tools</h4>
-                                <p>Merge, split, compress, extract tables to CSV, sign, OCR, and summarize PDFs.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Recent Analyses & Documents -->
-                    <div class="section-block">
-                        <div class="section-header">
-                            <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity & Documents</h3>
-                            <button class="btn btn-ghost btn-sm" id="dash-view-all-history">View All History</button>
-                        </div>
-                        <div class="table-container">
-                            <table class="data-table" id="dash-recent-table">
-                                <thead>
-                                    <tr>
-                                        <th>Document Name</th>
-                                        <th>Analyzed At</th>
-                                        <th>Words</th>
-                                        <th>Plagiarism</th>
-                                        <th>Originality</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dash-recent-tbody">
-                                    <tr class="empty-row">
-                                        <td colspan="6">No recent documents analyzed yet. Click <strong>Analyze Document</strong> or <strong>Try Sample</strong> to begin.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 2. ANALYZE VIEW (Upload, Paste, Results & Highlighting) -->
-                <section class="view-section" id="view-analyze">
-                    <div class="view-header-bar">
-                        <div>
-                            <h2>Document Originality & Plagiarism Analysis</h2>
-                            <p>Upload a file or paste text to perform granular sentence-by-sentence analysis.</p>
-                        </div>
-                        <div class="analyze-mode-tabs">
-                            <button class="tab-btn active" id="tab-upload-btn">
-                                <i class="fa-solid fa-file-arrow-up"></i> Upload Document
-                            </button>
-                            <button class="tab-btn" id="tab-paste-btn">
-                                <i class="fa-solid fa-paste"></i> Paste Text
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Mode 1: File Upload Box -->
-                    <div class="analyze-input-panel" id="panel-upload">
-                        <div class="dropzone-box" id="upload-dropzone">
-                            <input type="file" id="file-input" accept=".pdf,.docx,.txt" class="file-input-hidden">
-                            <div class="dropzone-content">
-                                <i class="fa-solid fa-cloud-arrow-up dropzone-icon"></i>
-                                <h3>Drag & drop your document here</h3>
-                                <p>Supports <strong>PDF, DOCX, TXT</strong> (Up to 100 MB)</p>
-                                <button class="btn btn-primary" id="btn-browse-file">Browse Files</button>
-                            </div>
-                        </div>
-
-                        <div class="upload-progress-container" id="upload-progress-wrapper" style="display: none;">
-                            <div class="progress-info">
-                                <span id="progress-filename">document.pdf</span>
-                                <span id="progress-percent">0%</span>
-                            </div>
-                            <div class="progress-bar-track">
-                                <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%;"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Mode 2: Paste Text Box -->
-                    <div class="analyze-input-panel" id="panel-paste" style="display: none;">
-                        <div class="paste-textarea-wrapper">
-                            <textarea id="paste-textarea" placeholder="Paste your academic text, essay, paper, or manuscript here for instant originality verification..." rows="10"></textarea>
-                            
-                            <div class="paste-toolbar">
-                                <div class="live-counters">
-                                    <span id="paste-char-count">0 characters</span>
-                                    <span class="dot-divider">•</span>
-                                    <span id="paste-word-count">0 words</span>
-                                    <span class="dot-divider">•</span>
-                                    <span id="paste-sent-count">0 sentences</span>
-                                </div>
-                                <div class="paste-actions">
-                                    <button class="btn btn-ghost btn-sm" id="btn-clear-paste">Clear</button>
-                                    <button class="btn btn-outline btn-sm" id="btn-sample-paste">Try Sample</button>
-                                    <button class="btn btn-primary btn-sm" id="btn-analyze-paste">
-                                        <i class="fa-solid fa-magnifying-glass"></i> Analyze Originality
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Analysis Results Display (Shown after analysis) -->
-                    <div class="analysis-results-container" id="analysis-results-wrapper" style="display: none;">
-                        
-                        <!-- Top Integrity Summary Cards -->
-                        <div class="results-score-row">
-                            <!-- Circular Plagiarism Gauge Card -->
-                            <div class="result-score-card primary-gauge-card">
-                                <div class="gauge-header">Plagiarism Score</div>
-                                <div class="gauge-display-val" id="res-plag-val">0%</div>
-                                <div class="gauge-subtitle" id="res-plag-subtitle">Matches Found</div>
-                            </div>
-
-                            <div class="result-score-card originality-card">
-                                <div class="gauge-header">Originality Score</div>
-                                <div class="gauge-display-val text-success" id="res-orig-val">100%</div>
-                                <div class="gauge-subtitle">Unique Content</div>
-                            </div>
-
-                            <div class="result-score-card metrics-breakdown-card">
-                                <div class="gauge-header">Match Breakdown</div>
-                                <div class="match-counts-list">
-                                    <div class="count-item text-danger">
-                                        <span>Lexical Matches:</span>
-                                        <strong id="res-count-lexical">0</strong>
-                                    </div>
-                                    <div class="count-item text-warning">
-                                        <span>Hybrid Matches:</span>
-                                        <strong id="res-count-hybrid">0</strong>
-                                    </div>
-                                    <div class="count-item text-purple">
-                                        <span>Semantic Matches:</span>
-                                        <strong id="res-count-semantic">0</strong>
-                                    </div>
-                                    <div class="count-item text-muted">
-                                        <span>Total Sentences:</span>
-                                        <strong id="res-count-total">0</strong>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="result-score-card readability-metrics-card">
-                                <div class="gauge-header">Document Analytics</div>
-                                <div class="analytics-mini-grid">
-                                    <div><span class="lbl">Words:</span> <strong id="res-words">0</strong></div>
-                                    <div><span class="lbl">Reading Ease:</span> <strong id="res-reading-ease">0</strong></div>
-                                    <div><span class="lbl">Grade Level:</span> <strong id="res-grade-level">0</strong></div>
-                                    <div><span class="lbl">Reading Time:</span> <strong id="res-reading-time">0m</strong></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Results Toolbar Actions -->
-                        <div class="results-action-bar">
-                            <div class="doc-title-badge">
-                                <i class="fa-solid fa-file-lines"></i>
-                                <span id="res-doc-title">Document Name</span>
-                            </div>
-                            <div class="results-buttons">
-                                <button class="btn btn-outline btn-sm" id="btn-open-in-pandaz">
-                                    <span>🐼 Open in Pandaz PDF</span>
-                                </button>
-                                <button class="btn btn-outline btn-sm" id="btn-ask-about-doc">
-                                    <i class="fa-solid fa-robot"></i> Ask Lemma
-                                </button>
-                                <button class="btn btn-secondary btn-sm" id="btn-rewrite-flagged">
-                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Rewrite Flagged
-                                </button>
-                                <button class="btn btn-primary btn-sm" id="btn-download-report-direct">
-                                    <i class="fa-solid fa-file-pdf"></i> Download PDF Report
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Side by Side Document Highlight Viewer & Match Inspector -->
-                        <div class="document-viewer-layout">
-                            <div class="document-text-container">
-                                <div class="container-header">
-                                    <h4>Analyzed Document with Real Sentence Coordinates</h4>
-                                    <span class="hint-text">Click any highlighted sentence to inspect match source & rewrite</span>
-                                </div>
-                                <div class="highlighted-text-box" id="document-text-rendered">
-                                    <!-- Rendered dynamically with <mark> tags -->
-                                </div>
-                            </div>
-
-                            <div class="match-sidebar-container">
-                                <div class="container-header">
-                                    <h4>Flagged Matches (<span id="matches-count-badge">0</span>)</h4>
-                                </div>
-                                <div class="matches-list-scroll" id="matches-list-wrapper">
-                                    <!-- Populated dynamically with match cards -->
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </section>
-
-                <!-- 3. ASK LEMMA AI VIEW -->
-                <section class="view-section" id="view-asklemma">
-                    <div class="chat-view-container">
-                        <div class="chat-header">
-                            <div class="chat-title-info">
-                                <h3><i class="fa-solid fa-robot gradient-icon"></i> Ask Lemma</h3>
-                                <p>Context-Aware Document Intelligence Assistant</p>
-                            </div>
-                            <div class="active-doc-pill" id="chat-active-doc-pill">
-                                <i class="fa-solid fa-file-lines"></i>
-                                <span id="chat-doc-name">No Active Document Loaded</span>
-                            </div>
-                        </div>
-
-                        <!-- Prompt Suggestion Chips -->
-                        <div class="chat-suggestions-bar">
-                            <button class="chip-btn" data-prompt="What is my plagiarism score?">📊 What is my plagiarism score?</button>
-                            <button class="chip-btn" data-prompt="Show my top 5 sources">📚 Show my top 5 sources</button>
-                            <button class="chip-btn" data-prompt="Which sentence has the highest similarity?">🚨 Which sentence has highest match?</button>
-                            <button class="chip-btn" data-prompt="Summarize this document">📝 Summarize document</button>
-                            <button class="chip-btn" data-prompt="Find claims that need citations">🔍 Find claims needing citations</button>
-                            <button class="chip-btn" data-prompt="Document analytics and readability">📈 Document analytics</button>
-                        </div>
-
-                        <!-- Messages Container -->
-                        <div class="chat-messages-container" id="chat-messages-box">
-                            <div class="chat-message assistant">
-                                <div class="message-avatar"><i class="fa-solid fa-robot"></i></div>
-                                <div class="message-content">
-                                    <p>Hello! I am <strong>Lemma</strong>, your context-aware research and originality assistant.</p>
-                                    <p>I have access to your active document's text, plagiarism scores, sentence coordinates, and matched sources. How can I help you today?</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Chat Input Box -->
-                        <div class="chat-input-wrapper">
-                            <div class="chat-input-bar">
-                                <textarea id="chat-input-text" placeholder="Ask Lemma about your document, plagiarism breakdown, sources, summaries..." rows="1"></textarea>
-                                <button class="btn btn-primary btn-icon" id="btn-send-chat" aria-label="Send Message">
-                                    <i class="fa-solid fa-paper-plane"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 4. PARAPHRASER VIEW -->
-                <section class="view-section" id="view-paraphrase">
-                    <div class="view-header-bar">
-                        <div>
-                            <h2>Academic & Professional Paraphraser</h2>
-                            <p>Eliminate plagiarism by reformulating passages with fine-tuned tone control.</p>
-                        </div>
-                        <div class="ai-status-badge" id="paraphrase-provider-badge">
-                            <span class="badge badge-info">OFFLINE REWRITE ACTIVE</span>
-                        </div>
-                    </div>
-
-                    <!-- Tone Selectors -->
-                    <div class="tone-selector-bar">
-                        <span class="tone-label">Tone:</span>
-                        <button class="tone-btn active" data-tone="academic">Academic</button>
-                        <button class="tone-btn" data-tone="professional">Professional</button>
-                        <button class="tone-btn" data-tone="formal">Formal</button>
-                        <button class="tone-btn" data-tone="simple">Simple</button>
-                        <button class="tone-btn" data-tone="concise">Concise</button>
-                        <button class="tone-btn" data-tone="detailed">Detailed</button>
-                    </div>
-
-                    <!-- Paraphrase Dual Workspace -->
-                    <div class="paraphrase-grid">
-                        <div class="paraphrase-box">
-                            <div class="box-header">
-                                <span>Original Text</span>
-                                <button class="btn btn-ghost btn-xs" id="btn-copy-original">Copy</button>
-                            </div>
-                            <textarea id="paraphrase-input" placeholder="Enter or select a sentence or paragraph to rewrite..." rows="8"></textarea>
-                        </div>
-
-                        <div class="paraphrase-box">
-                            <div class="box-header">
-                                <span>Rewritten Result</span>
-                                <div class="box-actions">
-                                    <button class="btn btn-ghost btn-xs" id="btn-copy-rewritten">Copy</button>
-                                    <button class="btn btn-outline btn-xs" id="btn-replace-in-doc">Replace in Document</button>
-                                </div>
-                            </div>
-                            <div class="rewritten-output-box" id="paraphrase-output">
-                                <span class="placeholder-text">Click 'Paraphrase' to generate rewrite...</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="paraphrase-controls">
-                        <button class="btn btn-primary btn-lg" id="btn-execute-paraphrase">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> Paraphrase Text
-                        </button>
-                        <button class="btn btn-secondary btn-lg" id="btn-batch-rewrite-all">
-                            <i class="fa-solid fa-bolt"></i> Rewrite All Flagged Sentences
-                        </button>
-                    </div>
-
-                    <!-- Batch Progress Bar (if running batch rewrite) -->
-                    <div class="batch-progress-wrapper" id="batch-progress-box" style="display: none;">
-                        <div class="batch-header">
-                            <span id="batch-progress-status">Rewriting flagged sentences: 0 / 0</span>
-                            <button class="btn btn-ghost btn-xs text-danger" id="btn-cancel-batch">Cancel</button>
-                        </div>
-                        <div class="progress-bar-track">
-                            <div class="progress-bar-fill" id="batch-progress-bar" style="width: 0%;"></div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 5. SOURCES VIEW -->
-                <section class="view-section" id="view-sources">
-                    <div class="view-header-bar">
-                        <div>
-                            <h2>Source Discovery & Reference Explorer</h2>
-                            <p>Matched document references and live external discovery across scholarly databases.</p>
-                        </div>
-                    </div>
-
-                    <!-- Filter Tabs -->
-                    <div class="sources-filter-bar">
-                        <div class="filter-group">
-                            <button class="filter-btn active" data-filter="all">All Sources</button>
-                            <button class="filter-btn" data-filter="lexical">Lexical</button>
-                            <button class="filter-btn" data-filter="hybrid">Hybrid</button>
-                            <button class="filter-btn" data-filter="semantic">Semantic</button>
-                        </div>
-
-                        <!-- Live Search Input -->
-                        <div class="sources-search-box">
-                            <input type="text" id="sources-search-input" placeholder="Discover external scholarly sources (Wikipedia, OpenAlex, Crossref, arXiv)...">
-                            <button class="btn btn-primary btn-sm" id="btn-search-sources">
-                                <i class="fa-solid fa-magnifying-glass"></i> Discover
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Sources Cards Grid -->
-                    <div class="sources-cards-grid" id="sources-grid-wrapper">
-                        <!-- Populated dynamically -->
-                    </div>
-                </section>
-
-                <!-- 6. REPORTS VIEW -->
-                <section class="view-section" id="view-reports">
-                    <div class="view-header-bar">
-                        <div>
-                            <h2>Lemma Integrity Reports</h2>
-                            <p>Official publication-grade verification reports with highlight breakdowns.</p>
-                        </div>
-                        <button class="btn btn-primary" id="btn-generate-report-view">
-                            <i class="fa-solid fa-file-pdf"></i> Generate & Download PDF
-                        </button>
-                    </div>
-
-                    <div class="report-preview-container" id="report-preview-box">
-                        <div class="report-paper">
-                            <div class="report-header-banner">
-                                <div>
-                                    <h1>LEMMA INTEGRITY REPORT</h1>
-                                    <p>Official Verification Document • Local-First Security</p>
-                                </div>
-                                <div class="report-badge-date" id="rep-date">2026-08-30</div>
-                            </div>
-
-                            <div class="report-meta-grid">
-                                <div><span>Document:</span> <strong id="rep-filename">None</strong></div>
-                                <div><span>Plagiarism Score:</span> <strong id="rep-plag-score" class="text-danger">0%</strong></div>
-                                <div><span>Originality Score:</span> <strong id="rep-orig-score" class="text-success">100%</strong></div>
-                                <div><span>Analyzed Sentences:</span> <strong id="rep-sentences">0</strong></div>
-                            </div>
-
-                            <div class="report-section-block">
-                                <h3>Executive Integrity Summary</h3>
-                                <p id="rep-summary-text">Upload or analyze a document to generate a complete verification report.</p>
-                            </div>
-
-                            <div class="report-section-block">
-                                <h3>Reference Sources Attributed</h3>
-                                <div id="rep-sources-list">No sources matched yet.</div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 7. HISTORY VIEW -->
-                <section class="view-section" id="view-history">
-                    <div class="view-header-bar">
-                        <div>
-                            <h2>Analysis History</h2>
-                            <p>Locally persisted analyses, reports, and document stats.</p>
-                        </div>
-                        <button class="btn btn-ghost text-danger btn-sm" id="btn-clear-history">
-                            <i class="fa-solid fa-trash"></i> Clear History
-                        </button>
-                    </div>
-
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Document Title</th>
-                                    <th>Timestamp</th>
-                                    <th>Words</th>
-                                    <th>Plagiarism</th>
-                                    <th>Originality</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="history-table-tbody">
-                                <!-- Populated dynamically -->
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <!-- 8. WORKSPACE VIEW -->
-                <section class="view-section" id="view-workspace">
-                    <div class="view-header-bar">
-                        <div>
-                            <h2>Workspace & Document Manager</h2>
-                            <p>Organize, manage, and inspect your documents, chats, and reports.</p>
-                        </div>
-                        <button class="btn btn-primary btn-sm" id="btn-workspace-new-doc">
-                            <i class="fa-solid fa-plus"></i> New Document
-                        </button>
-                    </div>
-
-                    <div class="workspace-grid" id="workspace-grid-container">
-                        <!-- Populated dynamically -->
-                    </div>
-                </section>
-
-                <!-- 9. PANDAZ PDF TOOLS VIEW -->
-                <section class="view-section" id="view-pandaz">
-                    <div class="pandaz-hero-banner">
-                        <div class="pandaz-hero-content">
-                            <div class="pandaz-pill">
-                                <span>🐼 PANDaz PDF SUITE</span>
-                            </div>
-                            <h2>Pandaz PDF Tools</h2>
-                            <p>Everything you need to work with PDFs — fast, private, simple, and fully integrated with Lemma.</p>
-                        </div>
-                    </div>
-
-                    <!-- Pandaz Tools Grid -->
-                    <div class="pandaz-tools-grid">
-                        
-                        <!-- Tool 1: Merge PDF -->
-                        <div class="pandaz-card" data-tool="merge">
-                            <div class="pandaz-card-icon" style="background: rgba(99, 102, 241, 0.15); color: #6366f1;">
-                                <i class="fa-solid fa-object-group"></i>
-                            </div>
-                            <h3>Merge PDF</h3>
-                            <p>Combine multiple PDF files into one clean document in your chosen order.</p>
-                            <button class="btn btn-primary btn-sm btn-pandaz-launch" data-tool="merge">Launch Tool</button>
-                        </div>
-
-                        <!-- Tool 2: Split PDF -->
-                        <div class="pandaz-card" data-tool="split">
-                            <div class="pandaz-card-icon" style="background: rgba(236, 72, 153, 0.15); color: #ec4899;">
-                                <i class="fa-solid fa-scissors"></i>
-                            </div>
-                            <h3>Split PDF</h3>
-                            <p>Extract specific page ranges (e.g. 1-3, 5, 8-10) into a new document.</p>
-                            <button class="btn btn-primary btn-sm btn-pandaz-launch" data-tool="split">Launch Tool</button>
-                        </div>
-
-                        <!-- Tool 3: Compress PDF -->
-                        <div class="pandaz-card" data-tool="compress">
-                            <div class="pandaz-card-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
-                                <i class="fa-solid fa-file-zipper"></i>
-                            </div>
-                            <h3>Compress PDF</h3>
-                            <p>Reduce file size without quality degradation. Remove duplicate streams.</p>
-                            <button class="btn btn-primary btn-sm btn-pandaz-launch" data-tool="compress">Launch Tool</button>
-                        </div>
-
-                        <!-- Tool 4: PDF to CSV -->
-                        <div class="pandaz-card" data-tool="csv">
-                            <div class="pandaz-card-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
-                                <i class="fa-solid fa-table"></i>
-                            </div>
-                            <h3>PDF → CSV</h3>
-                            <p>Extract structured tables and tabular text directly into downloadable CSV format.</p>
-                            <button class="btn btn-primary btn-sm btn-pandaz-launch" data-tool="csv">Launch Tool</button>
-                        </div>
-
-                        <!-- Tool 5: Rename PDF -->
-                        <div class="pandaz-card" data-tool="rename">
-                            <div class="pandaz-card-icon" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">
-                                <i class="fa-solid fa-file-pen"></i>
-                            </div>
-                            <h3>Rename PDF</h3>
-                            <p>Safely rename your PDF without altering or overwriting the original file.</p>
-                            <button class="btn btn-primary btn-sm btn-pandaz-launch" data-tool="rename">Launch Tool</button>
-                        </div>
-
-                        <!-- Tool 6: Edit & Sign PDF -->
-                        <div class="pandaz-card" data-tool="sign">
-                            <div class="pandaz-card-icon" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
-                                <i class="fa-solid fa-signature"></i>
-                            </div>
-                            <h3>Edit & Sign PDF</h3>
-                            <p>Place digital signatures, annotations, and text overlays onto PDF pages.</p>
-                            <button class="btn btn-primary btn-sm btn-pandaz-launch" data-tool="sign">Launch Tool</button>
-                        </div>
-
-                        <!-- Tool 7: OCR Handwriting & Image to Text -->
-                        <div class="pandaz-card" data-tool="ocr">
-                            <div class="pandaz-card-icon" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
-                                <i class="fa-solid fa-eye"></i>
-                            </div>
-                            <h3>OCR Text Extraction</h3>
-                            <p>Extract machine-readable text from scanned PDFs and images with confidence score.</p>
-                            <button class="btn btn-primary btn-sm btn-pandaz-launch" data-tool="ocr">Launch Tool</button>
-                        </div>
-
-                        <!-- Tool 8: AI PDF Summarizer -->
-                        <div class="pandaz-card" data-tool="summarizer">
-                            <div class="pandaz-card-icon" style="background: rgba(20, 184, 166, 0.15); color: #14b8a6;">
-                                <i class="fa-solid fa-brain"></i>
-                            </div>
-                            <h3>AI PDF Summarizer</h3>
-                            <p>Generate instant executive summaries, key points, sections, and keywords.</p>
-                            <button class="btn btn-primary btn-sm btn-pandaz-launch" data-tool="summarizer">Launch Tool</button>
-                        </div>
-
-                        <!-- Tool 9: Rotate & Manage Pages -->
-                        <div class="pandaz-card" data-tool="rotate">
-                            <div class="pandaz-card-icon" style="background: rgba(100, 116, 139, 0.15); color: #64748b;">
-                                <i class="fa-solid fa-rotate-right"></i>
-                            </div>
-                            <h3>Rotate & Manage</h3>
-                            <p>Rotate pages 90°/180° or delete unwanted pages in a single operation.</p>
-                            <button class="btn btn-primary btn-sm btn-pandaz-launch" data-tool="rotate">Launch Tool</button>
-                        </div>
-                    </div>
-
-                    <!-- Active Pandaz Modal / Interactive Workbench -->
-                    <div class="pandaz-modal" id="pandaz-workbench-modal" style="display: none;">
-                        <div class="pandaz-modal-content">
-                            <div class="modal-header">
-                                <h3 id="pandaz-modal-title">Pandaz Tool</h3>
-                                <button class="btn-close-modal" id="btn-close-pandaz-modal"><i class="fa-solid fa-xmark"></i></button>
-                            </div>
-                            <div class="modal-body" id="pandaz-modal-body">
-                                <!-- Populated dynamically based on tool selected -->
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 10. SETTINGS & SYSTEM STATUS VIEW -->
-                <section class="view-section" id="view-settings">
-                    <div class="view-header-bar">
-                        <div>
-                            <h2>Settings & System Status</h2>
-                            <p>Verify subsystem health, configure backend URLs, and manage platform preferences.</p>
-                        </div>
-                        <button class="btn btn-primary btn-sm" id="btn-refresh-status">
-                            <i class="fa-solid fa-arrows-rotate"></i> Refresh Status
-                        </button>
-                    </div>
-
-                    <div class="settings-grid">
-                        <div class="settings-card">
-                            <h3><i class="fa-solid fa-heart-pulse"></i> Subsystem Status</h3>
-                            <div class="status-list" id="settings-status-list">
-                                <div class="status-row"><span>FastAPI Backend:</span> <strong class="text-success">ONLINE</strong></div>
-                                <div class="status-row"><span>Plagiarism Engine:</span> <strong class="text-success">ONLINE (Lite Mode)</strong></div>
-                                <div class="status-row"><span>AI Assistant:</span> <strong id="set-ai-status">Checking...</strong></div>
-                                <div class="status-row"><span>Search Providers:</span> <strong class="text-success">ONLINE</strong></div>
-                                <div class="status-row"><span>Report Generator:</span> <strong class="text-success">ONLINE</strong></div>
-                                <div class="status-row"><span>Pandaz PDF Toolkit:</span> <strong class="text-success">ONLINE</strong></div>
-                            </div>
-                        </div>
-
-                        <div class="settings-card">
-                            <h3><i class="fa-solid fa-network-wired"></i> Backend Connection</h3>
-                            <div class="form-group">
-                                <label for="setting-api-url">API Base URL</label>
-                                <input type="text" id="setting-api-url" class="form-control" placeholder="http://localhost:8000">
-                                <small class="form-text">Supports localhost, Netlify, same-origin, or remote endpoints.</small>
-                            </div>
-                            <button class="btn btn-secondary btn-sm" id="btn-save-api-url">Save URL Override</button>
-                        </div>
-
-                        <div class="settings-card">
-                            <h3><i class="fa-solid fa-palette"></i> Interface Theme</h3>
-                            <div class="theme-choice-row">
-                                <button class="btn btn-outline btn-sm theme-choice-btn active" data-theme="dark">
-                                    <i class="fa-solid fa-moon"></i> Dark Theme
-                                </button>
-                                <button class="btn btn-outline btn-sm theme-choice-btn" data-theme="light">
-                                    <i class="fa-solid fa-sun"></i> Light Theme
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-            </div>
-        </main>
-    </div>
-
-    <!-- Match Details Modal -->
-    <div class="custom-modal" id="match-inspector-modal" style="display: none;">
-        <div class="modal-backdrop"></div>
-        <div class="modal-box">
-            <div class="modal-header">
-                <h3 id="modal-match-title">Match Details</h3>
-                <button class="btn-close-modal" id="btn-close-match-modal"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="modal-body">
-                <div class="match-meta-row">
-                    <span class="badge" id="modal-match-badge">Lexical Match</span>
-                    <span class="badge badge-danger" id="modal-match-score">85% Similarity</span>
-                </div>
-
-                <div class="modal-section">
-                    <label>Original Sentence in Document:</label>
-                    <blockquote id="modal-query-sentence">...</blockquote>
-                </div>
-
-                <div class="modal-section">
-                    <label>Matched Reference Sentence:</label>
-                    <blockquote id="modal-ref-sentence">...</blockquote>
-                </div>
-
-                <div class="modal-section">
-                    <label>Reference Provenance:</label>
-                    <div class="source-provenance-box">
-                        <strong id="modal-source-title">Source Title</strong>
-                        <div id="modal-source-author">Author</div>
-                        <div id="modal-source-pub">Publication Details</div>
-                    </div>
-                </div>
-
-                <div class="modal-actions">
-                    <button class="btn btn-primary" id="modal-btn-rewrite">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Rewrite in Paraphraser
-                    </button>
-                    <button class="btn btn-secondary" id="modal-btn-copy">
-                        <i class="fa-solid fa-copy"></i> Copy Sentence
-                    </button>
-                    <a href="#" target="_blank" class="btn btn-outline" id="modal-btn-view-source">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Source
-                    </a>
-                </div>
-            </div>
+  <div class="app-layout">
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside class="scholarly-sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="brand-link" title="Back to Homepage">
+          <div class="brand-mark">L</div>
+          <div class="brand-title">
+            <span class="brand-name">Lemma <span style="font-size:0.75rem; font-family:var(--font-mono); color:var(--accent-flag);">2.0</span></span>
+            <span class="brand-tagline">Scholarly Instrument</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="sidebar-nav-container">
+        <!-- WORKSPACE SECTION -->
+        <div class="nav-group">
+          <div class="nav-group-title">Scholarly Desk</div>
+          <ul class="nav-list">
+            <li>
+              <button class="nav-item-btn active" data-target="view-dashboard">
+                <i class="fa-solid fa-gauge-high"></i>
+                <span>Dashboard</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-target="view-analyze">
+                <i class="fa-solid fa-magnifying-glass-chart"></i>
+                <span>Analyze</span>
+                <span class="nav-badge">DESK</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-target="view-paraphrase">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>Paraphraser</span>
+                <span class="nav-badge">6 TONES</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-target="view-asklemma">
+                <i class="fa-solid fa-robot"></i>
+                <span>Ask Lemma</span>
+                <span class="nav-badge" style="background:var(--accent-scholarly-bg); color:var(--accent-scholarly);">RAG</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-target="view-sources">
+                <i class="fa-solid fa-book-bookmark"></i>
+                <span>Sources</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-target="view-reports">
+                <i class="fa-solid fa-file-invoice"></i>
+                <span>Reports</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-target="view-history">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>History</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-target="view-workspace">
+                <i class="fa-solid fa-folder-tree"></i>
+                <span>Workspace</span>
+              </button>
+            </li>
+          </ul>
         </div>
-    </div>
 
-    <!-- Command Palette (Ctrl + K) Modal -->
-    <div class="command-palette-modal" id="command-palette-modal" style="display: none;">
-        <div class="palette-backdrop"></div>
-        <div class="palette-box">
-            <div class="palette-search-bar">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="palette-search-input" placeholder="Type a command or search..." autofocus>
-                <kbd>ESC</kbd>
-            </div>
-            <div class="palette-results-list" id="palette-results-list">
-                <!-- Populated dynamically -->
-            </div>
+        <!-- PANDAZ PDF TOOLS -->
+        <div class="nav-group">
+          <div class="nav-group-title">PDF Intelligence</div>
+          <ul class="nav-list">
+            <li>
+              <button class="nav-item-btn" data-target="view-pandaz">
+                <i class="fa-solid fa-file-pdf" style="color:var(--accent-flag);"></i>
+                <span>Pandaz PDF Suite</span>
+                <span class="nav-badge">9 TOOLS</span>
+              </button>
+            </li>
+          </ul>
         </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="system-pill">
+          <span class="status-dot"></span>
+          <span id="system-status-text">Lite Mode: Local Ready</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="scholarly-header">
+      <div class="header-left">
+        <div class="breadcrumbs">
+          <span>Lemma</span>
+          <span>/</span>
+          <span class="breadcrumb-active" id="breadcrumb-active-label">Dashboard</span>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <button class="search-command-btn" title="Press Ctrl+K to search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span>Search documents, chats, sources...</span>
+          <span class="kbd-shortcut">Ctrl+K</span>
+        </button>
+      </div>
+
+      <div class="header-right">
+        <button class="btn btn-outline btn-sm" id="btn-paste-text-modal-trigger" onclick="document.getElementById('paste-text-modal').classList.add('open')">
+          <i class="fa-solid fa-file-pen"></i> Paste Text
+        </button>
+        <button class="theme-toggle-btn" aria-label="Toggle Theme" title="Toggle Ink/Paper Theme">
+          <i class="fa-solid fa-sun"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- ==================== MAIN CONTENT AREA ==================== -->
+    <main class="scholarly-main">
+
+      <!-- VIEW 1: DASHBOARD -->
+      <section id="view-dashboard" class="view-section active">
+        <div style="max-width:1100px; margin:0 auto;">
+          <div style="margin-bottom:1.5rem;">
+            <h1 style="font-family:var(--font-serif); font-size:2rem; font-weight:600; margin-bottom:0.35rem;">Manuscript Originality & Intelligence</h1>
+            <p style="color:var(--text-secondary); font-size:0.95rem;">High-precision local analysis, character coordinate inspection, multi-tone rewriting, and PDF tool workflows.</p>
+          </div>
+
+          <!-- Overview Cards -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1.25rem; margin-bottom:2rem;">
+            <div class="inspector-card">
+              <div class="inspector-header">
+                <span class="inspector-title">Plagiarism Rate</span>
+                <span class="score-badge danger" id="dash-plag-score">40.0%</span>
+              </div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">Lexical & semantic match ratio</div>
+            </div>
+
+            <div class="inspector-card">
+              <div class="inspector-header">
+                <span class="inspector-title">Originality Score</span>
+                <span class="score-badge clean" id="dash-orig-score">60.0%</span>
+              </div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">Clean verified manuscript text</div>
+            </div>
+
+            <div class="inspector-card">
+              <div class="inspector-header">
+                <span class="inspector-title">Word Count</span>
+                <span class="nav-badge" id="dash-words-count">76</span>
+              </div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">Active document length</div>
+            </div>
+
+            <div class="inspector-card">
+              <div class="inspector-header">
+                <span class="inspector-title">Grade Level</span>
+                <span class="nav-badge" id="dash-grade-level">Grade 12.4</span>
+              </div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">Flesch-Kincaid scale</div>
+            </div>
+          </div>
+
+          <!-- Active Manuscript Quick Banner -->
+          <div class="inspector-card" style="margin-bottom:2rem; background:linear-gradient(to right, var(--bg-primary), var(--bg-secondary));">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+              <div>
+                <div style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--text-muted); letter-spacing:0.08em;">ACTIVE MANUSCRIPT</div>
+                <h3 style="font-family:var(--font-serif); font-size:1.35rem; margin:0.25rem 0;" id="dash-doc-name">Neural Representation Learning & Research Integrity</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary);">Ready for coordinate inspection, margin notes review, and multi-tone paraphrasing.</p>
+              </div>
+              <div style="display:flex; gap:0.75rem;">
+                <button class="btn btn-primary" data-goto="view-analyze">
+                  <i class="fa-solid fa-magnifying-glass-chart"></i> Open Manuscript Desk
+                </button>
+                <button class="btn btn-secondary" data-goto="view-paraphrase">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Paraphraser
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Workflow Grid -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1.25rem;">
+            <div class="pandaz-card" data-goto="view-asklemma">
+              <span class="pandaz-card-icon">🤖</span>
+              <div class="pandaz-card-title">Ask Lemma Assistant</div>
+              <div class="pandaz-card-desc">Ask factual questions about your plagiarism results, sources, and document metrics with context-aware RAG retrieval.</div>
+            </div>
+
+            <div class="pandaz-card" data-goto="view-sources">
+              <span class="pandaz-card-icon">📚</span>
+              <div class="pandaz-card-title">Scholarly Sources Discovery</div>
+              <div class="pandaz-card-desc">Search OpenAlex, Crossref, arXiv, Wikipedia, and local reference corpora with match filtering.</div>
+            </div>
+
+            <div class="pandaz-card" data-goto="view-pandaz">
+              <span class="pandaz-card-icon">🐼</span>
+              <div class="pandaz-card-title">Pandaz PDF Intelligence</div>
+              <div class="pandaz-card-desc">Merge, Split, Compress, Extract CSV, Sign, OCR, and Summarize PDFs with 1-click Lemma analysis handoff.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: ANALYZE / MANUSCRIPT DESK -->
+      <section id="view-analyze" class="view-section">
+        <div class="analyze-grid">
+          <!-- Center Manuscript Pane -->
+          <div class="manuscript-desk">
+            <div class="manuscript-toolbar">
+              <div class="doc-info">
+                <i class="fa-regular fa-file-lines" style="font-size:1.1rem; color:var(--text-muted);"></i>
+                <span class="doc-title" id="manuscript-header-title">Manuscript</span>
+                <span class="doc-stat-pill" id="manuscript-word-pill">0 Words</span>
+                <span class="score-badge danger" id="manuscript-plag-pill">0% Flagged</span>
+              </div>
+              <div style="display:flex; gap:0.5rem;">
+                <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
+                  <i class="fa-solid fa-upload"></i> Upload File
+                  <input type="file" id="manuscript-file-upload" accept=".pdf,.docx,.txt" style="display:none;">
+                </label>
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('paste-text-modal').classList.add('open')">
+                  <i class="fa-solid fa-paste"></i> Paste Text
+                </button>
+              </div>
+            </div>
+
+            <div class="manuscript-body-scroll" id="manuscript-text-pane">
+              <!-- Rendered coordinate sentence spans -->
+            </div>
+          </div>
+
+          <!-- Right Margin Notes / Inspector Dock -->
+          <div class="inspector-dock" id="inspector-dock-content">
+            <!-- Dynamic Inspector Cards rendered by app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: PARAPHRASER WORKBENCH -->
+      <section id="view-paraphrase" class="view-section">
+        <div style="max-width:1100px; margin:0 auto;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:1rem;">
+            <div>
+              <h2 style="font-family:var(--font-serif); font-size:1.6rem; font-weight:600;">Scholarly Paraphraser Workbench</h2>
+              <p style="color:var(--text-secondary); font-size:0.9rem;">Eliminate plagiarism with tone-targeted transformations, sentence restructuring, and live re-analysis.</p>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="btn btn-primary btn-sm" id="btn-rewrite-all-flagged">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Rewrite All Flagged Sentences
+              </button>
+              <button class="btn btn-clean btn-sm" id="btn-reanalyze-manuscript">
+                <i class="fa-solid fa-rotate"></i> Re-Analyze Manuscript
+              </button>
+            </div>
+          </div>
+
+          <!-- Tone Selector Strip -->
+          <div class="tone-selector-strip">
+            <span style="font-size:0.8rem; font-weight:700; color:var(--text-muted); align-self:center; margin-right:0.25rem;">TARGET TONE:</span>
+            <button class="tone-btn active" data-tone="academic"><i class="fa-solid fa-graduation-cap"></i> Academic</button>
+            <button class="tone-btn" data-tone="professional"><i class="fa-solid fa-briefcase"></i> Professional</button>
+            <button class="tone-btn" data-tone="simple"><i class="fa-solid fa-feather"></i> Simple</button>
+            <button class="tone-btn" data-tone="concise"><i class="fa-solid fa-compress"></i> Concise</button>
+            <button class="tone-btn" data-tone="detailed"><i class="fa-solid fa-align-left"></i> Detailed</button>
+            <button class="tone-btn" data-tone="creative"><i class="fa-solid fa-palette"></i> Creative</button>
+          </div>
+
+          <!-- Side-by-side Workbench Cards -->
+          <div class="paraphrase-grid">
+            <!-- Left: Original Input -->
+            <div class="workbench-card">
+              <div class="inspector-header">
+                <span class="inspector-title">Target Sentence / Passage</span>
+                <span class="nav-badge">ORIGINAL</span>
+              </div>
+              <textarea id="paraphrase-input-text" placeholder="Select a flagged sentence in the Analyze view or enter text here..."></textarea>
+              <div style="margin-top:1rem; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.8rem; color:var(--text-muted);" id="paraphrase-diff-stat">Word Count: 0</span>
+                <button class="btn btn-primary" id="btn-execute-rewrite">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Paraphrase
+                </button>
+              </div>
+            </div>
+
+            <!-- Right: Paraphrased Output -->
+            <div class="workbench-card">
+              <div class="inspector-header">
+                <span class="inspector-title">Paraphrased Result</span>
+                <span class="score-badge clean">AI REWRITTEN</span>
+              </div>
+              <textarea id="paraphrase-output-text" placeholder="Rewritten output will appear here with preserved meaning and original citations..."></textarea>
+              <div style="margin-top:1rem; display:flex; justify-content:flex-end; gap:0.5rem;">
+                <button class="btn btn-secondary btn-sm" id="btn-copy-paraphrase">
+                  <i class="fa-regular fa-copy"></i> Copy Output
+                </button>
+                <button class="btn btn-clean btn-sm" id="btn-replace-in-manuscript">
+                  <i class="fa-solid fa-arrow-down-to-square"></i> Replace in Manuscript
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: ASK LEMMA (RAG ASSISTANT) -->
+      <section id="view-asklemma" class="view-section">
+        <div style="max-width:900px; margin:0 auto;">
+          <div class="chat-container">
+            <div class="manuscript-toolbar">
+              <div class="doc-info">
+                <i class="fa-solid fa-robot" style="color:var(--accent-scholarly);"></i>
+                <span class="doc-title">Ask Lemma Assistant</span>
+                <span class="nav-badge">DOCUMENT CONTEXT READY</span>
+              </div>
+            </div>
+
+            <div class="chat-messages-scroll" id="chat-messages-container">
+              <!-- Rendered Chat Bubbles -->
+            </div>
+
+            <!-- Suggested Prompt Pills -->
+            <div style="padding:0.5rem 1.25rem; display:flex; gap:0.5rem; overflow-x:auto; background:var(--bg-primary); border-top:1px solid var(--border-subtle);">
+              <span class="tone-btn chat-suggestion-pill">"What is my plagiarism score?"</span>
+              <span class="tone-btn chat-suggestion-pill">"Which sentence has highest similarity?"</span>
+              <span class="tone-btn chat-suggestion-pill">"Show top reference sources"</span>
+              <span class="tone-btn chat-suggestion-pill">"Summarize this document"</span>
+              <span class="tone-btn chat-suggestion-pill">"Find claims that need citations"</span>
+            </div>
+
+            <div class="chat-input-row">
+              <input type="text" class="chat-input" id="chat-user-input" placeholder="Ask about originality, sources, readability metrics, or research arguments...">
+              <button class="btn btn-primary" id="btn-send-chat">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: SOURCES DISCOVERY -->
+      <section id="view-sources" class="view-section">
+        <div style="max-width:1000px; margin:0 auto;">
+          <div style="margin-bottom:1.5rem;">
+            <h2 style="font-family:var(--font-serif); font-size:1.75rem; font-weight:600; margin-bottom:0.25rem;">Scholarly Reference Library & Discovery</h2>
+            <p style="color:var(--text-secondary); font-size:0.9rem;">Matched local reference corpus + live querying across Wikipedia, OpenAlex, Crossref, and arXiv.</p>
+          </div>
+
+          <!-- Search Query Bar -->
+          <div style="display:flex; gap:0.75rem; margin-bottom:1.5rem;">
+            <input type="text" id="sources-search-query" class="chat-input" placeholder="Search academic papers, arXiv preprints, crossref DOIs, or topics...">
+            <button class="btn btn-primary" id="btn-search-sources">
+              <i class="fa-solid fa-magnifying-glass"></i> Search Sources
+            </button>
+          </div>
+
+          <!-- Match Type Tabs -->
+          <div style="display:flex; gap:0.5rem; border-bottom:1px solid var(--border-subtle); padding-bottom:0.75rem; margin-bottom:1.25rem;">
+            <button class="tone-btn source-filter-tab active" data-filter="all">All Sources</button>
+            <button class="tone-btn source-filter-tab" data-filter="lexical">Lexical Matches</button>
+            <button class="tone-btn source-filter-tab" data-filter="semantic">Semantic Matches</button>
+            <button class="tone-btn source-filter-tab" data-filter="hybrid">Hybrid Matches</button>
+          </div>
+
+          <div id="sources-list-container">
+            <!-- Sources rendered by app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 6: REPORTS -->
+      <section id="view-reports" class="view-section">
+        <div style="max-width:900px; margin:0 auto;">
+          <div style="margin-bottom:1.5rem;">
+            <h2 style="font-family:var(--font-serif); font-size:1.75rem; font-weight:600; margin-bottom:0.25rem;">Lemma Integrity Report</h2>
+            <p style="color:var(--text-secondary); font-size:0.9rem;">Publication-ready PDF and HTML originality certificates with verified sentence coordinates.</p>
+          </div>
+
+          <div class="inspector-card" style="padding:2rem; margin-bottom:1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem; border-bottom:1px solid var(--border-subtle); padding-bottom:1.5rem; margin-bottom:1.5rem;">
+              <div>
+                <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-muted);">DOCUMENT CERTIFICATE</div>
+                <h3 style="font-family:var(--font-serif); font-size:1.4rem;" id="report-doc-title">Manuscript</h3>
+                <p style="font-size:0.85rem; color:var(--text-secondary);">Generated with spaCy coordinate mapping & multi-tier similarity scoring.</p>
+              </div>
+              <button class="btn btn-primary" id="btn-download-pdf-report">
+                <i class="fa-solid fa-file-pdf"></i> Download PDF Report
+              </button>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem;">
+              <div class="sentence-snippet">
+                <div style="font-size:0.75rem; color:var(--text-muted);">PLAGIARISM SCORE</div>
+                <div style="font-size:1.5rem; font-family:var(--font-mono); font-weight:700; color:var(--accent-flag);" id="report-plag-score">40.0%</div>
+              </div>
+              <div class="sentence-snippet">
+                <div style="font-size:0.75rem; color:var(--text-muted);">ORIGINALITY SCORE</div>
+                <div style="font-size:1.5rem; font-family:var(--font-mono); font-weight:700; color:var(--accent-clean);" id="report-orig-score">60.0%</div>
+              </div>
+              <div class="sentence-snippet">
+                <div style="font-size:0.75rem; color:var(--text-muted);">LEXICAL SIMILARITY</div>
+                <div style="font-size:1.5rem; font-family:var(--font-mono); font-weight:700;" id="report-lexical-score">50.0%</div>
+              </div>
+              <div class="sentence-snippet">
+                <div style="font-size:0.75rem; color:var(--text-muted);">SEMANTIC SIMILARITY</div>
+                <div style="font-size:1.5rem; font-family:var(--font-mono); font-weight:700;" id="report-semantic-score">30.0%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 7: HISTORY -->
+      <section id="view-history" class="view-section">
+        <div style="max-width:1000px; margin:0 auto;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+            <div>
+              <h2 style="font-family:var(--font-serif); font-size:1.75rem; font-weight:600; margin-bottom:0.25rem;">Analysis History</h2>
+              <p style="color:var(--text-secondary); font-size:0.9rem;">Persistent historical records of all analyzed manuscripts across sessions.</p>
+            </div>
+            <button class="btn btn-outline btn-sm" id="btn-clear-history">
+              <i class="fa-regular fa-trash-can"></i> Clear History
+            </button>
+          </div>
+
+          <div class="inspector-card" style="padding:0; overflow:hidden;">
+            <table class="coordinate-table" style="font-size:0.85rem;">
+              <thead style="background:var(--bg-secondary);">
+                <tr>
+                  <th style="padding:10px 14px; text-align:left;">Document</th>
+                  <th style="padding:10px 14px; text-align:left;">Plagiarism</th>
+                  <th style="padding:10px 14px; text-align:left;">Originality</th>
+                  <th style="padding:10px 14px; text-align:left;">Length</th>
+                  <th style="padding:10px 14px; text-align:left;">Date</th>
+                  <th style="padding:10px 14px; text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 8: WORKSPACE PROJECTS -->
+      <section id="view-workspace" class="view-section">
+        <div style="max-width:1000px; margin:0 auto;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+            <div>
+              <h2 style="font-family:var(--font-serif); font-size:1.75rem; font-weight:600; margin-bottom:0.25rem;">Workspace Projects</h2>
+              <p style="color:var(--text-secondary); font-size:0.9rem;">Group manuscripts, analysis histories, chats, and sources into organized research projects.</p>
+            </div>
+            <button class="btn btn-primary" id="btn-create-project">
+              <i class="fa-solid fa-folder-plus"></i> New Project
+            </button>
+          </div>
+
+          <div id="workspace-projects-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1.25rem;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 9: PANDAZ PDF TOOLS -->
+      <section id="view-pandaz" class="view-section">
+        <div style="max-width:1100px; margin:0 auto;">
+          <div style="margin-bottom:1.5rem;">
+            <h2 style="font-family:var(--font-serif); font-size:1.75rem; font-weight:600; margin-bottom:0.25rem;">🐼 Pandaz PDF Intelligence Suite</h2>
+            <p style="color:var(--text-secondary); font-size:0.9rem;">9 high-performance PDF manipulation utilities with seamless one-click Lemma originality analysis handoff.</p>
+          </div>
+
+          <div class="pandaz-grid">
+            <div class="pandaz-card pandaz-tool-card" data-tool="merge">
+              <span class="pandaz-card-icon">📑</span>
+              <div class="pandaz-card-title">Merge PDFs</div>
+              <div class="pandaz-card-desc">Combine 2 or more PDF documents into a single unified publication.</div>
+            </div>
+
+            <div class="pandaz-card pandaz-tool-card" data-tool="split">
+              <span class="pandaz-card-icon">✂️</span>
+              <div class="pandaz-card-title">Split PDF</div>
+              <div class="pandaz-card-desc">Extract specific page ranges (e.g. 1-3, 5, 8-10) into a new document.</div>
+            </div>
+
+            <div class="pandaz-card pandaz-tool-card" data-tool="compress">
+              <span class="pandaz-card-icon">🗜️</span>
+              <div class="pandaz-card-title">Compress PDF</div>
+              <div class="pandaz-card-desc">Optimize binary streams and eliminate redundant objects to reduce file size.</div>
+            </div>
+
+            <div class="pandaz-card pandaz-tool-card" data-tool="to-csv">
+              <span class="pandaz-card-icon">📊</span>
+              <div class="pandaz-card-title">PDF → CSV</div>
+              <div class="pandaz-card-desc">Parse tabular datasets from documents into structured comma-separated values.</div>
+            </div>
+
+            <div class="pandaz-card pandaz-tool-card" data-tool="rename">
+              <span class="pandaz-card-icon">🏷️</span>
+              <div class="pandaz-card-title">Rename PDF</div>
+              <div class="pandaz-card-desc">Sanitize and reformat document filenames cleanly.</div>
+            </div>
+
+            <div class="pandaz-card pandaz-tool-card" data-tool="sign">
+              <span class="pandaz-card-icon">✍️</span>
+              <div class="pandaz-card-title">Sign PDF</div>
+              <div class="pandaz-card-desc">Draw digital signatures and stamp authorization marks onto document pages.</div>
+            </div>
+
+            <div class="pandaz-card pandaz-tool-card" data-tool="ocr">
+              <span class="pandaz-card-icon">🔍</span>
+              <div class="pandaz-card-title">OCR Scanned PDF</div>
+              <div class="pandaz-card-desc">Extract searchable digital text from scanned paper PDF documents.</div>
+            </div>
+
+            <div class="pandaz-card pandaz-tool-card" data-tool="summarize">
+              <span class="pandaz-card-icon">📝</span>
+              <div class="pandaz-card-title">AI Summarizer</div>
+              <div class="pandaz-card-desc">Generate executive TL;DR, core analytical insights, and keyword taxonomy.</div>
+            </div>
+
+            <div class="pandaz-card pandaz-tool-card" data-tool="rotate">
+              <span class="pandaz-card-icon">🔄</span>
+              <div class="pandaz-card-title">Rotate PDF</div>
+              <div class="pandaz-card-desc">Rotate pages by 90°, 180°, or 270° clockwise.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- 1. COMMAND PALETTE (CTRL+K) -->
+  <div class="command-palette-backdrop" id="command-palette-backdrop">
+    <div class="command-palette-modal">
+      <div class="command-input-row">
+        <i class="fa-solid fa-magnifying-glass" style="color:var(--text-muted);"></i>
+        <input type="text" id="command-palette-input" class="command-input" placeholder="Type a command, document name, or search query...">
+        <span class="kbd-shortcut">ESC</span>
+      </div>
+      <ul class="command-results-list" id="command-palette-results">
+        <!-- Rendered dynamically -->
+      </ul>
     </div>
+  </div>
 
-    <!-- Toast Notifications -->
-    <div class="toast-container" id="toast-container"></div>
+  <!-- 2. PASTE TEXT MODAL -->
+  <div class="command-palette-backdrop" id="paste-text-modal">
+    <div class="command-palette-modal" style="width:680px;">
+      <div class="command-input-row" style="justify-content:space-between;">
+        <span style="font-weight:600; font-family:var(--font-serif); font-size:1.15rem;">Paste Manuscript for Direct Analysis</span>
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('paste-text-modal').classList.remove('open')">✕</button>
+      </div>
+      <div style="padding:1.25rem;">
+        <textarea id="paste-text-input" class="workbench-card" style="height:220px; width:100%;" placeholder="Paste your academic paper, essay, or document text here..."></textarea>
+      </div>
+      <div style="padding:0.75rem 1.25rem; background:var(--bg-secondary); display:flex; justify-content:flex-end; gap:0.5rem;">
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('paste-text-modal').classList.remove('open')">Cancel</button>
+        <button class="btn btn-primary btn-sm" id="btn-submit-pasted-text">
+          <i class="fa-solid fa-magnifying-glass-chart"></i> Start Originality Analysis
+        </button>
+      </div>
+    </div>
+  </div>
 
-    <!-- Scripts -->
-    <script src="assets/js/config.js"></script>
-    <script src="assets/js/app.js"></script>
+  <!-- 3. PANDAZ TOOL INTERACTIVE MODAL -->
+  <div class="command-palette-backdrop" id="pandaz-tool-modal">
+    <div class="command-palette-modal" style="width:640px;">
+      <div class="command-input-row" style="justify-content:space-between;">
+        <div>
+          <span style="font-weight:600; font-family:var(--font-serif); font-size:1.15rem;" id="pandaz-modal-tool-title">Pandaz PDF Tool</span>
+          <div style="font-size:0.8rem; color:var(--text-muted);" id="pandaz-modal-tool-desc">Tool description</div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('pandaz-tool-modal').classList.remove('open')">✕</button>
+      </div>
+      
+      <div style="padding:1.25rem; display:flex; flex-direction:column; gap:1rem;">
+        <div>
+          <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:6px;">Upload PDF File(s):</label>
+          <input type="file" id="pandaz-file-input" class="chat-input" accept=".pdf" multiple>
+        </div>
+
+        <div id="pandaz-tool-options">
+          <!-- Dynamic tool-specific options -->
+        </div>
+
+        <div id="pandaz-result-box" class="sentence-snippet" style="display:none; border-left-color:var(--accent-clean);">
+          <div id="pandaz-result-text" style="font-family:var(--font-mono); font-size:0.82rem;"></div>
+          <div style="margin-top:0.75rem; display:flex; gap:0.5rem;">
+            <button class="btn btn-clean btn-sm" id="btn-download-pandaz-output">
+              <i class="fa-solid fa-download"></i> Download Output
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:0.75rem 1.25rem; background:var(--bg-secondary); display:flex; justify-content:space-between; align-items:center;">
+        <button class="btn btn-clean btn-sm" id="btn-pandaz-to-lemma" title="Directly extract & run Lemma originality analysis">
+          🐼 ➔ Analyze with Lemma
+        </button>
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('pandaz-tool-modal').classList.remove('open')">Close</button>
+          <button class="btn btn-primary btn-sm" id="btn-execute-pandaz-tool">Execute Tool</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core JavaScript Modules -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/scholarly-app.js"></script>
 </body>
 </html>
