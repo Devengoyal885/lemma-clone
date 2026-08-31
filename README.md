@@ -2,786 +2,295 @@
 
 > **Local-First Academic Plagiarism Detection, Document Intelligence & Pandaz PDF Toolkit**
 
-[![Python](https://img.shields.io/badge/Python-3.10+-3776ab?style=flat-square&logo=python)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
-[![Netlify](https://img.shields.io/badge/Netlify-Ready-00C7B7?style=flat-square&logo=netlify)](https://netlify.com)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-[![Lemma](https://img.shields.io/badge/Lemma-2.0-blueviolet?style=flat-square)](https://github.com/Devengoyal885/lemma-clone)
-
-Lemma 2.0 is a state-of-the-art, **privacy-first** academic document intelligence platform designed as a **Scholarly Instrument** (manuscript-and-margin-notes layout, leader lines, paper/ink themes, high data density). Everything runs completely locally in zero-dependency Lite Mode with standard Python.
+[![Python](https://img.shields.io/badge/Python-3.10+-3776ab?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![Netlify](https://img.shields.io/badge/Netlify-Ready-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://netlify.com)
+[![Ollama](https://img.shields.io/badge/Ollama-Local_AI-black?style=for-the-badge&logo=ollama&logoColor=white)](https://ollama.com)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![Lemma Repo](https://img.shields.io/badge/GitHub-Devengoyal885%2Flemma--clone-181717?style=for-the-badge&logo=github)](https://github.com/Devengoyal885/lemma-clone)
 
 ---
 
-## ✨ Key Features & Navigation
+## 📌 Executive Summary
 
-### 1. 🔍 Dual-Tier Plagiarism & Originality Engine
-- **Lexical Matching**: TF-IDF + Cosine Similarity for exact/near-exact copy detection
-- **Semantic Matching**: SentenceTransformer embeddings for paraphrased content detection
-- **Hybrid Scoring**: Combined confidence scores with multi-type breakdown
-- **Character Coordinate Inspector**: SpaCy sentence segmentation with absolute `start_char` and `end_char` offsets linked to interactive margin notes
+**Lemma 2.0** is an open-source, privacy-first **Scholarly Document Intelligence Platform** designed specifically for students, researchers, and academic institutions. 
+
+Built with a manuscript-and-margin-notes layout (**Scholarly Instrument**), Lemma combines:
+1. **Dual-Tier Plagiarism Engine**: Verbatim lexical overlap (TF-IDF + BM25) & semantic paraphrase analysis (Sentence-Transformers + pgvector).
+2. **Character Coordinate Inspector**: spaCy token segmentation mapping exact sentence matches to absolute character offsets (`start_char`, `end_char`) with interactive margin callouts.
+3. **Pandaz PDF Intelligence Suite**: Built-in 8+ PDF utility tools (Merge, Split, Compress, OCR, Tabular CSV Extraction, AI Summarizer, Digital Signature).
+4. **Context-Aware Document RAG Assistant**: Local deterministic + LLM-backed interactive manuscript querying ("Ask Lemma").
+5. **Local-First Execution (Lite Mode)**: Runs out-of-the-box with **zero infrastructure requirements** (no PostgreSQL or Docker required!).
+
+---
+
+## 🏛️ System Architecture
+
+```mermaid
+flowchart TB
+    subgraph Client ["Client Layer (Browser / Static UI)"]
+        UI["Scholarly Instrument Desk (HTML5 / Vanilla JS / CSS3)"]
+        PANDAZ["Pandaz PDF Intelligence Suite"]
+        MARGINS["Interactive Margin Notes & Leader Lines"]
+    end
+
+    subgraph API ["Backend API Layer (FastAPI)"]
+        ROUTER["FastAPI Application Router"]
+        EXTRACTOR["Document Extractor (PDF, DOCX, TXT)"]
+        SEGMENTER["spaCy Sentence Segmenter"]
+        ANALYTICS["Flesch Readability Engine"]
+        PDFGEN["WeasyPrint PDF Generator"]
+    end
+
+    subgraph MatchEngine ["Plagiarism Detection Engine"]
+        LITE["Lite Mode (TF-IDF Cosine Matcher)"]
+        DUAL["Dual-Tier Matcher (RRF Fusion)"]
+        BM25["Elasticsearch BM25 Lexical Search"]
+        SEMANTIC["pgvector / SentenceTransformers"]
+    end
+
+    subgraph RAG ["Document Intelligence & RAG"]
+        RAGENGINE["Ask Lemma Engine"]
+        OLLAMA["Local Ollama LLM (qwen2.5 / llama3)"]
+        WEBSEARCH["Scholarly Sources Retriever (arXiv / OpenAlex)"]
+    end
+
+    UI --> ROUTER
+    PANDAZ --> EXTRACTOR
+    ROUTER --> EXTRACTOR
+    EXTRACTOR --> SEGMENTER
+    SEGMENTER --> ANALYTICS
+    SEGMENTER --> LITE
+    SEGMENTER --> DUAL
+    DUAL --> BM25
+    DUAL --> SEMANTIC
+    UI --> RAGENGINE
+    RAGENGINE --> OLLAMA
+    RAGENGINE --> WEBSEARCH
+    ROUTER --> PDFGEN
+    PDFGEN --> MARGINS
+```
+
+---
+
+## ✨ Key Features & Capability Matrix
+
+### 1. 🔍 Dual-Tier Plagiarism & Originality Detection
+- **Lexical Overlap**: Detects exact copy-paste matching using TF-IDF and Elasticsearch BM25 ranking.
+- **Semantic Paraphrase Detection**: Identifies structurally altered or synonym-replaced sentences using SentenceTransformer embeddings (`all-MiniLM-L6-v2`).
+- **Reciprocal Rank Fusion (RRF)**: Merges rank scores from lexical and semantic passes to eliminate false positives.
+- **Absolute Coordinate Mapping**: Every matched sentence retains precise character start/end coordinates for highlighting inside document viewers.
 
 ### 2. 📝 Scholarly Paraphraser Workbench
-- **6 Target Tones**: Academic, Professional, Simple, Concise, Detailed, Creative
-- **Batch Paraphrasing**: "Rewrite All Flagged Sentences" with real-time progress
-- **Live Re-Analyze**: Verified before→after score recalculation
-- **Word Count & Diff Metrics**: Instant comparative word and character statistics
+- **6 Paraphrasing Tones**: Academic, Professional, Simple, Concise, Detailed, Creative.
+- **Batch Paraphrase**: 1-Click "Rewrite All Flagged Sentences" with real-time UI progress updates.
+- **Live Re-Analysis**: Instant verification of score reduction after accepting rewritten passages.
 
 ### 3. 🤖 Ask Lemma (Context-Aware Document RAG Assistant)
-- Real-time retrieval across document chunks, similarity matches, and readability metrics
-- Deterministic local answers for factual queries ("What is my plagiarism score?", "Highest similarity match?")
-- Local LLM support via Ollama with streaming tokens and graceful offline fallback
+- **Factual & Deterministic Query Engine**: Answers questions about document stats, top similarity sources, and readability without hallucinations.
+- **Local LLM Integration**: Connects seamlessly to Ollama for interactive deep Q&A on manuscript contents.
+- **Streaming Response Tokenization**: Natural conversational interface with zero data leaving your machine.
 
-### 4. 📚 Scholarly Sources Discovery
-- Filterable match provenance (All, Lexical, Semantic, Hybrid)
-- Live multi-provider academic discovery (Wikipedia, OpenAlex, Crossref, arXiv, local corpus) with timeout resilience
+### 4. 📚 Academic Web Sources Discovery
+- Fetches candidate papers from **arXiv**, **OpenAlex**, **Crossref**, and **Wikipedia**.
+- Timeout-resilient asynchronous retrieval with fallback handling.
 
-### 5. 📄 Publication-Ready Integrity Reports
-- Direct WeasyPrint/ReportLab PDF report downloads with color-coded highlighting
-- Complete score breakdown, matched sentence tables, and recommendations
-
-### 6. 🐼 Pandaz PDF Intelligence Suite
-- **Merge PDFs**: Combine multiple documents into one publication
-- **Split PDF**: Extract specific page ranges
-- **Compress PDF**: Binary stream optimization with real before/after size stats
-- **PDF → CSV**: Extract tabular data
-- **Rename & Sanitize**: Clean filename metadata formatting
-- **Sign & Annotate**: Draw digital signatures or place annotations
-- **OCR Scanned PDF**: Extract text from scanned paper PDFs
-- **AI PDF Summarizer**: Executive TL;DR, core insights, and keyword taxonomy
-- **1-Click "Analyze with Lemma"**: Direct analysis handoff from any Pandaz output into the manuscript desk!
-
-### 7. 🗂️ History, Workspace Projects & Command Palette (Ctrl+K)
-- Structured persistence for historical analysis runs
-- Workspace project grouping for documents, chats, and sources
-- Instant fuzzy global search across all entities via `Ctrl+K`
-
-
-### ⚡ Two Execution Modes
-
-#### **Lite Mode** (Default - No Dependencies)
-- Works **without** PostgreSQL, Elasticsearch, Redis, Docker
-- Uses local JSON reference corpus
-- TF-IDF + optional SentenceTransformer
-- Perfect for local development and deployment
-- Instant startup, minimal resource usage
-
-#### **Advanced Mode** (Optional - Full Infrastructure)
-- PostgreSQL + pgvector for vector search
-- Elasticsearch for full-text search
-- Redis + Celery for async job processing
-- Online retrieval (Semantic Scholar API)
-- FAISS indexing for faster similarity search
-
-Automatic fallback: If PostgreSQL is unavailable, Lemma switches to Lite Mode seamlessly.
-
----
-
-## 🛠️ Technology Stack
-
-| Layer | Technology |
+### 5. 🐼 Pandaz PDF Intelligence Suite
+| Tool | Description |
 |---|---|
-| **Frontend** | HTML5, CSS3, Vanilla JavaScript, Canvas |
-| **Backend API** | FastAPI (Python 3.10+), Pydantic v2 |
-| **NLP/ML** | spaCy, scikit-learn (TF-IDF), SentenceTransformers |
-| **Document Processing** | pypdf, python-docx, PyPDF2 |
-| **PDF Generation** | WeasyPrint |
-| **Local LLM** | Ollama (llama3, qwen2.5, custom models) |
-| **Optional Infrastructure** | PostgreSQL + pgvector, Elasticsearch, Redis, Celery |
-| **Deployment** | Netlify (frontend), Heroku/Railway/Fly.io (backend) |
-| **Testing** | pytest |
+| **PDF Merger** | Join multiple academic PDFs into a single unified file. |
+| **PDF Splitter** | Extract custom page ranges into individual documents. |
+| **PDF Compressor** | Optimize binary stream size with real-time byte metrics. |
+| **PDF to CSV** | Extract structured table data directly into spreadsheet format. |
+| **PDF Summarizer** | Generate executive TL;DRs, key takeaways, and research topics. |
+| **OCR Scanner** | Convert scanned image-based PDFs into searchable text. |
+| **PDF Signer** | Apply canvas digital signatures and text annotations. |
+| **1-Click Handoff** | Directly send any processed Pandaz PDF output into Lemma's plagiarism desk. |
 
 ---
 
-## 🚀 Quick Start (5 Minutes)
+## ⚡ Lite Mode vs. Advanced Mode
+
+Lemma automatically detects your environment and runs seamlessly in either mode:
+
+| Capability | Lite Mode (Default) | Advanced Mode |
+|---|---|---|
+| **Prerequisites** | Standard Python 3.10+ | Docker, PostgreSQL, Elasticsearch, Redis |
+| **Setup Time** | < 30 Seconds | 5 Minutes |
+| **Plagiarism Engine** | Scikit-Learn TF-IDF + Cosine | Dual-Tier (Elasticsearch BM25 + pgvector) |
+| **Reference Corpus** | Built-in JSON (`mock_references.json`) | Scalable PostgreSQL Database |
+| **Document Storage** | In-Memory / Local Disk | PostgreSQL Relational Store |
+| **Async Tasks** | Synchronous Execution (`CELERY_ALWAYS_EAGER`) | Celery Task Workers + Redis Queue |
+| **Best For** | Local Dev, Laptops, Offline Usage, Netlify | High-Volume Production Deployments |
+
+---
+
+## 🚀 Quick Start Guide
 
 ### Prerequisites
-- **Python 3.10+** ([download](https://python.org/downloads))
-- **Git** ([download](https://git-scm.com))
-- ✅ No Docker required
-- ✅ No PostgreSQL required
-- ✅ No API keys required
+- **Python 3.10+** ([Download Python](https://python.org))
+- **Git** ([Download Git](https://git-scm.com))
 
 ### Step 1: Clone Repository
-
 ```bash
 git clone https://github.com/Devengoyal885/lemma-clone.git
 cd lemma-clone
 ```
 
-### Step 2: Run Setup & Start Server
+### Step 2: Launch Application
 
-**Windows:**
-```bash
-run.bat
+#### **Windows** (Automatic Setup Script):
+Double-click `run.bat` or run in PowerShell:
+```powershell
+.\run.bat
 ```
 
-**macOS/Linux:**
+#### **macOS / Linux**:
 ```bash
 chmod +x run.sh
 ./run.sh
 ```
 
-The script will:
-1. ✅ Create Python virtual environment
-2. ✅ Install dependencies
-3. ✅ Download spaCy English model
-4. ✅ Start FastAPI server on port 8000
+#### **Manual Python Setup**:
+```bash
+# 1. Create & activate virtual environment
+python -m venv venv
+# On Windows:
+call venv\Scripts\activate.bat
+# On macOS/Linux:
+source venv/bin/activate
 
-### Step 3: Open in Browser
+# 2. Install dependencies
+pip install -r requirements.txt
+python -m spacy download en_core_web_sm
 
+# 3. Launch server
+$env:PYTHONPATH="backend"
+python -m uvicorn app.main:app --port 8000 --reload
+```
+
+### Step 3: Access Workspace
+Open your web browser and navigate to:
 ```
 http://localhost:8000
 ```
-
-Done! 🎉 You now have a fully functional plagiarism detection engine running locally.
-
----
-
-## 📖 Usage Guide
-
-### Upload & Analyze
-1. Click **"Upload Document"** or **"Paste Text"**
-2. Select PDF, DOCX, or TXT file (or paste text directly)
-3. Click **"Analyze"**
-4. View plagiarism score, originality score, and flagged passages
-5. Click highlighted sections to see source references
-
-### Rewrite Flagged Text
-1. Select a plagiarism match in the results
-2. Click **"Rewrite"** (requires Ollama running)
-3. Choose tone: Academic, Professional, Standard, or Creative
-4. Compare original vs. rewritten text
-5. Click **"Replace in Document"** to update text
-6. Re-analyze to see improved originality score
-
-### Generate Report
-1. After analysis completes, click **"Download Report"**
-2. Receive a professional PDF with:
-   - Plagiarism percentage
-   - Originality score
-   - All flagged passages
-   - Source references
-   - Document statistics
-
-### View Analysis History
-1. Go to **"History"** tab
-2. See all previous analyses with scores
-3. Click **"View"** to reload analysis
-4. Click **"Delete"** to remove from history
+- **Landing Page**: `http://localhost:8000/`
+- **Dashboard Workspace**: `http://localhost:8000/dashboard.html`
+- **Interactive OpenAPI Docs**: `http://localhost:8000/docs`
 
 ---
 
-## ⚙️ Configuration
+## 🦙 Ollama Local AI Setup (Optional)
 
-### Environment Variables
+To enable local AI text rewriting and document RAG features:
 
-Create a `.env` file in the project root (copy from `.env.example`):
-
-```bash
-# Lite Mode (default - no external services)
-LEMMA_MODE=lite
-LEMMA_CELERY_ALWAYS_EAGER=true
-
-# File uploads
-LEMMA_MAX_FILE_SIZE_MB=100
-LEMMA_ALLOWED_EXTENSIONS=pdf,docx,txt
-
-# NLP models
-LEMMA_SPACY_MODEL=en_core_web_sm
-LEMMA_SENTENCE_TRANSFORMERS_MODEL=all-MiniLM-L6-v2
-
-# Plagiarism thresholds (0.0-1.0)
-LEMMA_LEXICAL_THRESHOLD=0.70
-LEMMA_SEMANTIC_THRESHOLD=0.65
-LEMMA_HYBRID_THRESHOLD=0.60
-
-# Optional: Ollama for text rewriting
-LEMMA_OLLAMA_URL=http://127.0.0.1:11434
-LEMMA_OLLAMA_MODEL=lemma-model
-
-# Optional: PostgreSQL (Advanced Mode)
-LEMMA_DATABASE_URL=
-LEMMA_POSTGRES_HOST=localhost
-LEMMA_POSTGRES_PORT=5432
-
-# Optional: Elasticsearch (Advanced Mode)
-LEMMA_ELASTICSEARCH_URL=http://localhost:9200
-
-# Optional: Redis & Celery
-LEMMA_REDIS_URL=redis://localhost:6379/0
-```
+1. Download & Install [Ollama](https://ollama.com).
+2. Pull your preferred LLM model:
+   ```bash
+   ollama pull qwen2.5:3b
+   # or
+   ollama pull llama3:8b
+   ```
+3. (Optional) Build the customized Lemma model prompt:
+   ```bash
+   ollama create lemma-model -f Modelfile
+   ```
+4. Verify status: Lemma's bottom health bar will automatically show **Ollama: Running**.
 
 ---
 
-## 🐳 Advanced Setup (With PostgreSQL & Elasticsearch)
+## 🛠️ Technology Stack
 
-For the full experience with vector search and async processing:
-
-### Prerequisites
-- Docker & Docker Compose
-- 4GB+ RAM available
-- 2GB disk space
-
-### Run with Docker
-
-```bash
-docker-compose up -d
-```
-
-This starts:
-- FastAPI backend on `http://localhost:8000`
-- PostgreSQL 15 on `localhost:5432`
-- Elasticsearch 8 on `localhost:9200`
-- Redis on `localhost:6379`
-
-### Create Database Schema
-
-```bash
-docker-compose exec backend python -m backend.scripts.init_db
-```
+- **Frontend**: HTML5, Vanilla JavaScript (ES6+), CSS3 (CSS Variables, Flexbox/Grid), HTML5 Canvas.
+- **Backend Framework**: FastAPI, Uvicorn, Pydantic v2.
+- **NLP & Computational Analytics**: spaCy, scikit-learn, SentenceTransformers, NumPy.
+- **Document Processing**: PyPDF, python-docx, WeasyPrint.
+- **Optional Infrastructure**: PostgreSQL (pgvector), Elasticsearch 8, Redis, Celery.
+- **Deployment**: Netlify (Frontend), Railway / Fly.io / Heroku (Backend).
 
 ---
 
-## 🦙 Ollama Setup (AI Text Rewriting)
+## 📡 API Reference Overview
 
-### Install Ollama
-
-1. Download from [ollama.com](https://ollama.com)
-2. Install and start the Ollama service
-
-### Pull & Customize a Model
-
-```bash
-# Option 1: Use existing model
-ollama pull qwen2.5:3b
-
-# Option 2: Create custom Lemma model (optimized)
-ollama create lemma-model -f Modelfile
+### Health Check Endpoint
+```http
+GET /health
 ```
-
-### Verify Ollama is Running
-
-```bash
-curl http://localhost:11434/api/tags
-```
-
-Should return a list of available models. If Ollama is offline, Lemma gracefully disables the rewrite feature.
-
----
-
-## 🌐 Netlify Deployment (Frontend)
-
-### Prerequisites
-- Frontend files in `frontend/` folder
-- GitHub repository
-- Netlify account (free)
-
-### Step 1: Connect Repository to Netlify
-
-1. Go to [netlify.com](https://netlify.com)
-2. Click **"New site from Git"**
-3. Authorize GitHub and select your Lemma repository
-4. Set publish directory to **`frontend`**
-5. No build command needed (static files)
-
-### Step 2: Configure Environment Variables
-
-In Netlify dashboard, go to **Site Settings → Build & Deploy → Environment**:
-
-```
-BACKEND_API_URL=https://your-backend-domain.com
-ENVIRONMENT=production
-THEME_MODE=dark
-```
-
-### Step 3: Configure SPA Routing
-
-The repository includes `netlify.toml` and `frontend/_redirects` which Netlify will auto-detect.
-
-### Deploy Backend
-
-Choose one of:
-
-**Option A: Heroku** (free tier no longer available, but still works with credit)
-```bash
-heroku login
-heroku create lemma-backend
-git push heroku main
-```
-
-**Option B: Railway.app** (recommended for free tier)
-1. Connect GitHub repository
-2. Auto-detect Python/FastAPI
-3. Set environment variables in dashboard
-4. Deploy
-
-**Option C: Fly.io**
-```bash
-flyctl launch
-flyctl deploy
-```
-
-### Update Frontend Configuration
-
-After deploying backend, update `frontend/config.json`:
-
-```json
-{
-  "BACKEND_API_URL": "https://your-backend-url.herokuapp.com",
-  "ENVIRONMENT": "production"
-}
-```
-
-Push changes and Netlify auto-deploys.
-
----
-
-## 📡 API Reference
-
-### Health & System Status
-
-#### `GET /health`
-Returns service health status and available features.
-
-**Response (200):**
 ```json
 {
   "status": "ok",
-  "mode": "lite",
+  "project": "Lemma Plagiarism Analysis Platform",
   "services": {
-    "postgres": false,
-    "elasticsearch": false,
-    "redis": false,
-    "ollama": false
-  },
-  "timestamp": "2024-01-15T10:30:00Z"
-}
-```
-
-#### `GET /api/v1/system/info`
-Returns platform capabilities and model information.
-
-**Response (200):**
-```json
-{
-  "version": "2.0.0",
-  "mode": "lite",
-  "capabilities": {
-    "text_analysis": true,
-    "pdf_upload": true,
-    "rewriting": false,
-    "async_processing": false
-  },
-  "models": {
-    "spacy": "en_core_web_sm",
-    "sentence_transformers": "all-MiniLM-L6-v2"
+    "database": { "status": "connected" },
+    "elasticsearch": { "status": "healthy" },
+    "ollama": { "status": "running", "model": "lemma-model" },
+    "celery": { "status": "idle" }
   }
 }
 ```
 
-### Text Analysis (Lite Mode)
-
-#### `POST /api/v1/analyze/text`
-Analyze plain text for plagiarism without file upload.
-
-**Request:**
-```json
-{
-  "text": "Your document text here...",
-  "title": "Essay Title (optional)"
-}
-```
-
-**Response (200):**
-```json
-{
-  "status": "success",
-  "title": "Essay Title",
-  "plagiarism_score": 23,
-  "originality_score": 77,
-  "total_sentences": 15,
-  "matched_sentences_count": 3,
-  "metrics": {
-    "word_count": 342,
-    "character_count": 1852,
-    "reading_ease": 65,
-    "grade_level": "10th grade",
-    "reading_time_minutes": 2
-  },
-  "matches": [
-    {
-      "query_text": "The quick brown fox",
-      "matched_text": "The quick brown fox",
-      "score": 0.98,
-      "match_type": "lexical",
-      "doc_title": "Reference Document",
-      "doc_author": "Unknown",
-      "sentence_index": 2
-    }
-  ],
-  "mode": "lite"
-}
-```
-
-### Document Upload & Analysis
-
-#### `POST /api/v1/documents/upload`
-Upload and synchronously analyze a document.
-
-**Request:**
-```
+### Upload & Segment Document
+```http
+POST /api/v1/documents/upload
 Content-Type: multipart/form-data
-file: [PDF/DOCX/TXT file]
 ```
+Returns extracted text, sentence coordinates, and Flesch readability metrics.
 
-**Response (200):**
+### Analyze Plagiarism (Async / Eager)
+```http
+POST /api/v1/analyze
+Content-Type: multipart/form-data
+```
+Returns a `job_id` to poll status at `/api/v1/status/{job_id}`.
+
+### Rewrite Text Segment
+```http
+POST /api/v1/rewrite
+Content-Type: application/json
+```
 ```json
 {
-  "status": "success",
-  "document_id": "doc_123456",
-  "filename": "essay.pdf",
-  "text_length": 5420,
-  "plagiarism_score": 18,
-  "originality_score": 82,
-  "matches": [...]
-}
-```
-
-### Text Rewriting
-
-#### `POST /api/v1/rewrite`
-Rewrite text using local Ollama model.
-
-**Request:**
-```json
-{
-  "text": "Text to rewrite...",
+  "text": "Existing text passage to rephrase...",
   "tone": "academic"
-}
-```
-
-**Response (200):**
-```json
-{
-  "status": "success",
-  "original": "Text to rewrite...",
-  "rewritten": "Revised text using academic tone...",
-  "tone": "academic"
-}
-```
-
-**Error Response (503):**
-```json
-{
-  "status": "error",
-  "error": "Ollama service unavailable",
-  "message": "Rewriting disabled. Start Ollama to enable this feature."
 }
 ```
 
 ---
 
-## 🧪 Testing
+## 🧪 Running Unit & Integration Tests
 
-### Run All Tests
+Run the complete pytest test suite:
 
 ```bash
-# Set Python path
+# Set PYTHONPATH to backend directory
+set PYTHONPATH=backend     # Windows CMD
+$env:PYTHONPATH="backend"  # Windows PowerShell
 export PYTHONPATH=backend  # macOS/Linux
-set PYTHONPATH=backend     # Windows
 
-# Run pytest
-python -m pytest backend/tests/ -v
+# Run tests
+python -m pytest backend/tests -v
 ```
-
-### Run Specific Test Suite
-
-```bash
-# Lite Mode tests (no dependencies)
-python -m pytest backend/tests/test_matcher.py -v
-
-# Analytics tests
-python -m pytest backend/tests/test_analytics.py -v
-
-# Text extraction tests
-python -m pytest backend/tests/test_extractor.py -v
-```
-
-### Test Coverage
-
-```bash
-python -m pytest backend/tests/ --cov=backend/app --cov-report=html
-```
-
----
-
-## 📁 Project Structure
-
-```
-lemma-clone/
-├── README.md                        # This file
-├── requirements.txt                 # Python dependencies
-├── pytest.ini                       # Test configuration
-├── .env.example                     # Environment variables template
-├── .gitignore                       # Git ignore rules
-├── run.bat                          # Windows startup script
-├── run.sh                           # macOS/Linux startup script
-├── Modelfile                        # Ollama model configuration
-├── docker-compose.yml               # Docker infrastructure
-├── netlify.toml                     # Netlify deployment config
-│
-├── backend/                         # FastAPI Backend
-│   ├── app/
-│   │   ├── main.py                  # FastAPI app + all endpoints
-│   │   ├── config.py                # Configuration management
-│   │   ├── data/
-│   │   │   └── mock_references.json # Reference corpus (Lite Mode)
-│   │   ├── schemas/
-│   │   │   ├── document.py          # Document Pydantic models
-│   │   │   └── rewrite.py           # Rewrite request/response models
-│   │   ├── services/
-│   │   │   ├── analytics.py         # Document metrics calculator
-│   │   │   ├── database.py          # PostgreSQL client
-│   │   │   ├── elasticsearch_client.py # Elasticsearch client
-│   │   │   ├── extractor.py         # PDF/DOCX/TXT parser
-│   │   │   ├── llm.py               # Ollama wrapper
-│   │   │   ├── lite_matcher.py      # TF-IDF plagiarism engine
-│   │   │   ├── matcher.py           # Advanced dual-tier matcher
-│   │   │   ├── matcher_factory.py   # Auto-detection factory
-│   │   │   ├── pdf_generator.py     # PDF report generation
-│   │   │   ├── segmenter.py         # Sentence segmentation
-│   │   │   └── online_retriever.py  # Web-based candidate retriever
-│   │   └── tasks/
-│   │       ├── celery_app.py        # Celery queue config
-│   │       └── analysis.py          # Background task workers
-│   ├── tests/                       # Pytest test suite
-│   │   ├── test_analytics.py
-│   │   ├── test_extractor.py
-│   │   ├── test_matcher.py
-│   │   ├── test_pdf.py
-│   │   ├── test_rewrite.py
-│   │   └── ...
-│   └── scripts/
-│       └── backfill_elasticsearch.py # Index population script
-│
-└── frontend/                        # React-Free Static UI
-    ├── index.html                   # Landing page
-    ├── dashboard.html               # Main application
-    ├── config.json                  # Runtime configuration
-    ├── _redirects                   # Netlify SPA routing
-    └── assets/
-        ├── css/
-        │   ├── style.css            # Main stylesheet
-        │   └── mobile.css           # Mobile responsive styles
-        └── js/
-            ├── app.js               # Dashboard logic
-            ├── config.js            # API config manager
-            ├── landing.js           # 3D particle animation
-            └── mobile-ui.js         # Mobile enhancements
-```
-
----
-
-## ⚖️ Lite Mode vs. Advanced Mode
-
-| Feature | Lite Mode | Advanced Mode |
-|---|---|---|
-| **Setup Time** | < 1 minute | 5-10 minutes |
-| **External Dependencies** | None | PostgreSQL, Elasticsearch, Redis |
-| **Reference Corpus** | Local JSON | PostgreSQL (scalable) |
-| **Matching Speed** | ~100-500ms | ~50-200ms (cached) |
-| **Maximum Documents** | ~1,000 references | 1M+ references |
-| **Async Processing** | Synchronous | Celery + Redis |
-| **Scalability** | Single machine | Distributed cluster |
-| **Cost** | Free | Infrastructure costs |
-| **Perfect For** | Students, small teams, local dev | Enterprises, production SaaS |
-
----
-
-## 🔒 Privacy & Security
-
-### No Cloud Uploads
-- All processing happens on your machine
-- Documents never leave your device
-- No telemetry or analytics tracking
-
-### No API Keys Required
-- No dependency on external services
-- No subscription fees
-- No vendor lock-in
-
-### Data Safety
-- Optional PostgreSQL encryption for Advanced Mode
-- Temporary files auto-deleted after analysis
-- SSL/TLS support for Netlify deployment
-
-### Open Source
-- Full source code available
-- Audit-friendly codebase
-- MIT License
-
----
-
-## 🐛 Troubleshooting
-
-### Backend won't start
-
-**Problem:** "Connection refused" when opening http://localhost:8000
-
-**Solution:**
-```bash
-# Check if port 8000 is in use
-netstat -ano | findstr :8000  # Windows
-lsof -i :8000                # macOS/Linux
-
-# Kill process or use different port
-# Then restart with: uvicorn backend.app.main:app --port 8001
-```
-
-### Ollama not available
-
-**Problem:** Rewrite button disabled, error "Ollama service unavailable"
-
-**Solution:**
-1. Install Ollama from [ollama.com](https://ollama.com)
-2. Start Ollama service: `ollama serve`
-3. Pull a model: `ollama pull qwen2.5:3b`
-4. Refresh browser
-
-Lemma works fine without Ollama—it just disables text rewriting.
-
-### PostgreSQL connection error
-
-**Problem:** Advanced Mode features not working
-
-**Solution:**
-1. Ensure PostgreSQL is running
-2. Check `.env` for correct `LEMMA_DATABASE_URL`
-3. Run: `python -m backend.scripts.init_db`
-4. Restart backend: `python -m uvicorn backend.app.main:app`
-
-If PostgreSQL unavailable, Lemma automatically falls back to Lite Mode.
-
-### PDF generation fails
-
-**Problem:** "Error generating PDF" when clicking download
-
-**Solution:**
-1. Ensure WeasyPrint dependencies installed: `pip install -r requirements.txt`
-2. Check file permissions in `backend/` directory
-3. Verify 500MB+ free disk space
-
-On Linux, may need: `sudo apt-get install libssl-dev libffi-dev python3-dev`
-
-### File upload fails
-
-**Problem:** "File type not supported" or upload timeout
-
-**Solution:**
-- Maximum file size: 100MB (configurable via `.env`)
-- Supported formats: PDF, DOCX, TXT
-- For large files (>50MB), use Lite Mode text analysis instead
-
----
-
-## 📊 Performance Benchmarks
-
-Tested on M1 MacBook Pro with 16GB RAM:
-
-| Operation | Lite Mode | Advanced Mode |
-|---|---|---|
-| Text analysis (500 words) | ~150ms | ~80ms |
-| PDF parsing (5MB) | ~300ms | ~300ms |
-| Plagiarism matching | ~200ms | ~50ms |
-| PDF report generation | ~500ms | ~500ms |
-| **Total (upload → report)** | **~1.2s** | **~0.9s** |
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how to get started:
+Contributions are welcome! Please feel free to open issues or submit Pull Requests.
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Make changes and write tests
-4. Run tests: `python -m pytest backend/tests/ -v`
-5. Commit: `git commit -m "feat: description"`
-6. Push and create Pull Request
-
-### Code Style
-- Python: PEP 8 via Black formatter
-- JavaScript: Standard ES6+
-- Commit messages: Conventional Commits
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ---
 
-## 📄 License
+## 📜 License
 
-Licensed under the **MIT License**. See [LICENSE](LICENSE) file for details.
-
-Free for personal, educational, and commercial use.
-
----
-
-## 🙏 Acknowledgments
-
-Built with:
-- [FastAPI](https://fastapi.tiangolo.com) - Modern Python web framework
-- [spaCy](https://spacy.io) - Industrial-strength NLP
-- [scikit-learn](https://scikit-learn.org) - Machine learning library
-- [Ollama](https://ollama.ai) - Local LLM runtime
-- [WeasyPrint](https://weasyprint.org) - HTML to PDF
-- [SentenceTransformers](https://www.sbert.net) - Semantic embeddings
-- [PostgreSQL](https://postgresql.org) + [Elasticsearch](https://elastic.co) - Optional infrastructure
-
----
-
-## 💡 Educational Value
-
-Lemma is ideal for:
-- **Computer Science students** learning NLP, information retrieval, and plagiarism detection algorithms
-- **Machine Learning practitioners** experimenting with TF-IDF, embeddings, and hybrid ranking
-- **Full-stack developers** building production applications with FastAPI, vector databases, and async processing
-- **Educators** teaching academic integrity through hands-on plagiarism detection tools
-
----
-
-## 🗺️ Roadmap
-
-### **v2.1** (Q2 2024)
-- [ ] GitHub Actions CI/CD workflow
-- [ ] Docker multi-stage builds for production
-- [ ] Caching layer for repeated analyses
-- [ ] Bulk upload/batch analysis API
-
-### **v2.2** (Q3 2024)
-- [ ] Custom reference corpus upload
-- [ ] Advanced filtering (by author, date range, source)
-- [ ] Detailed source attribution and citation formatting
-- [ ] Export to multiple formats (JSON, XML, CSV)
-
-### **v3.0** (Q4 2024)
-- [ ] GPT-4 integration for AI rewriting (cloud optional)
-- [ ] Paraphrase detection with structural analysis
-- [ ] API rate limiting and authentication
-- [ ] Multi-language support
-- [ ] Real-time collaboration features
-
----
-
-## 📬 Support & Feedback
-
-- **Issues**: [GitHub Issues](https://github.com/Devengoyal885/lemma-clone/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/Devengoyal885/lemma-clone/discussions)
-- **Email**: devengoyal885@gmail.com
+Distributed under the **MIT License**. See `LICENSE` for details.
 
 ---
 
 <div align="center">
-
-**Made with ❤️ for students, educators, and researchers**
-
-[⭐ Star on GitHub](https://github.com/Devengoyal885/lemma-clone) | [🐛 Report Issue](https://github.com/Devengoyal885/lemma-clone/issues) | [💬 Discuss](https://github.com/Devengoyal885/lemma-clone/discussions)
-
+  <b>Built with ❤️ by <a href="https://github.com/Devengoyal885">Deven Goyal</a></b>
 </div>
