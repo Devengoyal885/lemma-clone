@@ -667,10 +667,29 @@ class PDFGeneratorService:
         
         analysis = result_data.get("analysis", {})
         plag_score = analysis.get("plagiarism_score", 0.0)
-        orig_score = analysis.get("originality_score", 100.0)
-        matches = analysis.get("matches", [])
-        sources = analysis.get("sources", [])
-        
+        def extract_text_str(val):
+            if isinstance(val, dict):
+                return val.get("text", "")
+            return str(val or "")
+
+        def format_match_item(m):
+            query_str = extract_text_str(m.get("query_sentence"))
+            ref_data = m.get("matched_sentence")
+            ref_str = extract_text_str(ref_data) if not isinstance(ref_data, dict) else ref_data.get("text", "")
+            
+            flagged = query_str or ref_str or "Flagged sentence fragment"
+            
+            src_name = m.get("source") or "Reference Document"
+            if isinstance(ref_data, dict) and ref_data.get("doc_title"):
+                src_name = f"{ref_data.get('doc_title')} ({ref_data.get('doc_author', 'Unknown')})"
+                
+            sim_val = m.get("score") if m.get("score") is not None else m.get("similarity", 0.0)
+            sim_pct = round(sim_val * 100, 1) if sim_val <= 1.0 else round(sim_val, 1)
+            
+            return f'<div class="match-item"><p><strong>Flagged Sentence:</strong> {html.escape(flagged)}</p><p><strong>Source:</strong> {html.escape(src_name)} ({sim_pct}% match)</p></div>'
+
+        matches_html = "".join([format_match_item(m) for m in matches]) if matches else "<p>No matching passages flagged.</p>"
+
         return f"""<!DOCTYPE html>
 <html>
 <head>
@@ -695,7 +714,7 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
 </div>
 <div class="card">
   <h3>Flagged Matches</h3>
-  {''.join([f'<div class="match-item"><p><strong>Flagged Sentence:</strong> {html.escape(m.get("matched_sentence") or m.get("query_sentence", {}).get("text", ""))}</p><p><strong>Source:</strong> {html.escape(m.get("source", "Reference"))} ({round(m.get("similarity", 0)*100, 1)}% match)</p></div>' for m in matches]) if matches else '<p>No matching passages flagged.</p>'}
+  {matches_html}
 </div>
 </body>
 </html>"""
